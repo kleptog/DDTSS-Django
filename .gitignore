@@ -1,0 +1,8 @@
+bin/
+dist/
+downloads/
+eggs/
+parts/
+*~
+.installed.cfg
+develop-eggs/
