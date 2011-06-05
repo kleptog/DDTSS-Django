@@ -4,5 +4,6 @@ downloads/
 eggs/
 parts/
 *~
+*.pyc
 .installed.cfg
 develop-eggs/
