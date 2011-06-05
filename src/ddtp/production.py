@@ -1,0 +1,2 @@
+
+from ddtp.settings import *
