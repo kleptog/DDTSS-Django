@@ -8,5 +8,4 @@ setup(name="ddtp", version="0.1",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       zip_safe=False,      
-      install_requires=['setuptools', 'SQLalchemy'])
-      
+      install_requires=['setuptools', 'psycopg2', 'SQLalchemy'])
