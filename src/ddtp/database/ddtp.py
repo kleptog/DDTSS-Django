@@ -1,3 +1,4 @@
+import hashlib
 from .db import Base, get_db_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import Session
@@ -37,10 +38,35 @@ class Description(Base):
     package_versions = relationship('PackageVersion', backref='description')
     translations = relationship('Translation', backref='description')
     tags = relationship('DescriptionTag', backref='description')
+    parts = relationship('PartDescription', backref='description')
 
     def translation(self, lang):
         """ Returns the translation for this description for a given language, or None of not found """
         return Session.object_session(self).query(Translation).filter_by(description_id=self.description_id).filter_by(language=lang).first()
+
+    def get_description_parts(self):
+        """ Returns a list of (string, md5) which are the parts of this description """
+        lines = self.description.split('\n')
+        parts = [lines.pop(0)]  # Take header as is
+        s = ""
+        for line in lines:
+            if line and line != " .":
+                s += line + "\n"
+            else:
+                if s: parts.append(s)
+                s = ""
+        if s: parts.append(s)
+        return [(p, hashlib.md5(p).hexdigest()) for p in parts]
+
+    def get_description_part_objects(self):
+        """ Returns a list of (string, md5, partobj) for the parts of this
+        description.
+        
+        Note this calculates the parts, you can use the 'parts' property to
+        get the parts in the database """
+        parts = self.get_description_parts()
+        
+        return [(p[0], p[1], Session.object_session(self).query(PartDescription).filter_by(part_md5=p[1]).first()) for p in parts]
 
     def __repr__(self):
         return 'Description(%d, package=%r, source=%r)' % (self.description_id, self.package, self.source)
@@ -94,8 +120,12 @@ class PartDescription(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
     part_md5 = Column(String, nullable=False)
 
+    def translation(self, lang):
+        """ Returns the translation for this part for a given language, or None of not found """
+        return Session.object_session(self).query(Part).filter_by(part_md5=self.part_md5).filter_by(language=lang).first()
+
     def __repr__(self):
-        return 'PartDescription(%d, %s)' % (self.description_id, self.part_md5)
+        return 'PartDescription(%d, descr=%d, %s)' % (self.part_description_id, self.description_id, self.part_md5)
 
 class Part(Base):
     """ Translated parts """
@@ -107,7 +137,7 @@ class Part(Base):
     language = Column(String, nullable=False)
 
     def __repr__(self):
-        return 'Part(%d, %s, lang=%s)' % (self.description_id, self.part_md5, self.language)
+        return 'Part(%d, %s, lang=%s)' % (self.part_id, self.part_md5, self.language)
 
 # ppart?
 class Suggestion(Base):
