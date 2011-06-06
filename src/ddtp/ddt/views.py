@@ -20,4 +20,10 @@ def browse(request, prefix):
             params[package][descr_id] = list()
         params[package][descr_id].append(tag)
 
+    # We want this sorted, so we need to flatten this to just lists
+    params = [(package,
+                  [(descr_id, sorted(tags, key=lambda x:x.tag))
+                    for descr_id, tags in sorted(descrs.items())])
+               for package,descrs in sorted(params.items())]
+    
     return render_to_response("overview.html", {'packages': params, 'prefix': prefix})

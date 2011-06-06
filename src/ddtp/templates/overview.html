@@ -4,9 +4,9 @@
 </HEAD>
 <BODY>
 <h3>l</h3>
-{% for package, descriptions in packages.iteritems %}
+{% for package, descriptions in packages %}
 <h4><a href="ddt.cgi?package=l2tpd">{{ package }}</a></h4>
-    {% for descr_id, tags in descriptions.iteritems %}
+    {% for descr_id, tags in descriptions %}
         <a href="ddt.cgi?desc_id=37181">{{ descr_id }}</a>:
         {% for tag in tags %}
             {{ tag.tag }}: {{tag.date_begin|date:"Y-m-d"}}...{{ tag.date_end|date:"Y-m-d" }};
