@@ -1,6 +1,8 @@
 from django.shortcuts import render_to_response
+from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import get_db_session, Description, DescriptionTag
 
+@cache_page(60*60)   # Cache for an hour
 def browse(request, prefix):
     session = get_db_session()
     

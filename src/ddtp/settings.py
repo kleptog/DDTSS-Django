@@ -58,5 +58,12 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), "templates"),
 )
 
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-ddtp',
+        'TIMEOUT': 4*3600,
+    }
+}
+                        
 INTERNAL_IPS = ('127.0.0.1',)
