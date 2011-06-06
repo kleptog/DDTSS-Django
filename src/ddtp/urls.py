@@ -4,10 +4,13 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+from ddtp.ddt import views as ddt_views
+
 handler500 # Pyflakes
 
 urlpatterns = patterns(
     '',
+    (r'^(\w).html', ddt_views.browse),
     (r'^admin/', include(admin.site.urls)),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 )
