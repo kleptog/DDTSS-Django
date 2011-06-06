@@ -5,6 +5,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 
 class DescriptionTag(Base):
+    """ Records for each description which releases it was in """
     __tablename__ = 'description_tag_tb'
 
     description_tag_id = Column(Integer, primary_key=True)
@@ -17,6 +18,7 @@ class DescriptionTag(Base):
         return 'DescriptionTag(%d, descr=%d, tag=%r, %s-%s)' % (self.description_tag_id, self.description_id, self.tag, self.date_begin.strftime("%Y-%m-%d"), self.date_end.strftime("%Y-%m-%d"))
 
 class ActiveDescription(Base):
+    """ Record is present of description is active """
     __tablename__ = 'active_tb'
 
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
@@ -25,6 +27,11 @@ class ActiveDescription(Base):
         return 'ActiveDescription(%d)' % self.description_id
 
 class Description(Base):
+    """ Main description table. Note that a majority of the fields in this
+    table aren't as useful as they appear.  This represents unique
+    descriptions.  The fields prioritize, package, source are for *some*
+    package with this description """
+
     __tablename__ = 'description_tb'
 
     description_id = Column(Integer, primary_key=True)
@@ -61,17 +68,20 @@ class Description(Base):
     def get_description_part_objects(self):
         """ Returns a list of (string, md5, partobj) for the parts of this
         description.
-        
+
         Note this calculates the parts, you can use the 'parts' property to
         get the parts in the database """
         parts = self.get_description_parts()
-        
+
         return [(p[0], p[1], Session.object_session(self).query(PartDescription).filter_by(part_md5=p[1]).first()) for p in parts]
 
     def __repr__(self):
         return 'Description(%d, package=%r, source=%r)' % (self.description_id, self.package, self.source)
 
 class Owner(Base):
+    """ This table is for tracking owner's, that is, who the description was
+    emailed to to translate.  Only used by the email interface.  """
+
     __tablename__ = 'owner_tb'
 
     owner_id = Column(Integer, primary_key=True)
@@ -85,6 +95,8 @@ class Owner(Base):
         return 'Owner(%d, owner=%r, lang=%r, descr=%d)' % (self.owner_id, self.owner, self.language, self.description_id)
 
 class PackageVersion(Base):
+    """ Tracks which versions of each package use which description """
+
     __tablename__ = 'package_version_tb'
 
     package_version_id = Column(Integer, primary_key=True)
@@ -96,6 +108,8 @@ class PackageVersion(Base):
         return 'PackageVersion(%d, package=%s (%s), descr=%d)' % (self.package_version_id, self.package, self.version, self.description_id)
 
 class Packages(Base):
+    """ List of packages. Not quite sure what the purpose of this is that
+    isn't covered by PackageVersions.  """
     __tablename__ = 'packages_tb'
 
     packages_id = Column(Integer, primary_key=True)
@@ -114,6 +128,8 @@ class Packages(Base):
         return 'Packages(%d, package=%r, source=%r, version=%r)' % (self.packages_id, self.package, self.source, self.version)
 
 class PartDescription(Base):
+    """ Untranslated parts. The actual string comes from the Description table """
+
     __tablename__ = 'part_description_tb'
 
     part_description_id = Column(Integer, primary_key=True)
@@ -139,7 +155,8 @@ class Part(Base):
     def __repr__(self):
         return 'Part(%d, %s, lang=%s)' % (self.part_id, self.part_md5, self.language)
 
-# ppart?
+# There is a ppart table but it has never been used.
+
 class Suggestion(Base):
     __tablename__ = 'suggestion_tb'
 
@@ -153,6 +170,7 @@ class Suggestion(Base):
     importtime = Column(Date, nullable=False)
 
 class Translation(Base):
+    """ Stores translated descriptions, parts are in Part table. """
     __tablename__ = 'translation_tb'
 
     translation_id = Column(Integer, primary_key=True)
@@ -163,12 +181,16 @@ class Translation(Base):
     def __repr__(self):
         return 'Translation(%d, descr=%d, lang=%s)' % (self.translation_id, self.description_id, self.language)
 
-class Version(Base):
-    __tablename__ = 'version_tb'
-
-    version_id = Column(Integer, primary_key=True)
-    version = Column(String, nullable=False)
-    description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
-
-    def __repr__(self):
-        return 'Version(%d, desc=%d, version=%s)' % (self.version_id, self.description_id, self.version)
+# This table is old, back from the time when it was assumed that
+# descriptions only belonged to one package.  It has been superceded by the
+# packages_versions table.
+#
+#class Version(Base):
+#    __tablename__ = 'version_tb'
+#
+#    version_id = Column(Integer, primary_key=True)
+#    version = Column(String, nullable=False)
+#    description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
+#
+#    def __repr__(self):
+#        return 'Version(%d, desc=%d, version=%s)' % (self.version_id, self.description_id, self.version)
