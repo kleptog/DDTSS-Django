@@ -4,14 +4,15 @@ from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, Acti
 from sqlalchemy import func
 
 @cache_page(60*60)   # Cache for an hour
-def browse(request, prefix):
+def view_browse(request, prefix):
+    """ Does overview pages (<foo>.html) """
     session = get_db_session()
-    
+
     resultset = session.query(Description.package, Description.description_id, DescriptionTag). \
                         filter(Description.description_id==DescriptionTag.description_id). \
                         filter(Description.package.like(prefix+'%')). \
                         order_by(Description.package, Description.description_id, DescriptionTag.tag).all()
-    
+
     # defaultdict would be better here, but django can't iterate over defaultdicts
     params = dict()
     for package, descr_id, tag in resultset:
@@ -26,11 +27,11 @@ def browse(request, prefix):
                   [(descr_id, sorted(tags, key=lambda x:x.tag))
                     for descr_id, tags in sorted(descrs.items())])
                for package,descrs in sorted(params.items())]
-    
+
     return render_to_response("overview.html", {'packages': params, 'prefix': prefix})
 
 @cache_page(60*60)   # Cache for an hour
-def index(request):
+def view_index(request):
     """ Main index.html, show summary info """
     session = get_db_session()
 
@@ -50,7 +51,7 @@ def index(request):
 
     return render_to_response("index.html", params)
 
-def package(request, package_name):
+def view_package(request, package_name):
     """ Show the page for a single package """
     session = get_db_session()
 
