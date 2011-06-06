@@ -49,3 +49,20 @@ def index(request):
     params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
 
     return render_to_response("index.html", params)
+
+def package(request, package_name):
+    """ Show the page for a single package """
+    session = get_db_session()
+
+    params = dict()
+    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+
+    resultset = session.query(Description, ActiveDescription.description_id). \
+                        filter(Description.package==package_name). \
+                        outerjoin(ActiveDescription, ActiveDescription.description_id == Description.description_id). \
+                        order_by(Description.description_id)
+
+    params['package'] = resultset
+    params['package_name'] = package_name
+
+    return render_to_response("package.html", params)

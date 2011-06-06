@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- package: {{package_name}} --- </TITLE>
+</HEAD>
+<BODY>
+{% for prefix in prefixlist %}
+<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
+{% endfor %}
+<br><h3>{{package_name}}</h3>
+
+{% for description, active in package %}
+    Description: <a href="ddt.cgi?desc_id=38222">{{description.description_id}}</a><br>
+    {% if active %}
+    This Description is active<br>
+    {% endif %}
+    {% for tag in description.tags %}
+        This Description was in {{tag.tag}} from {{tag.date_begin|date:"Y-m-d"}} to {{tag.date_end|date:"Y-m-d"}};<br>
+    {% endfor %}
+{% endfor %}
+<br>
+</BODY>
+</HTML>
