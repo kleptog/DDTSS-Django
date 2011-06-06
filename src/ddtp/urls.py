@@ -1,5 +1,5 @@
 
-from django.conf.urls.defaults import patterns, include, handler500
+from django.conf.urls.defaults import patterns, include, handler500, url
 from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
@@ -10,7 +10,8 @@ handler500 # Pyflakes
 
 urlpatterns = patterns(
     '',
-    (r'^(\w).html', ddt_views.browse),
+    url(r'^$', ddt_views.index, name='ddt_index'),
+    url(r'^(\w).html', ddt_views.browse, name='ddt_overview'),
     (r'^admin/', include(admin.site.urls)),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 )
