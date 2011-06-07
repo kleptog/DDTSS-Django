@@ -1,6 +1,6 @@
 import hashlib
 from .db import Base, get_db_session
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, collections
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 
@@ -46,11 +46,10 @@ class Description(Base):
     translations = relationship('Translation', backref='description')
     tags = relationship('DescriptionTag', backref='description')
     parts = relationship('PartDescription', backref='description')
-
-    def translation(self, lang):
-        """ Returns the translation for this description for a given language, or None of not found """
-        return Session.object_session(self).query(Translation).filter_by(description_id=self.description_id).filter_by(language=lang).first()
-
+    
+    # Provides access to translations, as a dict
+    translation = relationship('Translation', collection_class=collections.attribute_mapped_collection('language'))
+    
     def get_description_parts(self):
         """ Returns a list of (string, md5) which are the parts of this description """
         lines = self.description.split('\n')
@@ -140,9 +139,8 @@ class PartDescription(Base):
         """ Returns a dict of translations for with part, indexed by language """
         return dict( Session.object_session(self).query(Part.language, Part).filter_by(part_md5=self.part_md5).all() )
 
-    def translation(self, lang):
-        """ Returns the translation for this part for a given language, or None of not found """
-        return Session.object_session(self).query(Part).filter_by(part_md5=self.part_md5).filter_by(language=lang).first()
+    # Provides access to translations, as a dict
+    translation = relationship('Part', collection_class=collections.attribute_mapped_collection('language'))
 
     def __repr__(self):
         return 'PartDescription(%d, descr=%d, %s)' % (self.part_description_id, self.description_id, self.part_md5)
@@ -152,7 +150,7 @@ class Part(Base):
     __tablename__ = 'part_tb'
 
     part_id = Column(Integer, primary_key=True)
-    part_md5 = Column(String, nullable=False)
+    part_md5 = Column(String, ForeignKey('part_description_tb.part_md5'), nullable=False)
     part = Column(String, nullable=False)
     language = Column(String, nullable=False)
 
