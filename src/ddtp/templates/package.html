@@ -10,7 +10,7 @@
 <br><h3>{{package_name}}</h3>
 
 {% for description, active in package %}
-    Description: <a href="ddt.cgi?desc_id=38222">{{description.description_id}}</a><br>
+    Description: <a href="{% url ddt_descr description.description_id %}">{{description.description_id}}</a><br>
     {% if active %}
     This Description is active<br>
     {% endif %}

@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} --- </TITLE>
+</HEAD>
+<BODY>
+{% for prefix in prefixlist %}
+<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
+{% endfor %}
+<br>
+<h3>{{descr.package}}</h3>
+<pre>
+Source: <a href="ddt.cgi?source=r-base">{{descr.source}}</a>
+Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
+Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
+Prioritize: {{descr.prioritize}}
+Description: {{descr.description}}
+</pre>
+<br>
+{% for tag in descr.tags %}
+    This Description was in {{tag.tag}} from {{tag.date_begin|date:"Y-m-d"}} to {{tag.date_end|date:"Y-m-d"}};<br>
+{% endfor %}
+<br>
+{% for lang in langs %}
+{% if lang in descr.translation %}
+This Description is translated to <a href="ddt.cgi?desc_id=70989&language=de">{{lang}}</a> 
+{% else %}
+This Description is not yet translated to {{lang}}
+{% endif %}
+<a href="ddt.cgi?desc_id=70989&getuntrans=de"><img src="{{MEDIA_URL}}quill.png" border=0 height=13></a> <br>
+{% endfor %}
+<br>
+parts-md5sum: <br><pre>
+{% for part in descr.parts %}
+{{part.part_md5}} {% for lang, part in part.translations.items %}<a href="ddt.cgi?part_md5=e4bff6245da6c1e5280f13731da7f3b7&language={{lang}}">{{lang}}</a> {% endfor %}{% endfor %}
+</pre>
+<h4>other Descriptions of the r-base package:</h4>
+{% for description in other_descriptions %}
+    Description: <a href="{% url ddt_descr description.description_id %}">{{description.description_id}}</a>
+    <a href="ddt.cgi?diff1=70989&diff2=67391">patch</a><br>
+    {% if active %}
+    This Description is active<br>
+    {% endif %}
+    {% for tag in description.tags %}
+        This Description was in {{tag.tag}} from {{tag.date_begin|date:"Y-m-d"}} to {{tag.date_end|date:"Y-m-d"}};<br>
+    {% endfor %}
+    <br>
+{% endfor %}
+</BODY>
+</HTML>

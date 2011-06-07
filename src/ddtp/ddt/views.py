@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, ActiveDescription, Translation
 from sqlalchemy import func
@@ -67,3 +68,26 @@ def view_package(request, package_name):
     params['package_name'] = package_name
 
     return render_to_response("package.html", params)
+
+def view_descr(request, descr_id):
+    """ Show the page for a single description """
+    session = get_db_session()
+
+    params = dict()
+    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+
+    # This description
+    descr = session.query(Description). \
+                        filter(Description.description_id==descr_id).one()
+    params['descr'] = descr
+
+    # Other descriptions for this package
+    resultset = session.query(Description). \
+                        filter(Description.package==descr.package).all()
+    params['other_descriptions'] = resultset
+    
+    # All languages
+    langs = session.query(Translation.language).group_by(Translation.language).order_by(Translation.language).all()
+    params['langs'] = [l[0] for l in langs]
+
+    return render_to_response("descr.html", params, context_instance=RequestContext(request))

@@ -136,6 +136,10 @@ class PartDescription(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
     part_md5 = Column(String, nullable=False)
 
+    def translations(self):
+        """ Returns a dict of translations for with part, indexed by language """
+        return dict( Session.object_session(self).query(Part.language, Part).filter_by(part_md5=self.part_md5).all() )
+
     def translation(self, lang):
         """ Returns the translation for this part for a given language, or None of not found """
         return Session.object_session(self).query(Part).filter_by(part_md5=self.part_md5).filter_by(language=lang).first()
