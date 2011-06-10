@@ -25,9 +25,12 @@ MEDIA_URL = '/media/'
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/admin_media/'
 
-# Don't share this with anybody.
-SECRET_KEY = '-)4vryd_@dd$fejbndzoj(ykugufrq%*r--f3(m^rx28(en$mn'
-
+# Use the generate_secret_key command to make the key
+try:
+    SECRET_FILE = open(os.path.join(os.path.dirname(__file__), "secret.key")).read() 
+except IOError:
+    pass
+            
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
