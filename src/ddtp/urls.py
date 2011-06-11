@@ -5,6 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from ddtp.ddt import views as ddt_views
+from ddtp.ddtss import urls as ddtss_urls
 
 handler500 # Pyflakes
 
@@ -14,6 +15,7 @@ urlpatterns = patterns(
     url(r'^(\w).html', ddt_views.view_browse, name='ddt_overview'),
     url(r'^package/([\w.+-]+)$', ddt_views.view_package, name='ddt_package'),
     url(r'^descr/(\d+)$', ddt_views.view_descr, name='ddt_descr'),
+    url(r'^ddtss/', include(ddtss_urls)),
     (r'^admin/', include(admin.site.urls)),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 )

@@ -1,0 +1,123 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS ({{lang.language}})</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>DDTSS for {{lang.language}}</h1>
+<!-- Messages not implemented for now
+<div class=messages>
+<h3>Project-Messages (2): <div class="help" title="Messages for the DDTP">?</div> 
+
+</h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
+-->
+{% if not user %}
+<b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
+<p>
+{% endif %}
+<p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+<!-- Message not implemented for now 
+<div class=messages>
+<h3>nl-Team-Messages (0): <div class="help" title="Messages from your language team">?</div> 
+</h3>None
+-->
+<table><col width="60%" /><col width="40%" />
+<tr>
+  <td valign='top' >
+  <div class=untranslated>
+  <h2>Pending translation ({{ pending_translations|length }})
+    <div class="help" title="List of descriptions needing translation. When you select a description, it will be locked for you for 15 minutes.">?</div> 
+  </h2>
+  <ol>
+{% for trans in pending_translations %}
+{% if forloop.first %}<ol>{% endif %}
+    <li><a href="translate/{{trans.description_id}}">{{trans.description.package}}</a>  (priority {{trans.description.prioritize}})</li>
+{% if forloop.last %}</ol>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+  </ol>
+  </div>
+
+  <h4>Fetch specific description 
+    <div class="help" title="Get a specific description to translate. Normally it won't fetch descriptions already translated, use force to override.">?</div> 
+  </h4>
+  <form method="post" action="/ddtss/index.cgi/nl/fetch" enctype="multipart/form-data">
+    <input name="package" type="text" />
+    <label><input type="checkbox" name="force" value="yes" id="force" /></label>
+    <label for="force">Force fetching even if not untranslated</label>
+    <div>
+      <input type="hidden" name=".cgifields" value="force"  />
+    </div>
+  </form>
+
+  <div class=forreview>
+  <h2>Pending review ({{ pending_review|length }})
+    <div class="help" title="List of translations that need review. Note: it may ask you review something you already reviewed. This is because someone has changed it.">?</div> 
+  </h2>
+  <ol>
+{% for trans in pending_review %}
+{% if forloop.first %}<ol>{% endif %}
+    <li><a href="forreview/{{trans.description_id}}">{{trans.description.package}}</a>
+    {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
+    </li>
+{% if forloop.last %}</ol>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+  </ol>
+  </div>
+<!-- Suggestions not yet done
+<div class=suggestion>
+<h2>Suggestions (2)  <div class="help" title="List of suggestions that need review.">?</div> 
+
+</h2><ol><li><a href="/ddtss/index.cgi/suggestion/11273">junior-games-gl</a> externalreview 2010-08-18</li> </ol></div>
+-->
+</td>
+<td valign='top' >
+<div class=infobox>
+<h2>Infos about : <div class="help" title="About your account, some stats,....">?</div> 
+</h2><ul>
+<li>Account: {{user.username}}</li>
+<li>not logged in (<a href="/ddtss/index.cgi/login">Login</a>)</li><li>Translations: </li><li>Reviews: 2</li></ul>
+
+</div>
+<!-- Messages not yet done
+<div class=messages>
+<h2>Messages for you (0)  <div class="help" title="Messages from other users for you">?</div> 
+</h2>None
+-->
+  <div class=reviewed>
+  <h2>Reviewed by you ({{ reviewed|length }}) 
+    <div class="help" title="List of translations you have already reviewed. You can still make changes though.">?</div> 
+  </h2>
+{% for trans in reviewed %}
+{% if forloop.first %}<ol>{% endif %}
+    <li><a href="forreview/{{trans.description_id}}">{{trans.description.package}}</a></li>
+{% if forloop.last %}</ol>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+  </div>
+<!-- Recently translated not yet done
+  <div class=translated>
+  <h2>Recently translated 
+    <div class="help" title="Logs from the DDTS of translation recently sent. If it says (check) review the log and resend if necessary">?</div> 
+  </h2>
+<ol><li><a href="translated/nl/logs/1307267242/cream">cream</a> (ok) Sun Jun  5 11:47:22 2011</li> <li><a href="translated/nl/logs/1302702738/gimp">gimp</a> (ok) Wed Apr 13 15:52:18 2011</li> <li><a href="translated/nl/logs/1302702734/sic">sic</a> (ok) Wed Apr 13 15:52:14 2011</li> <li><a href="translated/nl/logs/1302702721/grep">grep</a> (ok) Wed Apr 13 15:52:01 2011</li> <li><a href="translated/nl/logs/1302607665/debian-zh-faq-t">debian-zh-faq-t</a> (ok) Tue Apr 12 13:27:45 2011</li> <li><a href="translated/nl/logs/1296073277/debian-zh-faq-s">debian-zh-faq-s</a> (ok) Wed Jan 26 21:21:17 2011</li> <li><a href="translated/nl/logs/1296073066/dictionaries-common">dictionaries-common</a> (ok) Wed Jan 26 21:17:46 2011</li> <li><a href="translated/nl/logs/1290714838/iceweasel">iceweasel</a> (ok) Thu Nov 25 20:53:58 2010</li> <li><a href="translated/nl/logs/1258886428/findutils">findutils</a> (ok) Sun Nov 22 11:40:28 2009</li> <li><a href="translated/nl/logs/1258886428/bsdutils">bsdutils</a> (ok) Sun Nov 22 11:40:28 2009</li> <li><a href="translated/nl/logs/1249397726/gqview">gqview</a> (ok) Tue Aug  4 16:55:26 2009</li> <li><a href="translated/nl/logs/1243860092/dpkg">dpkg</a> (ok) Mon Jun  1 14:41:32 2009</li> <li><a href="translated/nl/logs/1243860091/diploma">diploma</a> (ok) Mon Jun  1 14:41:31 2009</li> <li><a href="translated/nl/logs/1236101829/aeskulap">aeskulap</a> (ok) Tue Mar  3 18:37:09 2009</li> <li><a href="translated/nl/logs/1232360720/bplay">bplay</a> (ok) Mon Jan 19 11:25:20 2009</li> <li><a href="translated/nl/logs/1228133731/libsemanage1">libsemanage1</a> (ok) Mon Dec  1 13:15:31 2008</li> <li><a href="translated/nl/logs/1228133266/ncurses-bin">ncurses-bin</a> (ok) Mon Dec  1 13:07:46 2008</li> <li><a href="translated/nl/logs/1228133139/linux-image-2.6.18-1-sparc32">linux-image-2.6.18-1-sparc32</a> (ok) Mon Dec  1 13:05:39 2008</li> <li><a href="translated/nl/logs/1228132942/linux-image-2.6.18-1-s390">linux-image-2.6.18-1-s390</a> (ok) Mon Dec  1 13:02:22 2008</li> <li><a href="translated/nl/logs/1228132924/linux-image-2.6.18-1-r4k-ip22">linux-image-2.6.18-1-r4k-ip22</a> (ok) Mon Dec  1 13:02:04 2008</li></ol>
+</div>
+-->
+</td></tr>
+</table>
+<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> 
+<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> 
+<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> 
+<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> 
+<a href="/ddtss/index.cgi/login">Login</a> 
+<a href="/ddtss/index.cgi/createlogin">Create Login</a>
+</body>
+</html>

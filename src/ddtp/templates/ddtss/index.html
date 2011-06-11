@@ -1,0 +1,47 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>DDTSS</h1>
+<p>
+The DDTSS is a web frontend to the DDTS.  It provides facilities to request
+translations, enter a translation and review other peoples translations. 
+Afterwards the updated translation can be sent via email to the DDTS server.
+<p>
+This is the experimental DDTSS-Django version. It is currently under developement.
+<p>
+More information about the DDTP and the DDTSS can be found  <a href="http://www.debian.org/international/l10n/ddtp">here</a>.
+<h1>Select a language:</h1>
+<table class="langlist"><col width="150px" /><col width="150px" /><col width="150px" /><col width="150px"/>
+<tr><th>Language</th> <th>Pending translation</th> <th>Pending review</th> <th>Translated</th></tr>
+{% for lang in languages %}{% if lang.enabled %}
+<tr class="{% cycle 'odd' 'even' %}">
+   <td><a href="{% url ddtss_index_lang lang.language %}">{{ lang.language }}</a></td> 
+   <td align="right">{{lang.pending_translation}}</td> 
+   <td align="right">{{lang.pending_review}}</td> 
+   <td align="right">{{lang.translated}}</td>
+</tr>
+{% endif %}{% endfor %}
+<tr>
+    <th colspan="3">Total</th> <th align="right">76882</th>
+</tr>
+</table>
+<p>
+The following languages are accepted by the DDTS but are disabled here
+because they have not requested it be actived.  They are ofcourse still
+available via the email system (the DDTS).
+<ul>
+{% for lang in languages %}
+{% if not lang.enabled %}
+<li>{{lang.language}}</li>
+{% endif %}
+{% endfor %}
+</ul>
+</body>
+</html>

@@ -1,0 +1,69 @@
+.help {
+  width: 20px; 
+  height: 20px; 
+  text-align: center; 
+  float: left; 
+  display: inline; 
+  cursor: help; 
+  font-size: 18px; 
+  font-family: sans-serif; 
+  color: white; 
+  background: blue; 
+  font-weight: bold;
+}
+
+.tooltip {
+  cursor: help; 
+  TEXT-DECORATION: underline;
+}
+
+.tooltip:hover {
+  background: yellow;
+}
+
+.diff .new {
+  background: #80ff80;
+}
+.diff .old {
+  background: #ff8080;
+}
+.diff {
+  background: #ffffff;
+}
+
+
+table.wordlist {
+  border: none;
+  border-spacing: 0px;
+
+}
+.wordlist th {
+  background: #f0f0f0;
+  border-bottom: solid;
+}
+
+.wordlist tr.even td {
+  background: #e0e0e0;
+}
+.wordlist tr.odd td {
+  background: #d0d0d0;
+}
+
+table.langlist {
+  border: none;
+  border-spacing: 0px;
+  table-layout: fixed;
+}
+
+.langlist th {
+  background: #f0f0f0;
+  border-bottom: solid;
+}
+
+.langlist tr.even td {
+  background: #e0e0e0;
+}
+.langlist tr.odd td {
+  background: #d0d0d0;
+}
+
