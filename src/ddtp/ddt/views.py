@@ -29,7 +29,7 @@ def view_browse(request, prefix):
                     for descr_id, tags in sorted(descrs.items())])
                for package,descrs in sorted(params.items())]
 
-    return render_to_response("overview.html", {'packages': params, 'prefix': prefix})
+    return render_to_response("overview.html", {'packages': params, 'prefix': prefix}, context_instance=RequestContext(request))
 
 @cache_page(60*60)   # Cache for an hour
 def view_index(request):
@@ -50,7 +50,7 @@ def view_index(request):
 
     params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
 
-    return render_to_response("index.html", params)
+    return render_to_response("index.html", params, context_instance=RequestContext(request))
 
 def view_package(request, package_name):
     """ Show the page for a single package """
@@ -67,7 +67,7 @@ def view_package(request, package_name):
     params['package'] = resultset
     params['package_name'] = package_name
 
-    return render_to_response("package.html", params)
+    return render_to_response("package.html", params, context_instance=RequestContext(request))
 
 def view_descr(request, descr_id):
     """ Show the page for a single description """
