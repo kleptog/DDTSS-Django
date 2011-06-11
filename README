@@ -1,0 +1,93 @@
+DDTSS-Django
+============
+
+This is the experimental Django reimplementation of the DDTSS. The old
+system used a simple key-value store without transactions and couldn't
+access the DDTP database directly. This version is implemented in Django
+with SQLalchemy for the ORM.
+
+First is a bried setup guide, below is some more details for developers.
+
+Setup
+=====
+
+To setup this version to run locally you need to do a few steps.
+
+1. Configure the buildout.
+
+$ python bootstrap.py
+$ bin/buildout
+
+This will download an install any packages needed to run the DDTSS. You will
+need to install a postgresql server manually.
+
+2. Create a PostgreSQL database called 'ddtp' with the correct encoding.
+
+$ createdb ddtp -E UTF8
+
+You probably need to the database superuser to do this.
+
+Make sure you can connect to it without a password, preferably with 'ident
+sameuser' authentication.  The username is not relevent, you should be able
+to login with your normal username (otherwise see createuser).  Ensure that
+when you type:
+
+$ psql ddtp
+
+It logs you into the database without asking for a password.
+
+3. Setup the schema.
+
+$ psql ddtp -q -f src/ddtp/database/initial/install-ddtp.sql
+
+This should complete without any errors.
+
+4. Add some sample data. Without some data in the database you can't do very
+much.
+
+Download the sample data. This is just a tiny fraction of the full DDTP
+database, but enough to get you started with testing everything. It can be
+loaded in seconds rather than hours.
+
+$ wget http://kleptog.org/temp/ddtp-sample.tar.gz
+
+Unpack the tarball into a temporary directory. Then while in that directory
+execute:
+
+$ psql ddtp -q -f src/ddtp/database/initial/load_sample.sql
+
+This should also complete without errors or warnings.
+
+5. Startup the Django test server.
+
+Setting up a full production Django server is outside the scope of this
+README. This runs the development server:
+
+$ bin/django generate_secret_key
+$ bin/django runserver
+
+There is now a test server running on http://localhost:8000/
+
+Development Tips
+================
+
+This is a Buildout with a Django project. All sources are in the src/
+directory.  The project is in src/ddtp/.  Within that we have the following
+directories:
+
+src/ddtp           - Project root
+    development.py - Development Django settings
+    production.py  - Production Django settings
+    urls.py        - Main URL configruration
+
+src/ddtp/database  - Database setup and configuration
+    db.py          - database session setup
+    ddtp.py        - ORM for DDTP tables
+    ddtss.py       - ORM for DDTSS tables
+
+src/ddtp/ddt       - DDTP website application
+    views.py       - Views for DDTP application
+
+src/ddtp/templates - Templates for DDTP website
+
+src/ddtp/media     - Images used by templates
