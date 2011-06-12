@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'ddtp.ddt',
+    'ddtp.database',
 )
 
 TEMPLATE_LOADERS = (
