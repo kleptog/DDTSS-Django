@@ -67,3 +67,7 @@ CACHES = {
 }
                         
 INTERNAL_IPS = ('127.0.0.1',)
+
+DDTP_DATABASE=dict(drivername='postgresql',
+                   database='ddtp')
+

@@ -3,9 +3,6 @@ from ddtp.settings import *
 DEBUG=True
 TEMPLATE_DEBUG=DEBUG
 
-DDTP_DATABASE=dict(drivername='postgresql',
-                   database='ddtp')
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
