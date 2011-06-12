@@ -91,3 +91,9 @@ src/ddtp/ddt       - DDTP website application
 src/ddtp/templates - Templates for DDTP website
 
 src/ddtp/media     - Images used by templates
+
+For development it is useful to know the command:
+
+$ bin/django shell
+
+Which gives you an IPython shell with all the paths set correctly.
