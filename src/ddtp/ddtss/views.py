@@ -3,7 +3,7 @@ from django.http import Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, ActiveDescription, Translation
-from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview
+from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
 from sqlalchemy import func
 
 @cache_page(60*60)   # Cache for an hour
@@ -50,13 +50,13 @@ def view_index_lang(request, language):
         raise Http404()
 
     if 'username' in request.session:
-        username = request.session['username']
+        user = session.query(Users).filter_by(username = request.session['username']).one()
     else:
-        username = request.META.get('REMOTE_ADDR')
+        user = Users(username=request.META.get('REMOTE_ADDR'))
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
-                                 func.count(PendingTranslationReview.username==username).label('reviewed'),
+                                 func.count(PendingTranslationReview.username==user.username).label('reviewed'),
                                  func.count().label('reviews')) \
                           .outerjoin(PendingTranslationReview) \
                           .filter(PendingTranslation.language==language) \
@@ -68,7 +68,7 @@ def view_index_lang(request, language):
     reviewed = []
 
     for trans, reviewed_by_me, reviews in translations:
-        if reviewed_by_me or trans.owner_username == username:
+        if reviewed_by_me or trans.owner_username == user.username:
             reviewed.append(trans)
         elif trans.state == PendingTranslation.STATE_PENDING_REVIEW:
             pending_review.append(trans)
@@ -81,6 +81,7 @@ def view_index_lang(request, language):
 
     return render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
+        user=user,
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed), context_instance=RequestContext(request))
