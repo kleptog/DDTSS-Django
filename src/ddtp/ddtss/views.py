@@ -5,6 +5,7 @@ from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, ActiveDescription, Translation
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
 from sqlalchemy import func
+from sqlalchemy.sql import expression
 
 @cache_page(60*60)   # Cache for an hour
 def view_index(request):
@@ -12,8 +13,8 @@ def view_index(request):
     session = get_db_session()
 
     pending_translations = session.query(Languages, \
-                                         func.count(PendingTranslation.state==PendingTranslation.STATE_PENDING_TRANSLATION), \
-                                         func.count(PendingTranslation.state==PendingTranslation.STATE_PENDING_REVIEW)) \
+                                         func.sum(expression.case([(PendingTranslation.state==PendingTranslation.STATE_PENDING_TRANSLATION, 1)], else_=0)), \
+                                         func.sum(expression.case([(PendingTranslation.state==PendingTranslation.STATE_PENDING_REVIEW, 1)], else_=0))) \
                                   .outerjoin(PendingTranslation) \
                                   .group_by(Languages) \
                                   .all()
@@ -56,10 +57,10 @@ def view_index_lang(request, language):
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
-                                 func.count(PendingTranslationReview.username==user.username).label('reviewed'),
+                                 func.sum(expression.case([(PendingTranslationReview.username==user.username, 1)], else_=0)).label('reviewed'),
                                  func.count().label('reviews')) \
                           .outerjoin(PendingTranslationReview) \
-                          .filter(PendingTranslation.language==language) \
+                          .filter(PendingTranslation.language_ref==language) \
                           .group_by(PendingTranslation) \
                           .all()
 
