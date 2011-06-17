@@ -49,7 +49,14 @@ class Description(Base):
     
     # Provides access to translations, as a dict
     translation = relationship('Translation', collection_class=collections.attribute_mapped_collection('language'))
-    
+
+    def short(self):
+        """ Returns the title of the description """
+        return self.description.partition("\n")[0]
+    def long(self):
+        """ Returns the body of the description """
+        return self.description.partition("\n")[2]
+
     def get_description_parts(self):
         """ Returns a list of (string, md5) which are the parts of this description """
         lines = self.description.split('\n')
