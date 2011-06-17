@@ -86,3 +86,30 @@ def view_index_lang(request, language):
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed), context_instance=RequestContext(request))
+
+def view_translate(request, language, description_id):
+    """ Show the translation page for a description """
+    session = get_db_session()
+
+    lang = session.query(Languages).get(language)
+    if not lang:
+        raise Http404()
+
+    descr = session.query(Description).filter_by(description_id=description_id).first()
+    if not descr:
+        raise Http404()
+
+    trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).first()
+    if not trans:
+        # Maybe in the future we build on the fly?
+        raise Http404()
+
+    if trans.comment is None:
+        trans.comment = ""
+    if trans.short is None:
+        trans.short, trans.long = PendingTranslation.make_suggestion(descr, language)
+
+    return render_to_response("ddtss/translate.html", dict(
+        lang=lang,
+        descr=descr,
+        trans=trans), context_instance=RequestContext(request))

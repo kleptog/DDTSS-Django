@@ -35,7 +35,7 @@
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="translate/{{trans.description_id}}">{{trans.description.package}}</a>  (priority {{trans.description.prioritize}})</li>
+    <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>  (priority {{trans.description.prioritize}})</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
     None

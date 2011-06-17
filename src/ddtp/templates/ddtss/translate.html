@@ -1,0 +1,52 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS ({{lang.language}}): Translating {{descr.package}}</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body onload="document.forms[0].submit.disabled=1">
+<h1>
+  <font color="red">Note: If you decide not to go ahead with translating a
+description, please hit &#39;Abandon&#39; below so others can have a
+go</font>
+</h1>
+<h1>Translating {{descr.package}}</h1>
+<ul>
+  <li><tt># Source: {{descr.source}}</tt></li>
+<!--  <li><tt># Package(s): fmit</tt></li> -->
+  <li><tt># Prioritize: {{descr.prioritize}}</tt></li>
+  <li><tt># Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}</tt>
+</li>
+</ul>
+<form method="post" action="{% url ddtss_translate lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
+
+<h5>Short description</h5>
+<ul>
+  <li>Untranslated:  <tt>{{descr.short}}</tt></li>
+  <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.short}}" size="75" onchange="document.forms[0].submit.disabled=0" /></li>
+</ul>
+<h5>Long description</h5>
+(Note: You must preserve the number of paragraphs)
+<ul>
+  <li>Untranslated:  <pre>{{descr.long}}</pre></li>
+  <li>Translated ({{lang.language}}):
+    <span class="tooltip" title="Due to bugs in some browsers, non-breaking spaces are displayed as '·' (middot). You should also enter them that way to make sure they get sent to the server. You can generally get it by composing the caret (^) with the space.">Non-breakspace note</span>
+    <span class="tooltip" title="Debian policy states that lines without leading spaces may be wrapped by user-agents. So for lists, make sure you include a leading space to avoid splattered text.">Textwrapping note</span>
+    <br />
+    <textarea name="long"  rows="10" cols="75" onchange="document.forms[0].submit.disabled=0" wrap="hard">{{trans.long}}</textarea></li>
+    Comment field: (free form, for discussion about translation. Saved even if you abandon.)
+    <br>
+    <textarea name="comment"  rows="4" cols="75">{{trans.comment}}</textarea>
+</ul>
+<input type="submit" name="abandon" value="Abandon" />
+<input type="submit" name="submit" value="Submit" />
+<!-- This is a hidden field which on many browsers is automatically filled
+in with the charset of the submitted form. Useful to check browsers are
+actually returning UTF-8 as promised -->
+<input type="hidden" name="_charset_" value=""  />
+</form>
+</body>
+</html>
