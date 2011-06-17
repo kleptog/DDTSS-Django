@@ -142,6 +142,11 @@ class PartDescription(Base):
     # Provides access to translations, as a dict
     translation = relationship('Part', collection_class=collections.attribute_mapped_collection('language'))
 
+    @property
+    def other_descriptions(self):
+        """ Return the other PartDescriptions with the same md5. So same part in other descriptions """
+        return Session.object_session(self).query(PartDescription).filter_by(part_md5=self.part_md5).all()
+
     def __repr__(self):
         return 'PartDescription(%d, descr=%d, %s)' % (self.part_description_id, self.description_id, self.part_md5)
 
