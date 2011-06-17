@@ -69,6 +69,20 @@ class PendingTranslation(Base):
     STATE_PENDING_TRANSLATION = 0
     STATE_PENDING_REVIEW = 1
 
+    @classmethod
+    def make_suggestion(self, description, language):
+        """ From a description object and a language, make a suggestion for
+        the description using existing parts """
+
+        parts = description.get_description_part_objects()
+        suggest = []
+        for text, hash, part in parts:
+            if part and language in part.translation:
+                suggest.append(part.translation[language].part)
+            else:
+                suggest.append(' <trans>\n')
+        return suggest[0], " .\n".join(suggest[1:])
+
 class PendingTranslationReview(Base):
     """ A review of a translation """
     __tablename__ = 'pendingtranslationreview_tb'
