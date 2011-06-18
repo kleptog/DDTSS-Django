@@ -1,5 +1,7 @@
+import time
 from .db import Base, get_db_session
 from .ddtp import Description
+from django.conf import settings
 from sqlalchemy.orm import relationship, collections
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
@@ -60,7 +62,7 @@ class PendingTranslation(Base):
     oldshort = Column(String)
     lastupdate = Column(Integer, nullable=False)  # timestamp
     owner_username = Column(String)               # NULL if no owner, could be IP for anonymous
-    owner_locktime = Column(Integer)              # Timestamp that owner "locked" this description
+    owner_locktime = Column(Integer)              # Timestamp that owner "locked" this description, NULL if not locked
     iteration = Column(Integer, nullable=False)   # Iteration
     state = Column(Integer, nullable=False)       # One of the states below
 
@@ -83,6 +85,29 @@ class PendingTranslation(Base):
             else:
                 suggest.append(' <trans>\n')
         return suggest[0], " .\n".join(suggest[1:])
+
+    def is_locked(self):
+        """ True if record is (optimistically) locked """
+        now = time.time()
+        return self.owner_locktime and self.owner_locktime > now - settings.DDTSS_LOCK_TIMEOUT
+
+    def trylock(self, user):
+        """ Check if this translation can be locked or is locked by this
+        user, and acquire lock if possible.  Returns True if lock acquired.
+        To protect against concurrency issues, the record should be selected
+        FOR UPDATE """
+
+        if self.is_locked() and self.owner_username != user.username:
+            return False
+
+        self.owner_username = user.username
+        self.owner_locktime = int(time.time())
+        return True
+
+    def unlock(self):
+        """ Remove lock from record """
+        self.owner_locktime = None
+        return
 
 class PendingTranslationReview(Base):
     """ A review of a translation """
