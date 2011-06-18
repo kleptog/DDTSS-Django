@@ -1,3 +1,4 @@
+from django import forms
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.http import Http404
@@ -109,6 +110,15 @@ def show_message_screen(request, msg, redirect, *args):
 
     return response
 
+class TranslationForm(forms.Form):
+    """ This form is used to encapsulate the results of form submission """
+    short = forms.CharField(max_length=80)
+    long = forms.CharField()
+    comment = forms.CharField(required=False)
+    submit = forms.CharField(required=False)
+    abandon = forms.CharField(required=False)
+    _charset_ = forms.CharField(required=False)
+
 def view_translate(request, language, description_id):
     """ Show the translation page for a description """
     session = get_db_session()
@@ -121,15 +131,46 @@ def view_translate(request, language, description_id):
     if not descr:
         raise Http404()
 
-    trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).first()
+    # Select FOR UPDATE, to avoid concurrency issues.
+    trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
     if not trans:
         # Maybe in the future we build on the fly?
         raise Http404()
+
+    if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
+        session.commit()
+        return show_message_screen(request, 'Already translated, redirecting to review screen', 'ddtss_review', language, description_id)
+
+    user = get_user(request)
+    if not trans.trylock(user):
+        session.commit()
+        return show_message_screen(request, 'Translation locked, try again later', 'ddtss_index_lang', language)
+
+    if request.method == 'POST':
+        form = TranslationForm(request.POST)
+
+        if not form.is_valid():
+            # Maybe return HTTP 400 - Bad request?
+            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
+
+        if 'abandon' in form.cleaned_data:
+            trans.unlock()
+            session.commit()
+            return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
+
+        if 'submit' in form.cleaned_data:
+            trans.update_translation(form.short, form.long)
+            trans.comment = form.comment
+            trans.unlock()
+            session.commit()
+            return show_message_screen(request, 'Translation submitted', 'ddtss_index_lang', language)
 
     if trans.comment is None:
         trans.comment = ""
     if trans.short is None:
         trans.short, trans.long = PendingTranslation.make_suggestion(descr, language)
+
+    session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
         lang=lang,
