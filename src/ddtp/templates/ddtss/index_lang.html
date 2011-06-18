@@ -30,12 +30,13 @@
   <td valign='top' >
   <div class=untranslated>
   <h2>Pending translation ({{ pending_translations|length }})
-    <div class="help" title="List of descriptions needing translation. When you select a description, it will be locked for you for 15 minutes.">?</div> 
+    <div class="help" title="List of descriptions needing translation. When you select a description, it will be locked for you for 15 minutes.">?</div>
   </h2>
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>  (priority {{trans.description.prioritize}})</li>
+    <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
+    (priority {{trans.description.prioritize}}{% if trans.is_locked %}, locked{% endif %})</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
     None
