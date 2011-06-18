@@ -6,6 +6,7 @@ from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, Acti
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
 from sqlalchemy import func
 from sqlalchemy.sql import expression
+from sqlalchemy.orm import subqueryload
 
 @cache_page(60*60)   # Cache for an hour
 def view_index(request):
@@ -62,6 +63,8 @@ def view_index_lang(request, language):
                           .outerjoin(PendingTranslationReview) \
                           .filter(PendingTranslation.language_ref==language) \
                           .group_by(PendingTranslation) \
+                          .options(subqueryload(PendingTranslation.reviews)) \
+                          .options(subqueryload(PendingTranslation.description)) \
                           .all()
 
     pending_translations = []
