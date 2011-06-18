@@ -59,9 +59,10 @@ class PendingTranslation(Base):
     oldlong = Column(String)
     oldshort = Column(String)
     lastupdate = Column(Integer, nullable=False)  # timestamp
-    iteration = Column(Integer, nullable=False)   # iter
     owner_username = Column(String)               # NULL if no owner, could be IP for anonymous
-    state = Column(Integer, nullable=False)
+    owner_locktime = Column(Integer)              # Timestamp that owner "locked" this description
+    iteration = Column(Integer, nullable=False)   # Iteration
+    state = Column(Integer, nullable=False)       # One of the states below
 
     user = relationship(Users, primaryjoin=(owner_username == Users.username), foreign_keys=[owner_username], uselist=False)
     description = relationship(Description, backref='pending_translations')
