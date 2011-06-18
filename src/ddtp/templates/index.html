@@ -7,7 +7,7 @@
     <a href="{% url ddt_overview prefix %}">{{prefix}}</a>
 {% endfor %}
 <hr>
-<a href="http://ddtp.debian.net/ddtss/index.cgi/">to the ddtss (a web interface for the ddtp)<a/><br>
+<a href="{% url ddtss_index %}">to the ddtss (a web interface for the ddtp)<a/><br>
 Daily description translation stats for 
 <a href='stats/stats-etch.html'>Etch</a>, 
 <a href='stats/stats-lenny.html'>Lenny</a> , 
