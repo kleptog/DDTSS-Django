@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.http import Http404
 from django.template import RequestContext
@@ -94,6 +95,19 @@ def view_index_lang(request, language):
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed), context_instance=RequestContext(request))
+
+def show_message_screen(request, msg, redirect, *args):
+    """ Display a message to user, and redirect to a new page after 5 seconds """
+    url = reverse(redirect, args=args)
+
+    response = render_to_response("ddtss/message.html", dict(
+        msg=msg,
+        url=url),
+        context_instance=RequestContext(request))
+
+    response['Refresh'] = '5; ' + request.build_absolute_uri(url)
+
+    return response
 
 def view_translate(request, language, description_id):
     """ Show the translation page for a description """
