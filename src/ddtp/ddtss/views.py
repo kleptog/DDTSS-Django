@@ -43,6 +43,13 @@ def view_index(request):
 
     return render_to_response("ddtss/index.html", {'languages': params}, context_instance=RequestContext(request))
 
+def get_user(request):
+    if 'username' in request.session:
+        user = session.query(Users).filter_by(username = request.session['username']).one()
+    else:
+        user = Users(username=request.META.get('REMOTE_ADDR'))
+    return user
+
 def view_index_lang(request, language):
     """ Does the main index page for a single language in DDTSS """
     session = get_db_session()
@@ -51,10 +58,7 @@ def view_index_lang(request, language):
     if not lang:
         raise Http404()
 
-    if 'username' in request.session:
-        user = session.query(Users).filter_by(username = request.session['username']).one()
-    else:
-        user = Users(username=request.META.get('REMOTE_ADDR'))
+    user = get_user(request)
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
