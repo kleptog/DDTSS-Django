@@ -76,11 +76,12 @@ def view_index_lang(request, language):
     reviewed = []
 
     for trans, reviewed_by_me, reviews in translations:
-        if reviewed_by_me or trans.owner_username == user.username:
-            reviewed.append(trans)
-        elif trans.state == PendingTranslation.STATE_PENDING_REVIEW:
-            pending_review.append(trans)
-        else:
+        if trans.state == PendingTranslation.STATE_PENDING_REVIEW:
+            if reviewed_by_me or trans.owner_username == user.username:
+                reviewed.append(trans)
+            else:
+                pending_review.append(trans)
+        elif trans.state == PendingTranslation.STATE_PENDING_TRANSLATION:
             pending_translations.append(trans)
 
     reviewed.sort(key=lambda t: t.lastupdate, reverse=True)
