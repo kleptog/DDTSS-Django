@@ -36,18 +36,24 @@ $ psql ddtp
 
 It logs you into the database without asking for a password.
 
-3. Setup the schema.
+3. Setup the schema for DDTP.
 
 $ psql ddtp -q -f src/ddtp/database/initial/install-ddtp.sql
 
 This should complete without any errors.
 
+If you want to test the DDTSS, you need more. Note that the schema for the
+DDTSS is not yet finalised and subject to change, so you may have to redo
+this step occasionally.
+
+$ psql ddtp -q -f src/ddtp/database/initial/install-ddtss.sql
+
 4. Add some sample data. Without some data in the database you can't do very
 much.
 
-Download the sample data. This is just a tiny fraction of the full DDTP
-database, but enough to get you started with testing everything. It can be
-loaded in seconds rather than hours.
+Download the sample data. This is just a tiny fraction (approximately one
+10,000th) of the full DDTP database, but enough to get you started with
+testing everything.  It can be loaded in seconds rather than hours.
 
 $ wget http://kleptog.org/temp/ddtp-sample.tar.gz
 
@@ -57,6 +63,10 @@ execute:
 $ psql ddtp -q -f src/ddtp/database/initial/load_sample.sql
 
 This should also complete without errors or warnings.
+
+For sample data for the DDTSS, you need to do:
+
+$ psql ddtp -q -f src/ddtp/database/initial/load_sample_ddtss.sql
 
 5. Startup the Django test server.
 
@@ -89,6 +99,7 @@ src/ddtp/ddt       - DDTP website application
     views.py       - Views for DDTP application
 
 src/ddtp/templates - Templates for DDTP website
+    ddtss/         - Templates for DDTSS website
 
 src/ddtp/media     - Images used by templates
 
