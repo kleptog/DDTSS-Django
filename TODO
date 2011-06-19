@@ -1,0 +1,32 @@
+TODO
+====
+
+- User login/logout/creation
+
+- User permissions
+
+  Probably needs a table to track superusers and language coordinators.
+
+- Complete translation process
+
+- Messages
+
+  The table need should already exist. Needs add/remove pages.
+
+- Rest of DDTP ddt.cgi (just for fun really, but mostly so it's templated so
+  people can restyle it.
+
+- Translation logging
+
+  People would like to keep the comments and logs of translation
+  indefinitely.  Also, people would like to see the comment of the previous
+  translation when it comes up again.  Will need schema changes.
+
+- Fuzzy matching
+
+  When a part comes up for translation which has not yet been previously
+  translated, look for fuzzy matches.
+
+- Suggestions
+
+  Need to work out exactly how these are imported in the first place.
