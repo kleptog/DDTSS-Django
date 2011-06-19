@@ -27,10 +27,10 @@ ADMIN_MEDIA_PREFIX = '/admin_media/'
 
 # Use the generate_secret_key command to make the key
 try:
-    SECRET_FILE = open(os.path.join(os.path.dirname(__file__), "secret.key")).read() 
+    SECRET_FILE = open(os.path.join(os.path.dirname(__file__), "secret.key")).read()
 except IOError:
     pass
-            
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -66,7 +66,7 @@ CACHES = {
         'TIMEOUT': 4*3600,
     }
 }
-                        
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 DDTP_DATABASE=dict(drivername='postgresql',

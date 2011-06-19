@@ -1,5 +1,5 @@
-# DDTSS-Django - A Django implementation of the DDTP/DDTSS website    
-# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
+# DDTSS-Django - A Django implementation of the DDTP/DDTSS website
+# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
 import hashlib
@@ -50,7 +50,7 @@ class Description(Base):
     translations = relationship('Translation', backref='description')
     tags = relationship('DescriptionTag', backref='description')
     parts = relationship('PartDescription', backref='description')
-    
+
     # Provides access to translations, as a dict
     translation = relationship('Translation', collection_class=collections.attribute_mapped_collection('language'))
 

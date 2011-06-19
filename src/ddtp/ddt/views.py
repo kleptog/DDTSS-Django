@@ -1,5 +1,5 @@
-# DDTSS-Django - A Django implementation of the DDTP/DDTSS website    
-# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
+# DDTSS-Django - A Django implementation of the DDTP/DDTSS website
+# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
 from django.shortcuts import render_to_response
@@ -89,7 +89,7 @@ def view_descr(request, descr_id):
     resultset = session.query(Description). \
                         filter(Description.package==descr.package).all()
     params['other_descriptions'] = resultset
-    
+
     # All languages
     langs = session.query(Translation.language).group_by(Translation.language).order_by(Translation.language).all()
     params['langs'] = [l[0] for l in langs]
