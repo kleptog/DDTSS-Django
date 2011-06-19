@@ -63,7 +63,7 @@
   <ol>
 {% for trans in pending_review %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="forreview/{{trans.description_id}}">{{trans.description.package}}</a>
+    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}">{{trans.description.package}}</a>
     {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
     </li>
 {% if forloop.last %}</ol>{% endif %}
@@ -98,7 +98,8 @@
   </h2>
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="forreview/{{trans.description_id}}">{{trans.description.package}}</a></li>
+    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}">{{trans.description.package}}</a>
+    {% if trans.owner_username == user.username %}(owner){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
     None

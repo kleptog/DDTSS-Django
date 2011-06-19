@@ -8,11 +8,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="document.forms[0].submit.disabled=1">
+{% if not forreview %}
 <h1>
   <font color="red">Note: If you decide not to go ahead with translating a
 description, please hit &#39;Abandon&#39; below so others can have a
 go</font>
 </h1>
+{% endif %}
 <h1>Translating {{descr.package}}</h1>
 <ul>
   <li><tt># Source: {{descr.source}}</tt></li>
@@ -21,8 +23,11 @@ go</font>
   <li><tt># Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}</tt>
 </li>
 </ul>
+{% if forreview %}
+<form method="post" action="{% url ddtss_forreview lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
+{% else %}
 <form method="post" action="{% url ddtss_translate lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
-
+{% endif %}
 <h5>Short description</h5>
 <ul>
   <li>Untranslated:  <tt>{{descr.short}}</tt></li>
@@ -41,8 +46,19 @@ go</font>
     <br>
     <textarea name="comment"  rows="4" cols="75">{{trans.comment}}</textarea>
 </ul>
+{% if forreview %}
+<input type="submit" name="accept" value="Accept as is" />
+<input type="submit" name="submit" value="Accept with changes" />
+<input type="submit" name="nothing" value="Change comment only" />
+<input name="timestamp" type="hidden" value="{{trans.lastupdate}}" />
+<br />
+'Accept as is' means you agree with this translation.
+'Accept with changes' means you made changes.
+In that case the review process will start again.
+{% else %}
 <input type="submit" name="abandon" value="Abandon" />
 <input type="submit" name="submit" value="Submit" />
+{% endif %}
 <!-- This is a hidden field which on many browsers is automatically filled
 in with the charset of the submitted form. Useful to check browsers are
 actually returning UTF-8 as promised -->

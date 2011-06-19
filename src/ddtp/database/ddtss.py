@@ -151,6 +151,7 @@ class PendingTranslation(Base):
         self.oldlong = long
         self.short = self.from_display(short)
         self.long = self.from_display(long)
+        self.lastupdate = int(time.time())
 
         if '<trans>' not in short and '<trans>' not in long:
             self.state = PendingTranslation.STATE_PENDING_REVIEW

@@ -143,9 +143,10 @@ def view_translate(request, language, description_id):
 
     if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
         session.commit()
-        return show_message_screen(request, 'Already translated, redirecting to review screen', 'ddtss_review', language, description_id)
+        return show_message_screen(request, 'Already translated, redirecting to review screen', 'ddtss_forreview', language, description_id)
 
     user = get_user(request)
+    # Try to lock the description, note sets the owner field
     if not trans.trylock(user):
         session.commit()
         return show_message_screen(request, 'Translation locked, try again later', 'ddtss_index_lang', language)
@@ -177,6 +178,91 @@ def view_translate(request, language, description_id):
     session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
+        forreview=False,
+        lang=lang,
+        descr=descr,
+        trans=trans), context_instance=RequestContext(request))
+
+class ReviewForm(forms.Form):
+    """ This form is used to encapsulate the results of form submission """
+    short = forms.CharField(max_length=80)
+    long = forms.CharField()
+    comment = forms.CharField(required=False)
+    submit = forms.CharField(required=False)
+    accept = forms.CharField(required=False)
+    nothing = forms.CharField(required=False)
+
+    _charset_ = forms.CharField(required=False)
+    timestamp = forms.IntegerField(required=False)
+
+def view_review(request, language, description_id):
+    """ Show the review page for a description """
+    session = get_db_session()
+
+    lang = session.query(Languages).get(language)
+    if not lang:
+        raise Http404()
+
+    descr = session.query(Description).filter_by(description_id=description_id).first()
+    if not descr:
+        raise Http404()
+
+    # Select FOR UPDATE, to avoid concurrency issues.
+    trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
+    if not trans:
+        raise Http404()
+
+    if trans.state != PendingTranslation.STATE_PENDING_REVIEW:
+        session.commit()
+        return show_message_screen(request, 'Translation not ready for review', 'ddtss_index_lang', language)
+
+    user = get_user(request)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+
+        if not form.is_valid():
+            # Maybe return HTTP 400 - Bad request?
+            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
+
+        if form.cleaned_data['timestamp'] != trans.lastupdate:
+            return show_message_screen(request, 'The translation was updated before submission, please recheck changes', 'ddtss_forreview', language, description_id)
+
+        if form.cleaned_data['nothing']:
+            trans.comment = form.cleaned_data['comment']
+            session.commit()
+            return show_message_screen(request, 'Changed comment only', 'ddtss_index_lang', language)
+
+        if form.cleaned_data['accept']:
+            trans.comment = form.cleaned_data['comment']
+            # Check if user has already reviewed it
+            for r in trans.reviews:
+                if r.username == user.username:
+                    session.commit()
+                    return show_message_screen(request, 'Translation was already reviewed', 'ddtss_index_lang', language)
+            # Add to reviewers
+            trans.reviews.append( PendingTranslationReview(username=user.username) )
+            session.commit()
+            return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
+
+        if form.cleaned_data['submit']:
+            trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
+            trans.comment = form.cleaned_data['comment']
+            trans.owner_username = user.username
+            # Clear reviews
+            for review in trans.reviews:
+                session.delete(review)
+            session.commit()
+            return show_message_screen(request, 'Translation updated, review process restarted', 'ddtss_index_lang', language)
+
+
+    if trans.comment is None:
+        trans.comment = ""
+
+    session.commit()
+
+    return render_to_response("ddtss/translate.html", dict(
+        forreview=True,
         lang=lang,
         descr=descr,
         trans=trans), context_instance=RequestContext(request))
