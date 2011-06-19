@@ -157,14 +157,14 @@ def view_translate(request, language, description_id):
             # Maybe return HTTP 400 - Bad request?
             return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
 
-        if 'abandon' in form.cleaned_data:
+        if form.cleaned_data['abandon']:
             trans.unlock()
             session.commit()
             return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
 
-        if 'submit' in form.cleaned_data:
-            trans.update_translation(form.short, form.long)
-            trans.comment = form.comment
+        if form.cleaned_data['submit']:
+            trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
+            trans.comment = form.cleaned_data['comment']
             trans.unlock()
             session.commit()
             return show_message_screen(request, 'Translation submitted', 'ddtss_index_lang', language)

@@ -143,6 +143,20 @@ class PendingTranslation(Base):
         s = s.replace(u"\u00B7", u"\u00A0")
         return s
 
+    # Update translation
+    def update_translation(self, short, long):
+        # FIXME: Check new description has correct numer of paragraphs
+        # FIXME: Logging of changes
+        self.oldshort = short
+        self.oldlong = long
+        self.short = self.from_display(short)
+        self.long = self.from_display(long)
+
+        if '<trans>' not in short and '<trans>' not in long:
+            self.state = PendingTranslation.STATE_PENDING_REVIEW
+
+        return
+
 class PendingTranslationReview(Base):
     """ A review of a translation """
     __tablename__ = 'pendingtranslationreview_tb'
