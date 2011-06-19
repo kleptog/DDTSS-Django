@@ -46,7 +46,7 @@ class PendingTranslation(Base):
     """ A translation that is in the process of being translated """
     __tablename__ = 'pendingtranslations_tb'
 
-    # Manually created sequence it necessary as SQLalchemy beleives SERIAL is only useful for primary keys
+    # Manually created sequence it necessary as SQLalchemy believes SERIAL is only useful for primary keys
     pending_translation_id = Column(Integer,
                                     Sequence('pendingtranslations_tb_pending_translation_id_seq'),
                                     server_default=text("nextval('pendingtranslations_tb_pending_translation_id_seq')"),

@@ -6,7 +6,7 @@ system used a simple key-value store without transactions and couldn't
 access the DDTP database directly. This version is implemented in Django
 with SQLalchemy for the ORM.
 
-First is a bried setup guide, below is some more details for developers.
+First is a basic setup guide, below is some more details for developers.
 
 Setup
 =====
@@ -28,8 +28,8 @@ $ createdb ddtp -E UTF8
 You probably need to the database superuser to do this.
 
 Make sure you can connect to it without a password, preferably with 'ident
-sameuser' authentication.  The username is not relevent, you should be able
-to login with your normal username (otherwise see createuser).  Ensure that
+sameuser' authentication.  The user name is not relevant, you should be able
+to login with your normal user name (otherwise see createuser).  Ensure that
 when you type:
 
 $ psql ddtp
@@ -68,7 +68,7 @@ For sample data for the DDTSS, you need to do:
 
 $ psql ddtp -q -f src/ddtp/database/initial/load_sample_ddtss.sql
 
-5. Startup the Django test server.
+5. Start up the Django test server.
 
 Setting up a full production Django server is outside the scope of this
 README. This runs the development server:
@@ -88,7 +88,7 @@ directories:
 src/ddtp           - Project root
     development.py - Development Django settings
     production.py  - Production Django settings
-    urls.py        - Main URL configruration
+    urls.py        - Main URL configuration
 
 src/ddtp/database  - Database setup and configuration
     db.py          - database session setup

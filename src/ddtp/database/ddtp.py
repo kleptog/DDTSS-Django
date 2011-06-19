@@ -200,7 +200,7 @@ class Translation(Base):
         return 'Translation(%d, descr=%d, lang=%s)' % (self.translation_id, self.description_id, self.language)
 
 # This table is old, back from the time when it was assumed that
-# descriptions only belonged to one package.  It has been superceded by the
+# descriptions only belonged to one package.  It has been superseded by the
 # packages_versions table.
 #
 #class Version(Base):

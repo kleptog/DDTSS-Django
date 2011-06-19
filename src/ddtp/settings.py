@@ -72,5 +72,5 @@ INTERNAL_IPS = ('127.0.0.1',)
 DDTP_DATABASE=dict(drivername='postgresql',
                    database='ddtp')
 
-# Optimisitic lock timeout in seconds
+# Optimistic lock timeout in seconds
 DDTSS_LOCK_TIMEOUT=900
