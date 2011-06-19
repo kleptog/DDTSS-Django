@@ -254,7 +254,7 @@ def view_review(request, language, description_id):
             user.countreviews += 1
 
             session.commit()
-            return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
+            return show_message_screen(request, 'Translation reviewed', 'ddtss_index_lang', language)
 
         if form.cleaned_data['submit']:
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
