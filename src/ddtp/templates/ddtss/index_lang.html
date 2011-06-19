@@ -84,8 +84,13 @@
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}</li>
-<li>not logged in (<a href="/ddtss/index.cgi/login">Login</a>)</li><li>Translations: </li><li>Reviews: 2</li></ul>
-
+{% if user.logged_in %}
+<li>Translations: {{user.counttranslations}}</li>
+<li>Reviews: {{user.countreviews}}</li>
+{% else %}
+<li>not logged in (<a href="/ddtss/index.cgi/login">Login</a>)</li>
+{% endif %}
+</ul>
 </div>
 <!-- Messages not yet done
 <div class=messages>

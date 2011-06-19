@@ -54,6 +54,9 @@ def get_user(request):
         user = session.query(Users).filter_by(username = request.session['username']).one()
     else:
         user = Users(username=request.META.get('REMOTE_ADDR'))
+        user.logged_in = False
+        user.countreviews = user.counttranslations = 0
+
     return user
 
 def view_index_lang(request, language):
@@ -167,6 +170,11 @@ def view_translate(request, language, description_id):
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
             trans.comment = form.cleaned_data['comment']
             trans.unlock()
+
+            # If no longer pending translation, add one to counter
+            if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
+                user.counttranslations += 1
+
             session.commit()
             return show_message_screen(request, 'Translation submitted', 'ddtss_index_lang', language)
 
@@ -242,6 +250,9 @@ def view_review(request, language, description_id):
                     return show_message_screen(request, 'Translation was already reviewed', 'ddtss_index_lang', language)
             # Add to reviewers
             trans.reviews.append( PendingTranslationReview(username=user.username) )
+            # count review
+            user.countreviews += 1
+
             session.commit()
             return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
 

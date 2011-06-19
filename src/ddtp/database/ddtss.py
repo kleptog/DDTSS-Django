@@ -40,6 +40,11 @@ class Users(Base):
 
     lastlanguage = relationship(Languages)
 
+    # A user from the database is by default logged. The login process will
+    # ensure that this field is reset in instances where the user is not a
+    # real user (just IP address).
+    logged_in = True
+
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed
 
