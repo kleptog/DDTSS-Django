@@ -1,3 +1,7 @@
+# DDTSS-Django - A Django implementation of the DDTP/DDTSS website    
+# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
+# See LICENCE file for details.
+
 from django import forms
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response

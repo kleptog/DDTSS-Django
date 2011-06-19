@@ -1,3 +1,7 @@
+# DDTSS-Django - A Django implementation of the DDTP/DDTSS website    
+# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
+# See LICENCE file for details.
+
 import hashlib
 from .db import Base, get_db_session
 from sqlalchemy.orm import relationship, collections

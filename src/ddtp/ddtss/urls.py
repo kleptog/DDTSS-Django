@@ -1,3 +1,6 @@
+# DDTSS-Django - A Django implementation of the DDTP/DDTSS website    
+# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
+# See LICENCE file for details.
 
 from django.conf.urls.defaults import patterns, include, handler500, url
 from django.conf import settings
