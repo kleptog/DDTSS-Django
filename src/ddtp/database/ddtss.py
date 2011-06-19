@@ -2,6 +2,7 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>    
 # See LICENCE file for details.
 
+import re
 import time
 from .db import Base, get_db_session
 from .ddtp import Description
@@ -112,6 +113,35 @@ class PendingTranslation(Base):
         """ Remove lock from record """
         self.owner_locktime = None
         return
+
+    # Display methods
+    #
+    # When editting we make slight changes to the text we display.
+    #
+    #    - Remove the leading space from the long description.
+    #
+    #    - Replace the non-breaking space (U+00A0) with middot (U+00B7)
+    #      because browsers otherwise lose it.
+    #
+    def display_long(self):
+        """ Convert long for display """
+        return self.for_display(self.long)
+
+    def display_short(self):
+        """ Convert long for display """
+        return self.for_display(self.short)
+
+    def for_display(self, s):
+        """ Convert string for display """
+        s = re.sub("(?m)^ ", "", s)
+        s = s.replace(u"\u00A0", u"\u00B7")
+        return s
+
+    def from_display(self, s):
+        """ Convert string in display back to normal """
+        s = re.sub("(?m)^", " ", s)
+        s = s.replace(u"\u00B7", u"\u00A0")
+        return s
 
 class PendingTranslationReview(Base):
     """ A review of a translation """
