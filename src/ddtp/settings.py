@@ -46,7 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',
-    'ddtp.ddt',
+    'ddtp.ddtp_web',
     'ddtp.database',
 )
 

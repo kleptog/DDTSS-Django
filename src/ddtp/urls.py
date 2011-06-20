@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
-from ddtp.ddt import views as ddt_views
+from ddtp.ddtp_web import views as ddt_views
 from ddtp.ddtss import urls as ddtss_urls
 
 handler500 # Pyflakes
