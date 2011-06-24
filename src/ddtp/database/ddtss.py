@@ -96,6 +96,7 @@ class PendingTranslation(Base):
                 suggest.append(' <trans>\n')
         return suggest[0], " .\n".join(suggest[1:])
 
+    # Methods for handling the optimistic locking
     def is_locked(self):
         """ True if record is (optimistically) locked """
         now = time.time()
