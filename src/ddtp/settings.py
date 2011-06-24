@@ -42,10 +42,7 @@ ROOT_URLCONF = 'ddtp.urls'
 
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.admin',
     'ddtp.ddtp_web',
     'ddtp.database',
 )
