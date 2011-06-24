@@ -1,0 +1,29 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS create login</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>DDTSS create login</h1>
+<p>
+A login on the DDTSS is only used so you can keep the status of what you've
+reviewed between machines.  Normally the system tries to guess if you're
+coming from the same machine.  and if that's the case, you do not need a
+login.  If you keep using different machines however, a login may be useful.
+<p>
+Note: Some languages require a login to translate and/or review.
+</p>
+<form method="post" action="{% url ddtss_create_user %}" enctype="multipart/form-data">
+<table id="create_table">
+{{form}}
+</table>
+<input type="submit" name="submit" value="Submit" />
+<input type="submit" name="cancel" value="Cancel" />
+</form>
+<p>An email will be sent to the given address to confirm it. Any accounts not used for 14 days will be removed.</p>
+</body>
+</html>

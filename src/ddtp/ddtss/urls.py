@@ -6,6 +6,7 @@ from django.conf.urls.defaults import patterns, include, handler500, url
 from django.conf import settings
 
 from ddtp.ddtss import views as ddtss_views
+from ddtp.ddtss import users as ddtss_users
 
 handler500 # Pyflakes
 
@@ -16,5 +17,6 @@ urlpatterns = patterns(
     url(r'^(\w\w(?:_\w\w)?)$', ddtss_views.view_index_lang, name='ddtss_index_lang'),
     url(r'^(\w\w(?:_\w\w)?)/translate/(\d+)$', ddtss_views.view_translate, name='ddtss_translate'),
     url(r'^(\w\w(?:_\w\w)?)/forreview/(\d+)$', ddtss_views.view_review, name='ddtss_forreview'),
+    url(r'^createlogin$', ddtss_users.view_create_user, name='ddtss_create_user'),
 )
 
