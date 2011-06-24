@@ -49,7 +49,7 @@ def view_index(request):
 
     return render_to_response("ddtss/index.html", {'languages': params}, context_instance=RequestContext(request))
 
-def get_user(request):
+def get_user(request, session):
     if 'username' in request.session:
         user = session.query(Users).filter_by(username = request.session['username']).one()
     else:
@@ -67,7 +67,7 @@ def view_index_lang(request, language):
     if not lang:
         raise Http404()
 
-    user = get_user(request)
+    user = get_user(request, session)
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
@@ -148,7 +148,7 @@ def view_translate(request, language, description_id):
         session.commit()
         return show_message_screen(request, 'Already translated, redirecting to review screen', 'ddtss_forreview', language, description_id)
 
-    user = get_user(request)
+    user = get_user(request, session)
     # Try to lock the description, note sets the owner field
     if not trans.trylock(user):
         session.commit()
@@ -224,7 +224,7 @@ def view_review(request, language, description_id):
         session.commit()
         return show_message_screen(request, 'Translation not ready for review', 'ddtss_index_lang', language)
 
-    user = get_user(request)
+    user = get_user(request, session)
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
