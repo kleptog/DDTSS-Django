@@ -74,6 +74,7 @@ Setting up a full production Django server is outside the scope of this
 README. This runs the development server:
 
 $ bin/django generate_secret_key
+$ bin/django syncdb
 $ bin/django runserver
 
 There is now a test server running on http://localhost:8000/
