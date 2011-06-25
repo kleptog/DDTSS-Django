@@ -20,6 +20,13 @@
 <p>
 {% endif %}
 <p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 <!-- Message not implemented for now
 <div class=messages>
 <h3>nl-Team-Messages (0): <div class="help" title="Messages from your language team">?</div>

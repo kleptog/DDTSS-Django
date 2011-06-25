@@ -10,6 +10,7 @@ import time
 from django import forms
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
+from django.contrib import messages
 from ddtp.database.ddtss import get_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
 from ddtp.ddtss.views import show_message_screen
 
@@ -86,6 +87,7 @@ def view_create_user(request):
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
 
+            messages.success(request, "Account successfully created.")
             return redirect('ddtss_index')
     else:
         form = UserCreationForm(session)
@@ -125,7 +127,10 @@ def view_login(request):
                 # Login user in
                 request.session['username'] = form.cleaned_data['username']
 
+                messages.success(request, "Login successful.")
                 return redirect('ddtss_index')
+            else:
+                messages.error(request, "Login failed.")
     else:
         form = LoginForm()
 
@@ -139,6 +144,7 @@ def view_logout(request):
     """ Handle user logout """
     if 'username' in request.session:
         # Login user in
+        messages.success(request, "Logout successful.")
         del request.session['username']
 
     return redirect('ddtss_index')
