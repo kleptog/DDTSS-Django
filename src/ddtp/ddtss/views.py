@@ -80,6 +80,8 @@ def view_index_lang(session, request, language):
         user.lastlanguage = lang
     user.lastseen = int(time.time())
 
+    session.commit()
+
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
                                  func.sum(expression.case([(PendingTranslationReview.username==user.username, 1)], else_=0)).label('reviewed'),
