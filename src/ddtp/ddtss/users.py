@@ -97,3 +97,49 @@ def view_create_user(request):
     }
     return render_to_response("ddtss/create_user.html", context,
                               context_instance=RequestContext(request))
+
+class LoginForm(forms.Form):
+    """
+    A form for logging in
+    """
+    username = forms.RegexField(label="Alias", max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
+        error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
+    password = forms.CharField(label="Password", widget=forms.PasswordInput,
+        help_text = "Enter the same password as above, for verification.")
+
+def view_login(request):
+    """ Handle user login """
+
+    if request.method == "POST":
+        if request.POST.get('cancel'):
+            return redirect('ddtss_index')
+
+        session = get_db_session()
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            # Check if user is exists and password match
+            user = session.query(Users).get(form.cleaned_data['username'])
+
+            if user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
+                # Login user in
+                request.session['username'] = form.cleaned_data['username']
+
+                return redirect('ddtss_index')
+    else:
+        form = LoginForm()
+
+    context = {
+        'form': form,
+    }
+    return render_to_response("ddtss/login.html", context,
+                              context_instance=RequestContext(request))
+
+def view_logout(request):
+    """ Handle user logout """
+    if 'username' in request.session:
+        # Login user in
+        del request.session['username']
+
+    return redirect('ddtss_index')
+

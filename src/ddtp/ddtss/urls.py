@@ -18,5 +18,7 @@ urlpatterns = patterns(
     url(r'^(\w\w(?:_\w\w)?)/translate/(\d+)$', ddtss_views.view_translate, name='ddtss_translate'),
     url(r'^(\w\w(?:_\w\w)?)/forreview/(\d+)$', ddtss_views.view_review, name='ddtss_forreview'),
     url(r'^createlogin$', ddtss_users.view_create_user, name='ddtss_create_user'),
+    url(r'^login$', ddtss_users.view_login, name='ddtss_login'),
+    url(r'^logout$', ddtss_users.view_logout, name='ddtss_logout'),
 )
 

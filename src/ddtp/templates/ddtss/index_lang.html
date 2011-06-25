@@ -88,7 +88,7 @@
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
 {% else %}
-<li>not logged in (<a href="/ddtss/index.cgi/login">Login</a>)</li>
+<li>not logged in (<a href="{% url ddtss_login %}">Login</a>)</li>
 {% endif %}
 </ul>
 </div>
@@ -124,7 +124,11 @@
 <a href="{% url ddtss_index_lang 'xx' %}">Another language</a>
 <a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a>
 <a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a>
-<a href="/ddtss/index.cgi/login">Login</a>
+{% if user.logged_in %}
+<a href="{% url ddtss_logout %}">Logout</a>
+{% else %}
+<a href="{% url ddtss_login %}">Login</a>
 <a href="{% url ddtss_create_user %}">Create Login</a>
+{% endif %}
 </body>
 </html>
