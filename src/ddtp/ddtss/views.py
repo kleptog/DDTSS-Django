@@ -2,6 +2,8 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
+import time
+
 from django import forms
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -68,6 +70,10 @@ def view_index_lang(request, language):
         raise Http404()
 
     user = get_user(request, session)
+
+    if user.lastlanguage != lang:
+        user.lastlanguage = lang
+    user.lastseen = int(time.time())
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
