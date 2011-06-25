@@ -6,7 +6,7 @@ import time
 
 from django import forms
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
@@ -17,9 +17,17 @@ from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
 @cache_page(60*60)   # Cache for an hour
-def view_index(request):
+def view_index(request, lang=None):
     """ Does the main index page for DDTSS, with list of languages and stats """
     session = get_db_session()
+
+    if lang is None:
+        user = get_user(request, session)
+        lang = user.lastlanguage_ref
+    if lang is None:
+        lang = 'xx'
+    if lang != 'xx':
+        return redirect('ddtss_index_lang', lang)
 
     pending_translations = session.query(Languages, \
                                          func.sum(expression.case([(PendingTranslation.state==PendingTranslation.STATE_PENDING_TRANSLATION, 1)], else_=0)), \

@@ -13,7 +13,7 @@ handler500 # Pyflakes
 urlpatterns = patterns(
     '',
     url(r'^$', ddtss_views.view_index, name='ddtss_index'),
-    url(r'^xx$', ddtss_views.view_index),
+    url(r'^(xx)$', ddtss_views.view_index),
     url(r'^(\w\w(?:_\w\w)?)$', ddtss_views.view_index_lang, name='ddtss_index_lang'),
     url(r'^(\w\w(?:_\w\w)?)/translate/(\d+)$', ddtss_views.view_translate, name='ddtss_translate'),
     url(r'^(\w\w(?:_\w\w)?)/forreview/(\d+)$', ddtss_views.view_review, name='ddtss_forreview'),
