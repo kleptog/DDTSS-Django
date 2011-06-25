@@ -5,14 +5,13 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, ActiveDescription, Translation
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation
 from sqlalchemy import func
 
 @cache_page(60*60)   # Cache for an hour
-def view_browse(request, prefix):
+@with_db_session
+def view_browse(session, request, prefix):
     """ Does overview pages (<foo>.html) """
-    session = get_db_session()
-
     resultset = session.query(Description.package, Description.description_id, DescriptionTag). \
                         filter(Description.description_id==DescriptionTag.description_id). \
                         filter(Description.package.like(prefix+'%')). \
@@ -36,10 +35,9 @@ def view_browse(request, prefix):
     return render_to_response("overview.html", {'packages': params, 'prefix': prefix}, context_instance=RequestContext(request))
 
 @cache_page(60*60)   # Cache for an hour
-def view_index(request):
+@with_db_session
+def view_index(session, request):
     """ Main index.html, show summary info """
-    session = get_db_session()
-
     resultset = session.query(Translation.language, func.count(Translation.description_id), func.count(ActiveDescription.description_id)). \
                         outerjoin(ActiveDescription, ActiveDescription.description_id == Translation.description_id). \
                         group_by(Translation.language).order_by(Translation.language).all()
@@ -56,10 +54,9 @@ def view_index(request):
 
     return render_to_response("index.html", params, context_instance=RequestContext(request))
 
-def view_package(request, package_name):
+@with_db_session
+def view_package(session, request, package_name):
     """ Show the page for a single package """
-    session = get_db_session()
-
     params = dict()
     params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
 
@@ -73,10 +70,9 @@ def view_package(request, package_name):
 
     return render_to_response("package.html", params, context_instance=RequestContext(request))
 
-def view_descr(request, descr_id):
+@with_db_session
+def view_descr(session, request, descr_id):
     """ Show the page for a single description """
-    session = get_db_session()
-
     params = dict()
     params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
 

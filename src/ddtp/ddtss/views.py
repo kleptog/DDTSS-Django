@@ -10,17 +10,15 @@ from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import get_db_session, Description, DescriptionTag, ActiveDescription, Translation
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
 from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
-@cache_page(60*60)   # Cache for an hour
-def view_index(request, lang=None):
+@with_db_session
+def view_index(session, request, lang=None):
     """ Does the main index page for DDTSS, with list of languages and stats """
-    session = get_db_session()
-
     if lang is None:
         user = get_user(request, session)
         lang = user.lastlanguage_ref
@@ -69,10 +67,9 @@ def get_user(request, session):
 
     return user
 
-def view_index_lang(request, language):
+@with_db_session
+def view_index_lang(session, request, language):
     """ Does the main index page for a single language in DDTSS """
-    session = get_db_session()
-
     lang = session.query(Languages).get(language)
     if not lang:
         raise Http404()
@@ -140,10 +137,9 @@ class TranslationForm(forms.Form):
     abandon = forms.CharField(required=False)
     _charset_ = forms.CharField(required=False)
 
-def view_translate(request, language, description_id):
+@with_db_session
+def view_translate(session, request, language, description_id):
     """ Show the translation page for a description """
-    session = get_db_session()
-
     lang = session.query(Languages).get(language)
     if not lang:
         raise Http404()
@@ -217,10 +213,9 @@ class ReviewForm(forms.Form):
     _charset_ = forms.CharField(required=False)
     timestamp = forms.IntegerField(required=False)
 
-def view_review(request, language, description_id):
+@with_db_session
+def view_review(session, request, language, description_id):
     """ Show the review page for a description """
-    session = get_db_session()
-
     lang = session.query(Languages).get(language)
     if not lang:
         raise Http404()

@@ -3,7 +3,7 @@
 # See LICENCE file for details.
 
 import hashlib
-from .db import Base, get_db_session
+from .db import Base, with_db_session
 from sqlalchemy.orm import relationship, collections
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey

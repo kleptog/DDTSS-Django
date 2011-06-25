@@ -11,7 +11,7 @@ from django import forms
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import get_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
+from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
 from ddtp.ddtss.views import show_message_screen
 
 class UserCreationForm(forms.Form):
@@ -61,10 +61,9 @@ def generate_random_string(length):
 
     return "".join([random.choice(chars) for i in range(length)])
 
-def view_create_user(request):
+@with_db_session
+def view_create_user(session, request):
     """ Handle the user creation """
-    session = get_db_session()
-
     if request.method == "POST":
         form = UserCreationForm(session=session, data=request.POST)
         if form.is_valid():
@@ -110,14 +109,14 @@ class LoginForm(forms.Form):
     password = forms.CharField(label="Password", widget=forms.PasswordInput,
         help_text = "Enter the same password as above, for verification.")
 
-def view_login(request):
+@with_db_session
+def view_login(session, request):
     """ Handle user login """
 
     if request.method == "POST":
         if request.POST.get('cancel'):
             return redirect('ddtss_index')
 
-        session = get_db_session()
         form = LoginForm(data=request.POST)
         if form.is_valid():
             # Check if user is exists and password match

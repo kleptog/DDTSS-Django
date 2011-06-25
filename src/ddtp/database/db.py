@@ -2,6 +2,8 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
+import functools
+
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
@@ -20,3 +22,14 @@ def get_db_session():
        Session = sessionmaker(bind=db_engine)
     # create a Session
     return Session()
+
+def with_db_session(view):
+    """ Decorator that provides a session argument and cleans up on return """
+    @functools.wraps(view)
+    def new_view(*args, **kwargs):
+        try:
+            session = get_db_session()
+            return view(session, *args, **kwargs)
+        finally:
+            session.close()
+    return new_view

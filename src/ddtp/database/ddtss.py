@@ -4,7 +4,7 @@
 
 import re
 import time
-from .db import Base, get_db_session
+from .db import Base, with_db_session
 from .ddtp import Description
 from django.conf import settings
 from sqlalchemy.orm import relationship, collections
