@@ -62,11 +62,15 @@ execute:
 
 $ psql ddtp -q -f src/ddtp/database/initial/load_sample.sql
 
-This should also complete without errors or warnings.
+This should also complete without errors or warnings. You should just see
+the sequence values being updated.
 
 For sample data for the DDTSS, you need to do:
 
 $ psql ddtp -q -f src/ddtp/database/initial/load_sample_ddtss.sql
+
+Note the sample data does not include any users. You will have to create
+those yourself.
 
 5. Start up the Django test server.
 
