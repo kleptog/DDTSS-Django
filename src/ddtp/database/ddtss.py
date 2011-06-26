@@ -164,10 +164,14 @@ class PendingTranslation(Base):
     def update_translation(self, short, long):
         # FIXME: Check new description has correct numer of paragraphs
         # FIXME: Logging of changes
-        self.oldshort = self.short
-        self.oldlong = self.long
-        self.short = self.from_display(short)
-        self.long = self.from_display(long)
+        newshort = self.from_display(short)
+        if self.short != newshort:
+            self.oldshort = self.short
+            self.short = newshort
+        newlong = self.from_display(long)
+        if self.long != newlong:
+            self.oldlong = self.long
+            self.long = newlong
         self.lastupdate = int(time.time())
 
         if ('<trans>' not in short and '<trans>' not in long and
