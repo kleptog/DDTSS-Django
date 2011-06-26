@@ -164,8 +164,8 @@ class PendingTranslation(Base):
     def update_translation(self, short, long):
         # FIXME: Check new description has correct numer of paragraphs
         # FIXME: Logging of changes
-        self.oldshort = short
-        self.oldlong = long
+        self.oldshort = self.short
+        self.oldlong = self.long
         self.short = self.from_display(short)
         self.long = self.from_display(long)
         self.lastupdate = int(time.time())
