@@ -1,0 +1,24 @@
+To help translators out there is a fuzzy matching algorithm which, for parts
+or a translation which have not yet been translated, attempts to find other
+translated parts that resemble the one in the current translation.
+
+The algorithm is fairly simple.
+
+1. Find all descriptions which share a paragraph with the current
+description.
+
+This part isn't foolproof, as the part_description_tb table is not complete.
+This is to capture the case where a library changed a version number but the
+rest of the description stayed the same.
+
+2. Find all descriptions which share a package or source package name with
+any of the descriptions found in the first step.
+
+Again, packages from the same source are more likely to have similar
+descriptions.
+
+3. For each paragraph of a description found in the second step, find the
+best match which is no more than 20% different from the paragraph being
+translated.
+
+The results so far seem ok, but it has yet to be used in practice.
