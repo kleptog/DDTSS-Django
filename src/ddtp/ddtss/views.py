@@ -174,6 +174,7 @@ def view_translate(session, request, language, description_id):
             return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
 
         if form.cleaned_data['abandon']:
+            trans.comment = form.cleaned_data['comment']
             trans.unlock()
             session.commit()
             return show_message_screen(request, 'Translation abandoned', 'ddtss_index_lang', language)
