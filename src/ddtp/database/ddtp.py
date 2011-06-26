@@ -4,7 +4,7 @@
 
 import hashlib
 from .db import Base, with_db_session
-from sqlalchemy.orm import relationship, collections
+from sqlalchemy.orm import relationship, collections, aliased
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 
@@ -84,6 +84,37 @@ class Description(Base):
         parts = self.get_description_parts()
 
         return [(p[0], p[1], Session.object_session(self).query(PartDescription).filter_by(part_md5=p[1]).first()) for p in parts]
+
+    def get_potential_fuzzy_matches(self, lang):
+        """ Returns a list of pairs (text,Parts) which may be fuzzy matches
+        for this description.  The part is the already translated version,
+        included because we needed to look it up anyway for existence """
+
+        session = Session.object_session(self)
+        # Find all descriptions which share a part with this description
+        PartDescr2=aliased(PartDescription)
+        related_descrs = set( d for d, in session.query(PartDescr2.description_id).
+                                                  join(PartDescription, PartDescription.part_md5==PartDescr2.part_md5).
+                                                  filter(PartDescription.description_id==self.description_id))
+        # Always add self, as part_description table is not complete
+        related_descrs.add(self.description_id)
+
+        # Finally, find all parts of all descriptions which have been
+        # translated and and part of a package which share a source or
+        # package
+        Descr2 = aliased(Description)
+        related_parts = session.query(Part, Descr2).join(PartDescription, PartDescription.part_md5 == Part.part_md5). \
+                                                    join(Descr2, Descr2.description_id == PartDescription.description_id). \
+                                                    join(Description, (Description.package == Descr2.package) | (Description.source == Descr2.source)). \
+                                                    filter(Description.description_id.in_(related_descrs)). \
+                                                    filter(Part.language == lang).all()
+
+        # First we go through the descriptions, deconstructing them into parts
+        descr_map = dict( (part_md5, part) for _, descr in related_parts for part, part_md5 in descr.get_description_parts() )
+
+        result = [ (descr_map.get(trans.part_md5), trans) for trans, _ in related_parts ]
+
+        return result
 
     def __repr__(self):
         return 'Description(%d, package=%r, source=%r)' % (self.description_id, self.package, self.source)

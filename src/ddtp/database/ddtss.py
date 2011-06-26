@@ -4,6 +4,8 @@
 
 import re
 import time
+import difflib
+
 from .db import Base, with_db_session
 from .ddtp import Description
 from django.conf import settings
@@ -88,12 +90,19 @@ class PendingTranslation(Base):
         the description using existing parts """
 
         parts = description.get_description_part_objects()
+        # A map from untranslated text, to translated text
+        fuzzy_parts = dict( description.get_potential_fuzzy_matches(language) )
         suggest = []
         for text, hash, part in parts:
             if part and language in part.translation:
                 suggest.append(part.translation[language].part)
             else:
-                suggest.append(' <trans>\n')
+                # Look for the nearest fuzzy match, and if exists
+                match = difflib.get_close_matches(text, fuzzy_parts.iterkeys(), 1, 0.8)
+                if match:
+                    suggest.append(u" <fuzzy>\n" + fuzzy_parts[match[0]].part)
+                else:
+                    suggest.append(u" <trans>\n")
         return suggest[0], " .\n".join(suggest[1:])
 
     # Methods for handling the optimistic locking
