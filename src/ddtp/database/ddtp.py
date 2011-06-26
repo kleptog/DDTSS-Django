@@ -73,7 +73,7 @@ class Description(Base):
                 if s: parts.append(s)
                 s = ""
         if s: parts.append(s)
-        return [(p, hashlib.md5(p).hexdigest()) for p in parts]
+        return [(p, hashlib.md5(p.encode('utf-8')).hexdigest()) for p in parts]
 
     def get_description_part_objects(self):
         """ Returns a list of (string, md5, partobj) for the parts of this
