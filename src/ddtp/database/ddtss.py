@@ -168,7 +168,8 @@ class PendingTranslation(Base):
         self.long = self.from_display(long)
         self.lastupdate = int(time.time())
 
-        if '<trans>' not in short and '<trans>' not in long:
+        if ('<trans>' not in short and '<trans>' not in long and
+            '<fuzzy>' not in short and '<fuzzy>' not in long):
             self.state = PendingTranslation.STATE_PENDING_REVIEW
 
         return
