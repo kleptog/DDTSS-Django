@@ -3,6 +3,7 @@
 # See LICENCE file for details.
 
 import time
+import difflib
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -204,6 +205,77 @@ def view_translate(session, request, language, description_id):
         descr=descr,
         trans=trans), context_instance=RequestContext(request))
 
+def generate_line_diff(old, new):
+    """ Given two lines, generate a diff between them. Intends for short
+    descriptions, also used internally for the long descriptions.
+    Returns a list of pairs:
+
+    ('new', text) is new
+    ('old', text) is removed
+    ('', text) is unchanged
+    """
+    res = []
+    matcher = difflib.SequenceMatcher(a=old, b=new)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        print tag, i1, i2, j1, j2
+        if tag in ('delete', 'replace'):
+            res.append( ('old', old[i1:i2]) )
+        if tag in ('insert', 'replace'):
+            res.append( ('new', new[j1:j2]) )
+        if tag == 'equal':
+            res.append( ('', old[i1:i2]) )
+
+    return res
+
+def generate_long_description_diff(old, new):
+    """ Given two long descriptions generate a diff between them. This can
+    be used between two untranslated descriptions, or two translations.
+    Returns a list of pairs:
+
+    ('new', text) is new
+    ('old', text) is removed
+    ('', text) is unchanged
+     """
+
+    old_parts = old.split(" .\n")
+    new_parts = new.split(" .\n")
+
+    # First make sure each has equally many parts.  Note we could be smarter
+    # here, perhaps putting the empty string elsewhere would give better
+    # matches.
+    while len(old_parts) < len(new_parts):
+        old_parts.append('')
+    while len(old_parts) > len(new_parts):
+        new_parts.append('')
+
+    print old_parts
+    print new_parts
+    res = []
+    # Then handle each pair of parts seperately
+    for i in range(len(old_parts)):
+        # We could just let the diff loose on the whole string, but with
+        # embedded newlines the results are not really intuitive
+        old_lines = old_parts[i].rstrip("\n").split("\n")
+        new_lines = new_parts[i].rstrip("\n").split("\n")
+        while len(old_lines) < len(new_lines):
+            old_lines.append('')
+        while len(old_lines) > len(new_lines):
+            new_lines.append('')
+
+        print old_lines
+        print new_lines
+
+        for j in range(len(old_lines)):
+            # Put the newline back on the end
+            res.extend( generate_line_diff(old_lines[j], new_lines[j]) )
+            res.append( ('', '\n') )
+
+        # Except for the last paragraph, add seperater
+        if i != len(old_parts)-1:
+            res.append( ('', ' .\n') )
+
+    return res
+
 class ReviewForm(forms.Form):
     """ This form is used to encapsulate the results of form submission """
     short = forms.CharField(max_length=80)
@@ -284,8 +356,16 @@ def view_review(session, request, language, description_id):
 
     session.commit()
 
+    diff_short = diff_long = None
+    if trans.oldshort and trans.for_display(trans.oldshort) != trans.for_display(trans.short):
+        diff_short = generate_line_diff(trans.for_display(trans.oldshort), trans.for_display(trans.short))
+    if trans.oldlong and trans.for_display(trans.oldlong) != trans.for_display(trans.long):
+        diff_long = generate_long_description_diff(trans.for_display(trans.oldlong), trans.for_display(trans.long))
+
     return render_to_response("ddtss/translate.html", dict(
         forreview=True,
+        diff_short=diff_short,
+        diff_long=diff_long,
         lang=lang,
         descr=descr,
         trans=trans), context_instance=RequestContext(request))
