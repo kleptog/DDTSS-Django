@@ -8,6 +8,22 @@ from sqlalchemy.orm import relationship, collections, aliased
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 
+def description_to_parts(descr):
+    """ Function to convert a textual description into the various
+    paragraphs.  Seperated out because it is needed in so many places """
+    lines = descr.split('\n')
+    parts = [lines.pop(0)]  # Take header as is
+    s = ""
+    for line in lines:
+        if line and line != " .":
+            s += line + "\n"
+        else:
+            if s: parts.append(s)
+            s = ""
+    if s: parts.append(s)
+
+    return parts
+
 class DescriptionTag(Base):
     """ Records for each description which releases it was in """
     __tablename__ = 'description_tag_tb'
@@ -63,16 +79,8 @@ class Description(Base):
 
     def get_description_parts(self):
         """ Returns a list of (string, md5) which are the parts of this description """
-        lines = self.description.split('\n')
-        parts = [lines.pop(0)]  # Take header as is
-        s = ""
-        for line in lines:
-            if line and line != " .":
-                s += line + "\n"
-            else:
-                if s: parts.append(s)
-                s = ""
-        if s: parts.append(s)
+        parts = description_to_parts(self.description)
+
         return [(p, hashlib.md5(p.encode('utf-8')).hexdigest()) for p in parts]
 
     def get_description_part_objects(self):
