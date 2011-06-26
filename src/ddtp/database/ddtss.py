@@ -149,12 +149,14 @@ class PendingTranslation(Base):
     def for_display(self, s):
         """ Convert string for display """
         s = re.sub("(?m)^ ", "", s)
+        s = s.replace(u"\r", u"")
         s = s.replace(u"\u00A0", u"\u00B7")
         return s
 
     def from_display(self, s):
         """ Convert string in display back to normal """
         s = re.sub("(?m)^", " ", s)
+        s = s.replace(u"\r", u"")
         s = s.replace(u"\u00B7", u"\u00A0")
         return s
 
