@@ -55,19 +55,6 @@ ALTER SEQUENCE description_tag_tb_description_tag_id_seq OWNED BY description_ta
 
 
 --
--- Name: description_tag_tb_old; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE TABLE description_tag_tb_old (
-    description_tag_id integer DEFAULT nextval('description_tag_tb_description_tag_id_seq'::regclass) NOT NULL,
-    description_id integer NOT NULL,
-    tag text NOT NULL,
-    date_begin date NOT NULL,
-    date_end date NOT NULL
-);
-
-
---
 -- Name: description_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
 --
 
@@ -562,20 +549,6 @@ CREATE UNIQUE INDEX active_tb_1_idx ON active_tb USING btree (description_id);
 
 
 --
--- Name: description_tag_tb_1_idx; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE INDEX description_tag_tb_1_idx ON description_tag_tb_old USING btree (description_id, tag);
-
-
---
--- Name: description_tag_tb_2_idx; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE INDEX description_tag_tb_2_idx ON description_tag_tb_old USING btree (description_id);
-
-
---
 -- Name: description_tag_tb_new_description_id_key; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
 --
 
@@ -755,14 +728,6 @@ CREATE INDEX version_tb_1_idx ON version_tb USING btree (description_id);
 --
 
 CREATE UNIQUE INDEX version_tb_3_idx ON version_tb USING btree (description_id, version);
-
-
---
--- Name: $1; Type: FK CONSTRAINT; Schema: public; Owner: ddtp
---
-
-ALTER TABLE ONLY description_tag_tb_old
-    ADD CONSTRAINT "$1" FOREIGN KEY (description_id) REFERENCES description_tb(description_id);
 
 
 --
