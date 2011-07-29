@@ -1,0 +1,16 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- source: {{source_name}} --- </TITLE>
+</HEAD>
+<BODY>
+{% for prefix in prefixlist %}
+<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
+{% endfor %}
+<br><h3>{{source_name}}</h3>
+{% for description in descriptions %}
+Package: <a href="{% url ddt_package description.package %}">{{description.package}}</a><br>
+{% endfor %}
+<br>
+</BODY>
+</HTML>
