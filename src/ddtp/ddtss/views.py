@@ -151,17 +151,26 @@ def view_translate(session, request, language, description_id):
     if not descr:
         raise Http404()
 
+    user = get_user(request, session)
+
     # Select FOR UPDATE, to avoid concurrency issues.
     trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
     if not trans:
-        # Maybe in the future we build on the fly?
-        raise Http404()
+        trans = PendingTranslation(
+                description_id=description_id,
+                language=lang,
+                firstupdate=int(time.time()),
+                lastupdate=int(time.time()),
+                owner_username=user.username,
+                owner_locktime=int(time.time()),
+                iteration=0,
+                state=0)
+        session.add(trans)
 
     if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
         session.commit()
         return show_message_screen(request, 'Already translated, redirecting to review screen', 'ddtss_forreview', language, description_id)
 
-    user = get_user(request, session)
     # Try to lock the description, note sets the owner field
     if not trans.trylock(user):
         session.commit()
