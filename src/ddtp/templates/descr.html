@@ -10,7 +10,7 @@
 <br>
 <h3>{{descr.package}}</h3>
 <pre>
-Source: <a href="ddt.cgi?source=r-base">{{descr.source}}</a>
+Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
 Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
@@ -23,7 +23,7 @@ Description: {{descr.description}}
 <br>
 {% for lang in langs %}
 {% if lang in descr.translation %}
-This Description is translated to <a href="ddt.cgi?desc_id=70989&language=de">{{lang}}</a> 
+This Description is translated to <a href="{%url ddt_transdescr descr.description_id lang%}">{{lang}}</a> 
 {% else %}
 This Description is not yet translated to {{lang}}
 {% endif %}
