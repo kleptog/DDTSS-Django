@@ -27,7 +27,7 @@ This Description is translated to <a href="{%url ddt_transdescr descr.descriptio
 {% else %}
 This Description is not yet translated to {{lang}}
 {% endif %}
-<a href="ddt.cgi?desc_id=70989&getuntrans=de"><img src="{{MEDIA_URL}}quill.png" border=0 height=13></a> <br>
+<a href="{%url ddtss_translate lang descr.description_id%}"><img src="{{MEDIA_URL}}quill.png" border=0 height=13></a> <br>
 {% endfor %}
 <br>
 parts-md5sum: <br><pre>
