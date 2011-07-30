@@ -116,7 +116,7 @@ def view_index_lang(session, request, language):
             if not description :
                 return show_message_screen(request, 'No description-id %s found' % str(description_id), 'ddtss_index_lang', language)
 
-            if not ((language in description.translation) and not (force)) :
+            if language not in description.translation or force:
                 trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
                 if not trans:
                     trans = PendingTranslation(
