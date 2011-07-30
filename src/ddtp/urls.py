@@ -16,7 +16,7 @@ urlpatterns = patterns(
     url(r'^package/([\w.+-]+)$', ddt_views.view_package, name='ddt_package'),
     url(r'^source/([\w.+-]+)$', ddt_views.view_source, name='ddt_source'),
     url(r'^descr/(\d+)$', ddt_views.view_descr, name='ddt_descr'),
-    url(r'^descr/(\d+)-(\w+)$', ddt_views.view_transdescr, name='ddt_transdescr'),
+    url(r'^descr/(\d+)/(\w+)$', ddt_views.view_transdescr, name='ddt_transdescr'),
     url(r'^ddtss/', include(ddtss_urls)),
 )
 
