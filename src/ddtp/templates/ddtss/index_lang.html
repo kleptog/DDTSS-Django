@@ -54,7 +54,7 @@
   <h4>Fetch specific description
     <div class="help" title="Get a specific description to translate. Normally it won't fetch descriptions already translated, use force to override.">?</div>
   </h4>
-  <form method="post" action="/ddtss/index.cgi/nl/fetch" enctype="multipart/form-data">
+  <form method="post" action="{% url ddtss_index_lang lang.language %}" enctype="multipart/form-data" accept-charset="utf-8">
     <input name="package" type="text" />
     <label><input type="checkbox" name="force" value="yes" id="force" /></label>
     <label for="force">Force fetching even if not untranslated</label>
