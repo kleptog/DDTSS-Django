@@ -22,5 +22,6 @@ urlpatterns = patterns(
     url(r'^login$', ddtss_users.view_login, name='ddtss_login'),
     url(r'^logout$', ddtss_users.view_logout, name='ddtss_logout'),
     url(r'^admin$', ddtss_admin.view_admin, name='ddtss_admin'),
+    url(r'^admin/(\w\w(?:_\w\w)?)$', ddtss_admin.view_admin_lang, name='ddtss_admin_lang'),
 )
 
