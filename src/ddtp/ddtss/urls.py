@@ -7,6 +7,7 @@ from django.conf import settings
 
 from ddtp.ddtss import views as ddtss_views
 from ddtp.ddtss import users as ddtss_users
+from ddtp.ddtss import admin as ddtss_admin
 
 handler500 # Pyflakes
 
@@ -20,5 +21,6 @@ urlpatterns = patterns(
     url(r'^createlogin$', ddtss_users.view_create_user, name='ddtss_create_user'),
     url(r'^login$', ddtss_users.view_login, name='ddtss_login'),
     url(r'^logout$', ddtss_users.view_logout, name='ddtss_logout'),
+    url(r'^admin$', ddtss_admin.view_admin, name='ddtss_admin'),
 )
 

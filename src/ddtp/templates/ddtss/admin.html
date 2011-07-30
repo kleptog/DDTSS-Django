@@ -1,0 +1,35 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS Admin</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>DDTSS Admin</h1>
+<p>
+<table class="langlist"><col width="150px" /><col width="150px" /><col width="150px" /><col width="150px"/>
+<tr><th>Language</th> <th>Name</th> <th>Require login</th> <th>Enabled</th></tr>
+{% for lang in languages %}
+<tr class="{% cycle 'odd' 'even' %}">
+   <td><a href="{% url ddtss_admin_lang lang.language %}">{{ lang.language }}</a></td>
+   <td align="left">{{lang.fullname}}</td>
+   <td align="center">{% if lang.requirelogin %}Yes{%else%}No{%endif%}</td>
+   <td align="center">{% if lang.enabled_ddtss %}Yes{%else%}No{%endif%}</td>
+</tr>
+{% endfor %}
+</table>
+<p>
+<table class="langlist"><col width="150px" /><col width="150px" />
+<tr><th>Admin</th> <th>Name</th></tr>
+{% for admin in admins %}
+<tr class="{% cycle 'odd' 'even' %}">
+   <td>{{ admin.username }}</td>
+   <td>{{ admin.realname }}</td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
