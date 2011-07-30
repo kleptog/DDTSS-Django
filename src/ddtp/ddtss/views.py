@@ -4,6 +4,7 @@
 
 import time
 import difflib
+import re
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -11,7 +12,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
 from sqlalchemy import func
 from sqlalchemy.sql import expression
@@ -68,6 +69,12 @@ def get_user(request, session):
 
     return user
 
+class FetchForm(forms.Form):
+    """ This form is used to encapsulate the results of Fetch request """
+    package = forms.CharField(max_length=80)
+    force = forms.CharField(required=False)
+    _charset_ = forms.CharField(required=False)
+
 @with_db_session
 def view_index_lang(session, request, language):
     """ Does the main index page for a single language in DDTSS """
@@ -80,6 +87,53 @@ def view_index_lang(session, request, language):
     if user.lastlanguage != lang:
         user.lastlanguage = lang
     user.lastseen = int(time.time())
+
+    if request.method == 'POST':
+        form = FetchForm(request.POST)
+
+        if not form.is_valid():
+            # Maybe return HTTP 400 - Bad request?
+            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
+
+        if form.cleaned_data['package']:
+            pack = form.cleaned_data['package']
+            force = form.cleaned_data['force']
+            
+            if re.match('^\d+$', pack) :
+                description_id=pack
+            else :
+                # FIXME error, ist package name is not found!
+                packageversion=session.query(PackageVersion).filter(PackageVersion.package==pack).\
+                        join(ActiveDescription, ActiveDescription.description_id == PackageVersion.description_id).limit(1).first()
+
+                if not packageversion :
+                    return show_message_screen(request, 'No Package %s found' % pack, 'ddtss_index_lang', language)
+
+                description_id=packageversion.description_id
+
+            description=session.query(Description).filter(Description.description_id==description_id).first()
+
+            if not description :
+                return show_message_screen(request, 'No description-id %s found' % str(description_id), 'ddtss_index_lang', language)
+
+            if not ((language in description.translation) and not (force)) :
+                trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
+                if not trans:
+                    trans = PendingTranslation(
+                            description_id=description_id,
+                            language=lang,
+                            firstupdate=int(time.time()),
+                            lastupdate=int(time.time()),
+                            owner_username=user.username,
+                            owner_locktime=int(time.time()),
+                            iteration=0,
+                            state=0)
+                    trans.short, trans.long = PendingTranslation.make_suggestion(description, language)
+                    session.add(trans)
+                    session.commit()
+                    return show_message_screen(request, 'Fetch Package %s (%s)' % (description.package,str(description_id)), 'ddtss_index_lang', language)
+
+            return show_message_screen(request, 'Don\'t fetch Package %s' % (pack), 'ddtss_index_lang', language)
 
     session.commit()
 
