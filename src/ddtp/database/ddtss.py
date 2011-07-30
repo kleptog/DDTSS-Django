@@ -39,6 +39,7 @@ class Users(Base):
     md5password = Column(String, nullable=False)
     lastseen = Column(Integer, nullable=False)   # timestamp
     lastlanguage_ref = Column('lastlanguage', String, ForeignKey('languages_tb.language'))
+    superuser = Column(Boolean, nullable=False, default=False)
 
     lastlanguage = relationship(Languages)
 

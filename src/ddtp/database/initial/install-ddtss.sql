@@ -118,7 +118,8 @@ CREATE TABLE users_tb (
     key character varying NOT NULL,
     md5password character varying NOT NULL,
     lastseen integer NOT NULL,
-    lastlanguage character varying
+    lastlanguage character varying,
+    superuser boolean NOT NULL DEFAULT false
 );
 
 
