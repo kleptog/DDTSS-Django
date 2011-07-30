@@ -90,7 +90,7 @@
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
-<li>Account: {{user.username}}</li>
+<li>Account: {{user.username}}{% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
