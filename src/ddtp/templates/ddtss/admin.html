@@ -11,11 +11,12 @@
 <h1>DDTSS Admin</h1>
 <p>
 <table class="langlist"><col width="150px" /><col width="150px" /><col width="150px" /><col width="150px"/>
-<tr><th>Language</th> <th>Name</th> <th>Require login</th> <th>Enabled</th></tr>
+<tr><th>Language</th> <th>Name</th> <th>#reviewers</th> <th>Require login</th> <th>Enabled</th></tr>
 {% for lang in languages %}
 <tr class="{% cycle 'odd' 'even' %}">
    <td><a href="{% url ddtss_admin_lang lang.language %}">{{ lang.language }}</a></td>
    <td align="left">{{lang.fullname}}</td>
+   <td align="center">{{lang.numreviewers}}</td>
    <td align="center">{% if lang.requirelogin %}Yes{%else%}No{%endif%}</td>
    <td align="center">{% if lang.enabled_ddtss %}Yes{%else%}No{%endif%}</td>
 </tr>
