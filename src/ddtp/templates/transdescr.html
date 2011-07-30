@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{lang}} --- </TITLE>
+</HEAD>
+<BODY>
+{% for prefix in prefixlist %}
+<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
+{% endfor %}
+<br>
+<h3>{{descr.package}}</h3>
+<pre>
+Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
+Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
+Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
+Prioritize: {{descr.prioritize}}
+Description: {{descr.description}}
+</pre>
+The {{lang}}-translation:
+<pre> 
+Description-{{lang}}: {{ translation.translation}}
+</pre> 
+parts-md5sum: <br><pre> {% for part in descr.parts %}
+{{part.part_md5}} {% endfor %}
+</pre>
+</BODY>
+</HTML>

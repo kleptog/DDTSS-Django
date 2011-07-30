@@ -3,11 +3,11 @@
 <TITLE>Debian Description Tracking  --- {{ prefix }} --- </TITLE>
 </HEAD>
 <BODY>
-<h3>l</h3>
+<h3>{{ prefix }}</h3>
 {% for package, descriptions in packages %}
 <h4><a href="{% url ddt_package package %}">{{ package }}</a></h4>
     {% for descr_id, tags in descriptions %}
-        <a href="ddt.cgi?desc_id=37181">{{ descr_id }}</a>:
+        <a href="/descr/{{ descr_id }}">{{ descr_id }}</a>:
         {% for tag in tags %}
             {{ tag.tag }}: {{tag.date_begin|date:"Y-m-d"}}...{{ tag.date_end|date:"Y-m-d" }};
         {% endfor %}
