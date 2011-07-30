@@ -91,3 +91,37 @@ def view_descr(session, request, descr_id):
     params['langs'] = [l[0] for l in langs]
 
     return render_to_response("descr.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def view_transdescr(session, request, descr_id, lang):
+    """ Show the page for a single translated description """
+    params = dict()
+    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+
+    # This description
+    descr = session.query(Description). \
+                        filter(Description.description_id==descr_id).one()
+    params['descr'] = descr
+    params['lang'] = lang
+
+    translation = session.query(Translation). \
+                        filter(Translation.description_id==descr_id). \
+                        filter(Translation.language==lang).one()
+    params['translation'] = translation
+
+    return render_to_response("transdescr.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def view_source(session, request, source_name):
+    """ Show the page for a single source package """
+    params = dict()
+    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+
+    params['source_name'] = source_name
+
+    # All Packages of this source package
+    descriptions = session.query(Description.package). \
+                        filter(Description.source==source_name).group_by(Description.package).order_by(Description.package).all()
+    params['descriptions'] = descriptions
+
+    return render_to_response("source.html", params, context_instance=RequestContext(request))
