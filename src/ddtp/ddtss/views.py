@@ -164,7 +164,10 @@ def view_translate(session, request, language, description_id):
                 owner_username=user.username,
                 owner_locktime=int(time.time()),
                 iteration=0,
-                state=0)
+                state=PendingTranslation.STATE_PENDING_TRANSLATION)
+
+        # Make a suggestion for the new translation
+        trans.short, trans.long = PendingTranslation.make_suggestion(descr, language)
         session.add(trans)
 
     if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
