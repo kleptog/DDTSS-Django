@@ -24,6 +24,11 @@ class Languages(Base):
     requirelogin = Column(Boolean, nullable=False, default=False)
     enabled_ddtss = Column(Boolean, nullable=False, default=True)  # disabled
 
+    @property
+    def coordinators(self):
+        """ Returns the coordinators for this language """
+        return Session.object_session(self).query(Users).join(UserAuthority).filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_COORDINATOR).all()
+
 # /aliases/*
 class Users(Base):
     """ Each user which can login has a record """
