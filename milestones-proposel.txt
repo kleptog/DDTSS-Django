@@ -1,0 +1,37 @@
+-- description_milestone_tb
+-- # store the package for all milestones.
+-- # milestone is the name of the milestone, in the form: "type:name", ex:
+-- #   prio:required etc
+-- #   sect:games etc
+-- #   task:desktop etc.
+-- #   land:de etc.
+-- #   user:user_id
+
+--
+-- Name: description_milestone_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+CREATE TABLE description_milestone_tb (
+    description_milestone_id integer NOT NULL,
+    description_id integer NOT NULL,
+    milestone text NOT NULL,
+);
+
+
+--
+-- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
+--
+
+CREATE SEQUENCE description_milestone_tb_description_milestone_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
+--
+
+ALTER SEQUENCE description_milestone_tb_description_milestone_id_seq OWNED BY description_milestone_tb.description_milestone_id;
+
