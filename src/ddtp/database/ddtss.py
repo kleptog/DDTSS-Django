@@ -48,6 +48,38 @@ class Users(Base):
     # real user (just IP address).
     logged_in = True
 
+    def get_authority(self, language):
+        auth = Session.object_session(self).query(UserAuthority).filter_by(username=self.username, language_ref=language).first()
+        if not auth:
+            return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
+        return auth
+
+class UserAuthority(Base):
+    """ Stores the trust level of each user for each language """
+    __tablename__ = 'userauthority_tb'
+
+    username = Column(String, ForeignKey('users_tb.username'), primary_key=True)
+    language_ref = Column('language', String, ForeignKey('languages_tb.language'), primary_key=True)
+
+    # For now all we have is a level. What you can do with each level is
+    # defined elsewhere.
+    auth_level = Column(Integer, nullable=False)
+
+    AUTH_LEVEL_NONE = 0
+    AUTH_LEVEL_TRUSTED = 1
+    AUTH_LEVEL_COORDINATOR = 2
+
+    auth_level_names = {AUTH_LEVEL_NONE: '',
+                        AUTH_LEVEL_TRUSTED: 'Trusted user',
+                        AUTH_LEVEL_COORDINATOR:  'Coordinator'}
+
+    user = relationship(Users, primaryjoin=(username == Users.username), foreign_keys=[username], uselist=False)
+    language = relationship(Languages)
+
+    @property
+    def auth_level_name(self):
+       return self.auth_level_names[self.auth_level]
+
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed
 
