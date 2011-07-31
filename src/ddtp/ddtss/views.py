@@ -168,6 +168,7 @@ def view_index_lang(session, request, language):
     return render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
         user=user,
+        auth=user.get_authority(language),
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed), context_instance=RequestContext(request))
