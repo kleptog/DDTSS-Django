@@ -10,6 +10,7 @@ import time
 from django import forms
 from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response, redirect
+from django.http import Http404
 from django.template import RequestContext
 from django.contrib import messages
 from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
@@ -40,6 +41,8 @@ class LanguageAdminForm(forms.Form):
     """
     language = forms.RegexField(label='Language code', regex=r'^\w\w(_\w\w)?$', help_text="Language code")
     name = forms.CharField(label="Name", max_length=30, help_text = "Human understandable name for language.")
+    numreviewers = forms.RegexField(label='Number of Reviewer', regex=r'^\d$', help_text="Number of needed reviewer")
+    login = forms.BooleanField(label="Require login", required=False, help_text="Require login for DDTSS")
     enabled = forms.BooleanField(label="Enabled", required=False, help_text="Enabled for DDTSS")
 
 @with_db_session
@@ -63,13 +66,15 @@ def view_admin_lang(session, request, language):
             if form.is_valid():
                 # Modify language
                 lang.fullname = form.cleaned_data['name']
+                lang.numreviewers = form.cleaned_data['numreviewers']
+                lang.requirelogin = form.cleaned_data['login']
                 lang.enabled_ddtss = form.cleaned_data['enabled']
 
                 session.commit()
 
                 return redirect('ddtss_admin')
 
-    form = LanguageAdminForm(dict(language=language, name=lang.fullname, enabled=lang.enabled_ddtss))
+    form = LanguageAdminForm(dict(language=language, name=lang.fullname, numreviewers=lang.numreviewers, login=lang.requirelogin, enabled=lang.enabled_ddtss))
 
     return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))
