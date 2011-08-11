@@ -15,6 +15,47 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: description_milestone_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace:
+--
+
+CREATE TABLE description_milestone_tb (
+    description_milestone_id integer NOT NULL,
+    description_id integer NOT NULL,
+    milestone text NOT NULL
+);
+
+--
+-- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
+--
+
+CREATE SEQUENCE description_milestone_tb_description_milestone_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+--
+-- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
+--
+
+ALTER SEQUENCE description_milestone_tb_description_milestone_id_seq OWNED BY description_milestone_tb.description_milestone_id;
+
+
+--
+-- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ddtp
+--
+
+SELECT pg_catalog.setval('description_milestone_tb_description_milestone_id_seq', 2978269, true);
+
+
+--
+-- Name: description_milestone_id; Type: DEFAULT; Schema: public; Owner: ddtp
+--
+
+ALTER TABLE description_milestone_tb ALTER COLUMN description_milestone_id SET DEFAULT nextval('description_milestone_tb_description_milestone_id_seq'::regclass);
+
+
+--
 -- Name: active_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
 --
 

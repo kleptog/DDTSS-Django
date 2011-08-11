@@ -238,6 +238,31 @@ class Translation(Base):
     def __repr__(self):
         return 'Translation(%d, descr=%d, lang=%s)' % (self.translation_id, self.description_id, self.language)
 
+class DescriptionMilestone(Base):
+    """ Records for referenc description and milestone """
+    __tablename__ = 'description_milestone_tb'
+
+    description_milestone_id = Column(Integer, primary_key=True)
+    description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
+    milestone = Column(String, nullable=False)
+    description = relationship(Description, backref='milestones')
+
+    def translated(self, lang, mile):
+        """ Return the the count of translated description in one milestone """
+        """ still unused """
+        return session.query(func.count(Translation.description_id)).join(DescriptionMilestone, DescriptionMilestone.description_id == Translation.description_id).\
+                  filter_by(milestone = mile).\
+                  filter_by(language = lang).one()
+
+    def count(self, mile):
+        """ Return the the count of description in one milestone """
+        """ still unused """
+        return session.query(func.count(DescriptionMilestone.description_id)).\
+                  filter_by(milestone = mile).one()
+
+    def __repr__(self):
+        return 'DescriptionMilestone(%d, milestone=%s, description_id=%d)' % (self.description_milestone_id, self.milestone, self.description_id)
+
 # This table is old, back from the time when it was assumed that
 # descriptions only belonged to one package.  It has been superseded by the
 # packages_versions table.
