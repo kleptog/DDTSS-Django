@@ -7,31 +7,14 @@
 -- #   land:de etc.
 -- #   user:user_id
 
---
--- Name: description_milestone_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
---
+DROP TABLE description_milestone_tb;
 
 CREATE TABLE description_milestone_tb (
-    description_milestone_id integer NOT NULL,
+    description_milestone_id serial PRIMARY KEY,
     description_id integer NOT NULL,
-    milestone text NOT NULL,
+    milestone text NOT NULL
 );
 
-
---
--- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
---
-
-CREATE SEQUENCE description_milestone_tb_description_milestone_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
---
-
-ALTER SEQUENCE description_milestone_tb_description_milestone_id_seq OWNED BY description_milestone_tb.description_milestone_id;
+CREATE INDEX description_milestone_tb1_IDX ON description_milestone_tb (description_id);
+CREATE INDEX description_milestone_tb2_IDX ON description_milestone_tb (milestone);
 
