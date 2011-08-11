@@ -5,7 +5,7 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone
 from sqlalchemy import func
 
 @cache_page(60*60)   # Cache for an hour
@@ -125,3 +125,21 @@ def view_source(session, request, source_name):
     params['descriptions'] = descriptions
 
     return render_to_response("source.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def stats_milestones_lang(session, request, lang):
+    """ Does milestones stats page per language """
+
+    resultset = session.query(DescriptionMilestone.milestone,func.count(Translation.description_id)). \
+                        join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
+                        filter(Translation.language==lang).\
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
+    resultset2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
+    params = dict()
+    resultdict = dict(resultset)
+    params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0)}) for r in resultset2]
+
+    return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))

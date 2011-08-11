@@ -105,6 +105,19 @@ CREATE TABLE pendingtranslations_tb (
 ALTER TABLE public.pendingtranslations_tb OWNER TO kleptog;
 
 --
+-- Name: userauthority_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
+--
+
+CREATE TABLE userauthority_tb (
+    username character varying NOT NULL,
+    language character varying NOT NULL,
+    auth_level integer NOT NULL
+);
+
+
+ALTER TABLE public.userauthority_tb OWNER TO kleptog;
+
+--
 -- Name: users_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
 --
 
@@ -173,6 +186,14 @@ ALTER TABLE ONLY pendingtranslations_tb
 
 
 --
+-- Name: userauthority_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: kleptog; Tablespace: 
+--
+
+ALTER TABLE ONLY userauthority_tb
+    ADD CONSTRAINT userauthority_tb_pkey PRIMARY KEY (username, language);
+
+
+--
 -- Name: users_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: kleptog; Tablespace: 
 --
 
@@ -226,6 +247,22 @@ ALTER TABLE ONLY pendingtranslations_tb
 
 ALTER TABLE ONLY pendingtranslations_tb
     ADD CONSTRAINT pendingtranslations_tb_language_fkey FOREIGN KEY (language) REFERENCES languages_tb(language);
+
+
+--
+-- Name: userauthority_tb_language_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
+--
+
+ALTER TABLE ONLY userauthority_tb
+    ADD CONSTRAINT userauthority_tb_language_fkey FOREIGN KEY (language) REFERENCES languages_tb(language);
+
+
+--
+-- Name: userauthority_tb_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
+--
+
+ALTER TABLE ONLY userauthority_tb
+    ADD CONSTRAINT userauthority_tb_username_fkey FOREIGN KEY (username) REFERENCES users_tb(username);
 
 
 --

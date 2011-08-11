@@ -67,3 +67,20 @@ table.langlist {
   background: #d0d0d0;
 }
 
+table#coordinators {
+  border: none;
+  border-spacing: 0px;
+}
+
+#coordinators th {
+  background: #f0f0f0;
+  border-bottom: solid;
+}
+
+#coordinators tr.even td {
+  background: #e0e0e0;
+}
+#coordinators tr.odd td {
+  background: #d0d0d0;
+}
+
