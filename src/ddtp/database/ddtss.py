@@ -27,7 +27,9 @@ class Languages(Base):
     @property
     def coordinators(self):
         """ Returns the coordinators for this language """
-        return Session.object_session(self).query(Users).join(UserAuthority).filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_COORDINATOR).all()
+        return Session.object_session(self).query(Users).join(UserAuthority).\
+                filter(UserAuthority.language_ref==self.language).\
+                filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_COORDINATOR).all()
 
 # /aliases/*
 class Users(Base):
