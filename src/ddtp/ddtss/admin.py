@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
+from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, UserAuthority
 from ddtp.ddtss.views import show_message_screen, get_user
 
 @with_db_session
@@ -73,6 +73,29 @@ def view_admin_lang(session, request, language):
                 session.commit()
 
                 return redirect('ddtss_admin')
+        if 'add' in request.POST:
+            # Add user as language coordinator
+            new_user = session.query(Users).get(request.POST.get('username'))
+            if not new_user:
+                messages.error(request, 'User %r not found' % request.POST.get('username'))
+            else:
+                # User exists, add or update authority
+                new_auth = new_user.get_authority(language)
+                new_auth.auth_level = UserAuthority.AUTH_LEVEL_COORDINATOR
+                session.add(new_auth)
+                messages.info(request, 'User %s now coordinator' % new_user.username)
+                session.commit()
+        if 'del' in request.POST:
+            # Remove user as language coordinator
+            new_user = session.query(Users).get(request.POST.get('del'))
+            if not new_user:
+                messages.error(request, 'User %r not found' % request.POST.get('username'))
+            else:
+                # User exists, drop back to trusted user
+                new_auth = new_user.get_authority(language)
+                new_auth.auth_level = UserAuthority.AUTH_LEVEL_TRUSTED
+                messages.info(request, 'User %s now only trusted' % new_user.username)
+                session.commit()
 
     form = LanguageAdminForm(dict(language=language, name=lang.fullname, numreviewers=lang.numreviewers, login=lang.requirelogin, enabled=lang.enabled_ddtss))
 

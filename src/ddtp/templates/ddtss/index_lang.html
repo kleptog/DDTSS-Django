@@ -15,6 +15,10 @@
 
 </h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
 -->
+Coordinators for {{lang.language}}:
+{% for user in lang.coordinators %}{{user.username}}{%if not forloop.last%}, {% endif %}
+{% empty %}(None){% endfor %}
+<p>
 {% if not user %}
 <b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
 <p>
@@ -90,7 +94,9 @@
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
-<li>Account: {{user.username}}{% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
+<li>Account: {{user.username}}
+{% if auth.auth_level %} ({{auth.auth_level_name}}){% endif %}
+{% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
