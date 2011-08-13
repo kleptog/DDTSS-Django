@@ -5,7 +5,7 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
 from sqlalchemy import func
 
 @cache_page(60*60)   # Cache for an hour
@@ -110,6 +110,54 @@ def view_transdescr(session, request, descr_id, lang):
     params['translation'] = translation
 
     return render_to_response("transdescr.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def view_part(session, request, part_md5):
+    """ Show a single translated part """
+    params = dict()
+
+    params['part_md5'] = part_md5
+
+    # This part
+    parts = session.query(Part). \
+                        filter(Part.part_md5==part_md5).\
+                        all()
+    params['parts'] = parts
+
+    # list of description
+    descrs = session.query(PartDescription.description_id).\
+                        filter(PartDescription.part_md5==part_md5).\
+                        all()
+    params['descrs'] = descrs
+
+    return render_to_response("part.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def view_onepart(session, request, part_md5, lang):
+    """ Show a single translated part """
+    params = dict()
+
+    params['lang'] = lang
+    params['part_md5'] = part_md5
+
+    # This part
+    part = session.query(Part.part). \
+                        filter(Part.part_md5==part_md5).\
+                        filter(Part.language==lang).one()
+    params['part'] = part
+
+    # list of translations
+    langs = session.query(Part.language). \
+                        filter(Part.part_md5==part_md5).all()
+    params['langs'] = langs
+
+    # list of description
+    descrs = session.query(PartDescription.description_id).\
+                        filter(PartDescription.part_md5==part_md5).\
+                        all()
+    params['descrs'] = descrs
+
+    return render_to_response("onepart.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_source(session, request, source_name):
