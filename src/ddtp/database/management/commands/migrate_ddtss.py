@@ -78,6 +78,7 @@ keymap = (
    (r'^aliases/([\w.]+)/(lastlanguage)$', r'^(.*)$', lambda a,b: setattr(users[a[0]], 'lastlanguage_ref', b[0])),
    (r'^aliases/([\w.]+)/timestamp$', r'^(\d+)$', lambda a,b: setattr(users[a[0]], 'lastseen', int(b[0]))),
    (r'^aliases/([\w.]+)/(active|password)$', r'', ignore),
+   (r'^aliases/([\w.]+)/isadmin$', r'', ignore),  # TODO
    (r'^aliases/([\w.]+)/messages$', r'', ignore),  # TODO
    (r'^(\w+)/config/(numreviewers|requirelogin)$', r'^(\d+)$', lambda a,b: setattr(languages[a[0]],a[1],b[0])),
    (r'^(\w+)/config/minuntranslated$', r'', ignore),

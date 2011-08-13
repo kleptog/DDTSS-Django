@@ -66,6 +66,7 @@ Coordinators for {{lang.language}}:
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
   </form>
+  <a href="{% url ddt_stats_milestones_lang lang.language %}">Fetch per Milestones</a>
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})
@@ -95,7 +96,7 @@ Coordinators for {{lang.language}}:
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}
-{% if auth.auth_level %} ({{auth.auth_level_name}}){% endif %}
+{% if auth.auth_level %} (<a href="{% url ddtss_admin_lang lang.language%}">{{auth.auth_level_name}}</a>){% endif %}
 {% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>

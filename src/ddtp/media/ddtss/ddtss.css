@@ -84,3 +84,26 @@ table#coordinators {
   background: #d0d0d0;
 }
 
+table.milestonelist {
+  border: none;
+  border-spacing: 0px;
+
+}
+.milestonelist th {
+  background: #f0f0f0;
+  border-bottom: solid;
+}
+
+.milestonelist tr.even td {
+  background: #e0e0e0;
+}
+.milestonelist tr.odd td {
+  background: #d0d0d0;
+}
+.milestonelist tr.even_untrans td {
+  background: #ffe0e0;
+}
+.milestonelist tr.odd_untrans td {
+  background: #ffd0d0;
+}
+
