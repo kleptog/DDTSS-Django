@@ -13,6 +13,7 @@
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
 Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
+Milestones: {% for milestone in descr.milestones %}{{milestone.milestone}}{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
 Description: {{descr.description}}
 </pre>
@@ -32,7 +33,7 @@ This Description is not yet translated to {{lang}}
 <br>
 parts-md5sum: <br><pre>
 {% for part in descr.parts %}
-{{part.part_md5}} {% for lang, part in part.translations.items %}<a href="ddt.cgi?part_md5=e4bff6245da6c1e5280f13731da7f3b7&language={{lang}}">{{lang}}</a> {% endfor %}{% endfor %}
+{{part.part_md5}} {% for lang, part in part.translations.items %}<a href="ddt.cgi?part_md5=e4bff6245da6c1e5280f13731da7f3b7&language={{lang}}">{{lang}}</a> {% endfor %} #list of descr with this part is missing {% endfor %} 
 </pre>
 <h4>other Descriptions of the r-base package:</h4>
 {% for description in other_descriptions %}
