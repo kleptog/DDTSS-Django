@@ -63,7 +63,7 @@ def view_package(session, request, package_name):
     resultset = session.query(Description, ActiveDescription.description_id). \
                         filter(Description.package==package_name). \
                         outerjoin(ActiveDescription, ActiveDescription.description_id == Description.description_id). \
-                        order_by(Description.description_id)
+                        order_by(-Description.description_id)
 
     params['package'] = resultset
     params['package_name'] = package_name
@@ -145,6 +145,7 @@ def stats_milestones_lang(session, request, lang):
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
 
+@cache_page(60*60)   # Cache for an hour
 @with_db_session
 def stats_one_milestones_lang(session, request, lang, mile):
     """ Does milestones stats page per language """
