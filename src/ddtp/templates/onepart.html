@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- part: {{part_md5}} - lang: {{lang}} --- </TITLE>
+</HEAD>
+<BODY>
+    <h3><a href="{% url ddt_part part_md5 %}">{{part_md5}}</a> in {{lang}}</h3>
+<pre>
+Part:
+{{part.part}}
+</pre>
+<h3>languages for this part</h3>
+<pre>
+NEEDTOFIX:{% for lang in langs %}<a href="{% url ddt_onepart 'part_md5' 'lang' %}">{{lang.language}}</a>{% if not forloop.last %}, {% endif %}{% endfor %} 
+</pre>
+<h3>Descriptions with this part:</h3>
+<pre>
+{% for descr in descrs %} <a href="{% url ddt_descr descr.description_id %}">{{descr.description_id}}</a>{% if not forloop.last %}, {% endif %}{% endfor %} 
+</pre>
+</BODY>
+</HTML>

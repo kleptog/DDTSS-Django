@@ -33,9 +33,9 @@ This Description is not yet translated to {{lang}}
 <br>
 parts-md5sum: <br><pre>
 {% for part in descr.parts %}
-{{part.part_md5}} {% for lang, part in part.translations.items %}<a href="ddt.cgi?part_md5=e4bff6245da6c1e5280f13731da7f3b7&language={{lang}}">{{lang}}</a> {% endfor %} #list of descr with this part is missing {% endfor %} 
+<a href="{%url ddt_part part.part_md5 %}">{{part.part_md5}}</a> {% for lang, part in part.translations.items %}<a href="{%url ddt_onepart part.part_md5 lang %}">{{lang}}</a> {% endfor %} {% for partdescr in part.other_descriptions %}{% if partdescr.description_id != descr.description_id %}<a href="{%url ddt_descr partdescr.description_id%}">{{partdescr.description_id}}</a>{% endif %} {% endfor %} {% endfor %}
 </pre>
-<h4>other Descriptions of the r-base package:</h4>
+<h4>other Descriptions of the {{descr.package}} package:</h4>
 {% for description in other_descriptions %}
     Description: <a href="{% url ddt_descr description.description_id %}">{{description.description_id}}</a>
     <a href="ddt.cgi?diff1=70989&diff2=67391">patch</a><br>
