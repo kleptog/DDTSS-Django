@@ -140,6 +140,35 @@ def stats_milestones_lang(session, request, lang):
 
     params = dict()
     resultdict = dict(resultset)
+    params['lang'] = lang
     params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0)}) for r in resultset2]
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
+
+@with_db_session
+def stats_one_milestones_lang(session, request, lang, mile):
+    """ Does milestones stats page per language """
+
+    resultset = session.query(Description). \
+                        join(DescriptionMilestone, DescriptionMilestone.description_id == Description.description_id).\
+                        filter(DescriptionMilestone.milestone==mile).\
+                        order_by(Description.prioritize).all()
+
+    resultset2 = session.query(DescriptionMilestone.description_id,DescriptionMilestone.description_id). \
+                        join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
+                        filter(Translation.language==lang).\
+                        filter(DescriptionMilestone.milestone==mile).\
+                        all()
+
+#    resultset2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
+#                        filter(DescriptionMilestone.milestone==milestone).\
+#                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
+    params = dict()
+    resultdict = dict(resultset2)
+    #params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0)}) for r in resultset]
+    params['lang'] = lang
+    params['milestone'] = mile
+    params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0)}) for r in resultset]
+
+    return render_to_response("one_milestones-lang.html", params, context_instance=RequestContext(request))

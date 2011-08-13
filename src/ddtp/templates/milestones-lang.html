@@ -1,15 +1,18 @@
 <HTML>
 <HEAD>
-<TITLE>Debian Description Tracking  --- milestones</TITLE>
+    <TITLE>Debian Description Tracking  --- milestones for {{land}}</TITLE>
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
 </HEAD>
 <BODY>
-<br>
-<table class="langlist">
+<h1>milestones for {{lang}}</h1>
+<a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
+<table class="milestonelist">
 <tr><th>milestone</th> <th>translated</th> <th>total</th></tr>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td>{{milestone}}</td> <td>{{milestoneinfo.translated}}</td> <td> {{milestoneinfo.total}}</td></tr>
+    <td><a href="{% url ddt_stats_one_milestones_lang lang milestone %}">{{milestone}}</a></td>
+    <td>{{milestoneinfo.translated}}</td>
+    <td> {{milestoneinfo.total}}</td></tr>
 {% endfor %}
 </table>
 <br>
