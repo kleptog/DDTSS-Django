@@ -56,7 +56,13 @@ class Users(Base):
     logged_in = True
 
     def get_authority(self, language):
-        auth = Session.object_session(self).query(UserAuthority).filter_by(username=self.username, language_ref=language).first()
+        """ Get authority object """
+        # If user is not persistant, no authority
+        session = Session.object_session(self)
+        if not session:
+            return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
+        # Otherwise check authority record
+        auth = session.query(UserAuthority).filter_by(username=self.username, language_ref=language).first()
         if not auth:
             return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
         return auth
