@@ -79,7 +79,7 @@ class FetchForm(forms.Form):
 def view_index_lang(session, request, language):
     """ Does the main index page for a single language in DDTSS """
     lang = session.query(Languages).get(language)
-    if not lang:
+    if not lang or not lang.enabled_ddtss:
         raise Http404()
 
     user = get_user(request, session)
@@ -199,7 +199,7 @@ class TranslationForm(forms.Form):
 def view_translate(session, request, language, description_id):
     """ Show the translation page for a description """
     lang = session.query(Languages).get(language)
-    if not lang:
+    if not lang or not lang.enabled_ddtss:
         raise Http404()
 
     descr = session.query(Description).filter_by(description_id=description_id).first()
@@ -359,7 +359,7 @@ class ReviewForm(forms.Form):
 def view_review(session, request, language, description_id):
     """ Show the review page for a description """
     lang = session.query(Languages).get(language)
-    if not lang:
+    if not lang or not lang.enabled_ddtss:
         raise Http404()
 
     descr = session.query(Description).filter_by(description_id=description_id).first()

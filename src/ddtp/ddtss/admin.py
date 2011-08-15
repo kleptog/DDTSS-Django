@@ -54,6 +54,7 @@ def view_admin_lang(session, request, language):
     if not user.superuser:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
+    # Note: this is one of the few places where you're allowed to look at a disable language
     lang = session.query(Languages).get(language)
     if not lang:
         raise Http404()
@@ -121,7 +122,7 @@ def view_coordinator(session, request, language):
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
     lang = session.query(Languages).get(language)
-    if not lang:
+    if not lang or not lang.enabled_ddtss:
         raise Http404()
 
     if request.method == "POST":
