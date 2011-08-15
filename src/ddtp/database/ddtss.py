@@ -98,7 +98,15 @@ class UserAuthority(Base):
 
     @property
     def auth_level_name(self):
-       return self.auth_level_names[self.auth_level]
+        return self.auth_level_names[self.auth_level]
+
+    @property
+    def is_trusted(self):
+        return self.auth_level >= UserAuthority.AUTH_LEVEL_TRUSTED
+
+    @property
+    def is_coordinator(self):
+        return self.auth_level >= UserAuthority.AUTH_LEVEL_COORDINATOR
 
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed
