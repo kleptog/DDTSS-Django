@@ -84,26 +84,49 @@ table#coordinators {
   background: #d0d0d0;
 }
 
-table.milestonelist {
+table.tablesorter {
   border: none;
   border-spacing: 0px;
 
 }
-.milestonelist th {
+.tablesorter th {
   background: #f0f0f0;
   border-bottom: solid;
 }
 
-.milestonelist tr.even td {
+.tablesorter tr.even td {
   background: #e0e0e0;
 }
-.milestonelist tr.odd td {
+.tablesorter tr.odd td {
   background: #d0d0d0;
 }
-.milestonelist tr.even_untrans td {
+.tablesorter tr.even_untrans td {
   background: #ffe0e0;
 }
-.milestonelist tr.odd_untrans td {
+.tablesorter tr.odd_untrans td {
   background: #ffd0d0;
 }
 
+.progress_bar {
+  position: relative;
+  margin: 0 0 0 0;
+  width: 250px;
+  border: 1px solid #CCC;
+  background: #FFF;  
+}
+ 
+.progress_bar span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 15px;
+  background-color: #AAF0FF;
+}
+ 
+.progress_bar strong {
+  position: relative;
+  z-index: 10;
+  display: block;
+  line-height: 15px;
+  text-align: center;
+}

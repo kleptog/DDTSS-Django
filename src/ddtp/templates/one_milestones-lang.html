@@ -7,7 +7,7 @@
     <h1>milestones '{{milestone}}' for {{lang}}</h1>
 <a href="{% url ddt_stats_milestones_lang lang %}">back to the milestones for {{lang}}</a><br>
 <a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
-<table class="milestonelist">
+<table class="tablesorter">
 <tr><th>milestone</th> <th>status</th> <th width=75%>Package</th></tr>
 {% for descr, transinfo in descriptions %}
 {% if transinfo.translate > 0 %}

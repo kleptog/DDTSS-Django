@@ -189,7 +189,7 @@ def stats_milestones_lang(session, request, lang):
     params = dict()
     resultdict = dict(resultset)
     params['lang'] = lang
-    params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0)}) for r in resultset2]
+    params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
 
