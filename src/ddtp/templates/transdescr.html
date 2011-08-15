@@ -13,6 +13,7 @@
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
 Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
+Milestones: {% for milestone in descr.milestones %}<a href="{% url ddt_stats_one_milestones_lang lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
 Description: {{descr.description}}
 </pre>
@@ -20,8 +21,11 @@ The {{lang}}-translation:
 <pre> 
 Description-{{lang}}: {{ translation.translation}}
 </pre> 
-parts-md5sum: <br><pre> {% for part in descr.parts %}
-{{part.part_md5}} {% endfor %}
+parts-md5sum: <br><pre>
+{% for part in descr.parts %}
+<a href="{%url ddt_onepart part.part_md5 lang %}">{{part.part_md5}}</a> {% for partdescr in part.other_descriptions %}{% if partdescr.description_id != descr.description_id %}<a href="{%url ddt_descr partdescr.description_id%}">{{partdescr.description_id}}</a>{% endif %} {% endfor %} {% endfor %}
+
+</pre>
 </pre>
 </BODY>
 </HTML>

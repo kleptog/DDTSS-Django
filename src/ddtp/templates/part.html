@@ -1,0 +1,19 @@
+<HTML>
+<HEAD>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+<TITLE>Debian Description Tracking  --- part: {{part_md5}} - lang: {{lang}} --- </TITLE>
+</HEAD>
+<BODY>
+<h2>{{part_md5}}</h2>
+{% for part in parts %}
+<h3><a href="{% url ddt_onepart part_md5 part.language %}">{{part_md5}} in {{part.language}}</a></h3>
+<pre>
+{{part.part}}
+</pre>
+{% endfor %} 
+<h3>Descriptions with this part:</h3>
+<pre>
+{% for descr in descrs %} <a href="{% url ddt_descr descr.description_id %}">{{descr.description_id}}</a>{% if not forloop.last %}, {% endif %}{% endfor %} 
+</pre>
+</BODY>
+</HTML>
