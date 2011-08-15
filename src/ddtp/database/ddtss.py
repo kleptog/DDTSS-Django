@@ -31,6 +31,13 @@ class Languages(Base):
                 filter(UserAuthority.language_ref==self.language).\
                 filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_COORDINATOR).all()
 
+    @property
+    def trusted_users(self):
+        """ Returns the coordinators for this language """
+        return Session.object_session(self).query(Users).join(UserAuthority).\
+                filter(UserAuthority.language_ref==self.language).\
+                filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_TRUSTED).all()
+
 # /aliases/*
 class Users(Base):
     """ Each user which can login has a record """
