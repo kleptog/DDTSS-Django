@@ -31,6 +31,13 @@ class Languages(Base):
                 filter(UserAuthority.language_ref==self.language).\
                 filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_COORDINATOR).all()
 
+    @property
+    def trusted_users(self):
+        """ Returns the coordinators for this language """
+        return Session.object_session(self).query(Users).join(UserAuthority).\
+                filter(UserAuthority.language_ref==self.language).\
+                filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_TRUSTED).all()
+
 # /aliases/*
 class Users(Base):
     """ Each user which can login has a record """
@@ -56,7 +63,13 @@ class Users(Base):
     logged_in = True
 
     def get_authority(self, language):
-        auth = Session.object_session(self).query(UserAuthority).filter_by(username=self.username, language_ref=language).first()
+        """ Get authority object """
+        # If user is not persistant, no authority
+        session = Session.object_session(self)
+        if not session:
+            return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
+        # Otherwise check authority record
+        auth = session.query(UserAuthority).filter_by(username=self.username, language_ref=language).first()
         if not auth:
             return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
         return auth
@@ -85,7 +98,15 @@ class UserAuthority(Base):
 
     @property
     def auth_level_name(self):
-       return self.auth_level_names[self.auth_level]
+        return self.auth_level_names[self.auth_level]
+
+    @property
+    def is_trusted(self):
+        return self.auth_level >= UserAuthority.AUTH_LEVEL_TRUSTED
+
+    @property
+    def is_coordinator(self):
+        return self.auth_level >= UserAuthority.AUTH_LEVEL_COORDINATOR
 
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed

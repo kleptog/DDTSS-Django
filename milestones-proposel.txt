@@ -1,0 +1,20 @@
+-- description_milestone_tb
+-- # store the package for all milestones.
+-- # milestone is the name of the milestone, in the form: "type:name", ex:
+-- #   prio:required etc
+-- #   sect:games etc
+-- #   task:desktop etc.
+-- #   land:de etc.
+-- #   user:user_id
+
+DROP TABLE description_milestone_tb;
+
+CREATE TABLE description_milestone_tb (
+    description_milestone_id serial PRIMARY KEY,
+    description_id integer NOT NULL,
+    milestone text NOT NULL
+);
+
+CREATE INDEX description_milestone_tb1_IDX ON description_milestone_tb (description_id);
+CREATE INDEX description_milestone_tb2_IDX ON description_milestone_tb (milestone);
+

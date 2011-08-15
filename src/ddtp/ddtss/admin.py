@@ -54,6 +54,7 @@ def view_admin_lang(session, request, language):
     if not user.superuser:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
+    # Note: this is one of the few places where you're allowed to look at a disable language
     lang = session.query(Languages).get(language)
     if not lang:
         raise Http404()
@@ -100,4 +101,68 @@ def view_admin_lang(session, request, language):
     form = LanguageAdminForm(dict(language=language, name=lang.fullname, numreviewers=lang.numreviewers, login=lang.requirelogin, enabled=lang.enabled_ddtss))
 
     return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
+                              context_instance=RequestContext(request))
+
+class CoordinatorAdminForm(forms.Form):
+    """
+    A form that manages the superuser view of languages
+    """
+    numreviewers = forms.RegexField(label='Number of Reviewer', regex=r'^\d$', help_text="Number of needed reviewer")
+    login = forms.BooleanField(label="Require login", required=False, help_text="Require login for DDTSS")
+
+@with_db_session
+def view_coordinator(session, request, language):
+    """ Handle coordinator language management """
+
+    user = get_user(request, session)
+
+    auth = user.get_authority(language)
+
+    if auth.auth_level != auth.AUTH_LEVEL_COORDINATOR:
+        return HttpResponseForbidden('<h1>Forbidden</h1>')
+
+    lang = session.query(Languages).get(language)
+    if not lang or not lang.enabled_ddtss:
+        raise Http404()
+
+    if request.method == "POST":
+        if 'cancel' in request.POST:
+            return redirect('ddtss_index_lang', language)
+        if 'submit' in request.POST:
+            form = CoordinatorAdminForm(data=request.POST)
+            if form.is_valid():
+                # Modify language
+                lang.numreviewers = form.cleaned_data['numreviewers']
+                lang.requirelogin = form.cleaned_data['login']
+
+                session.commit()
+
+                return redirect('ddtss_index_lang', language)
+        if 'add' in request.POST:
+            # Add user as language coordinator
+            new_user = session.query(Users).get(request.POST.get('username'))
+            if not new_user:
+                messages.error(request, 'User %r not found' % request.POST.get('username'))
+            else:
+                # User exists, add or update authority
+                new_auth = new_user.get_authority(language)
+                new_auth.auth_level = UserAuthority.AUTH_LEVEL_TRUSTED
+                session.add(new_auth)
+                messages.info(request, 'User %s now trusted' % new_user.username)
+                session.commit()
+        if 'del' in request.POST:
+            # Remove user as language coordinator
+            new_user = session.query(Users).get(request.POST.get('del'))
+            if not new_user:
+                messages.error(request, 'User %r not found' % request.POST.get('username'))
+            else:
+                # User exists, drop back to trusted user
+                new_auth = new_user.get_authority(language)
+                new_auth.auth_level = UserAuthority.AUTH_LEVEL_NONE
+                messages.info(request, 'User %s no longer trusted' % new_user.username)
+                session.commit()
+
+    form = CoordinatorAdminForm(dict(numreviewers=lang.numreviewers, login=lang.requirelogin))
+
+    return render_to_response("ddtss/coordinator.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))
