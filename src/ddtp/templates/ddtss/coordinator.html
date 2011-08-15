@@ -1,0 +1,60 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>DDTSS Coordinate language {{lang.language}}</title>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>DDTSS Coordinate language {{lang.language}}</h1>
+<p>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+<p>
+{% endif %}
+<form method="post" action="{% url ddtss_coordinate lang.language %}" enctype="multipart/form-data">
+<table id="login">
+{{form}}
+</table>
+<input type="submit" name="submit" value="Submit" />
+<input type="submit" name="cancel" value="Cancel" />
+</form>
+<p>
+Coordinators:
+<table id="coordinators">
+<tr><th>Username</th><th>Name</th><th></th></tr>
+{% for user in lang.coordinators %}
+<tr class="{% cycle 'odd' 'even' %}">
+  <td>{{user.username}}</td>
+  <td>{{user.realname}} ({{user.email}})</td>
+</tr>
+{% endfor %}
+</table>
+<p>
+Trusted users:
+<table id="trustedusers">
+<tr><th>Username</th><th>Name</th><th></th></tr>
+{% for user in lang.trusted_users %}
+<form method="post" action="{% url ddtss_coordinate lang.language %}">
+<tr class="{% cycle 'odd' 'even' %}">
+  <td>{{user.username}}</td>
+  <td>{{user.realname}} ({{user.email}})</td>
+  <td><button type="submit" name="del" value="{{user.username}}">Remove</button>
+</tr>
+</form>
+{% endfor %}
+<form method="post" action="{% url ddtss_coordinate lang.language %}">
+<tr>
+  <td colspan=2><input name="username" type="text"></td>
+  <td><button type="submit" name="add" value="Add">Add</button></td>
+</tr>
+</form>
+</table>
+</body>
+</html>
