@@ -8,18 +8,17 @@
 <a href="{% url ddt_stats_milestones_lang lang %}">back to the milestones for {{lang}}</a><br>
 <a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
 <table class="tablesorter">
-<tr><th>milestone</th> <th>status</th> <th width=75%>Package</th></tr>
+<tr><th>status</th> <th width=75%>Package</th></tr>
 {% for descr, transinfo in descriptions %}
 {% if transinfo.translate > 0 %}
     <tr class="{% cycle 'odd' 'even' %}">
 {% else %}
     <tr class="{% cycle 'odd_untrans' 'even_untrans' %}">
 {% endif %}
-    <td>{{milestone}}</td>  
     <td>{% if transinfo.translate > 0 %}
             <a href="{% url ddt_transdescr transinfo.translate lang %}">translated</a>
         {% else %}
-            <a href="{% url ddtss_translate lang descr.description_id %}">fetch to translated</a>
+            <a href="{% url ddtss_translate lang descr.description_id %}">Fetched for translation</a>
         {% endif %}
     </td>
     <td>{% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %} </td> </tr>
