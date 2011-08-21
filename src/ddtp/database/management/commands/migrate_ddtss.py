@@ -148,7 +148,6 @@ class Command(NoArgsCommand):
                 user.lastlanguage_ref = None
             user.active = True
             user.username = username
-            user.md5password = 'password'
             save_users.append(user)
 
         print "%d users saved" % len(save_users)
