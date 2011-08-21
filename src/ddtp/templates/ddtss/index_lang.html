@@ -5,6 +5,15 @@
 <head>
 <title>DDTSS ({{lang.language}})</title>
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<script type="text/javascript">//<![CDATA[
+function popup (url) {
+ fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
+ fenster.focus();
+ return true;
+}
+
+ 
+//]]></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -15,8 +24,29 @@
 
 </h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
 -->
+<div class=messages>
+    <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>  </h2>
+<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="Write a Project-Messages" />
+  </form>
+{% for message in global_messages %}
+{% if forloop.first %}<ul>{% endif %}
+    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="{{message.from_user}}" />
+        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
+    <b>{{message.message}}</b>
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+</div> 
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %}{{user.username}}{%if not forloop.last%}, {% endif %}
+{% for user in lang.coordinators %}<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="{{user.username}}" />
+        <input type="hidden" name="to_user" value="{{user.username}}"  />
+  </form> {%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
 {% if not user %}
@@ -31,11 +61,25 @@ Coordinators for {{lang.language}}:
     {% endfor %}
 </ul>
 {% endif %}
-<!-- Message not implemented for now
 <div class=messages>
-<h3>nl-Team-Messages (0): <div class="help" title="Messages from your language team">?</div>
-</h3>None
--->
+    <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
+<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="Write a Team-Messages" />
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+  </form>
+{% for message in team_messages %}
+{% if forloop.first %}<ul>{% endif %}
+    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="{{message.from_user}}" />
+        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
+    <b>{{message.message}}</b>
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+</div> 
 <table><col width="60%" /><col width="40%" />
 <tr>
   <td valign='top' >
@@ -106,11 +150,21 @@ Coordinators for {{lang.language}}:
 {% endif %}
 </ul>
 </div>
-<!-- Messages not yet done
 <div class=messages>
-<h2>Messages for you (0)  <div class="help" title="Messages from other users for you">?</div>
-</h2>None
--->
+    <h2>Messages for you (0)  <div class="help" title="Messages from other users for you">?</div>  </h2>
+{% for message in user_messages %}
+{% if forloop.first %}<ul>{% endif %}
+    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="{{message.from_user}}"/>
+        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
+    <b>{{message.message}}</b>
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+</div> 
   <div class=reviewed>
   <h2>Reviewed by you ({{ reviewed|length }})
     <div class="help" title="List of translations you have already reviewed. You can still make changes though.">?</div>

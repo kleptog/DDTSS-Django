@@ -38,6 +38,7 @@ CREATE TABLE messages_tb (
     message_id integer NOT NULL,
     language character varying,
     to_user character varying,
+    for_description integer,
     from_user character varying NOT NULL,
     "timestamp" integer NOT NULL,
     message character varying NOT NULL
