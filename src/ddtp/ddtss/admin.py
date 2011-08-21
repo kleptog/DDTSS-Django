@@ -103,6 +103,49 @@ class CoordinatorAdminForm(forms.Form):
     """
     A form that manages the superuser view of languages
     """
+    error_css_class = 'error'
+
+    ct = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for coordinator translation")
+    lt = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for logged-in translation")
+    at = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for anonymous translation")
+    cr = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for coordinator review")
+    lr = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for logged-in review")
+    ar = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for anonymous review")
+
+    stable = forms.IntegerField(min_value=0, max_value=10, initial=1, help_text="Points for no changes")
+    accept = forms.IntegerField(min_value=1, max_value=99, initial=3, help_text="Points required for acceptence")
+
+    # Set class of field to integer input
+    ct.widget.attrs['class'] = 'intinput'
+    lt.widget.attrs['class'] = 'intinput'
+    at.widget.attrs['class'] = 'intinput'
+    cr.widget.attrs['class'] = 'intinput'
+    lr.widget.attrs['class'] = 'intinput'
+    ar.widget.attrs['class'] = 'intinput'
+    stable.widget.attrs['class'] = 'intinput'
+    accept.widget.attrs['class'] = 'intinput'
+
+    def __init__(self, *args, **kwargs):
+        super(CoordinatorAdminForm, self).__init__(*args, **kwargs)
+        # This little peice of magic sets te class on any field that has an error
+        for f_name in self.errors:
+            self.fields[f_name].widget.attrs['class'] += ' error'
+
+    def clean(self):
+        data = self.cleaned_data
+
+        # Helper function to check if field f1 >= field f2
+        def check(f1, f2):
+            if f1 in data and f2 in data:
+                if data[f1] < data[f2]:
+                    self._errors[f1] = self.error_class([self[f1].help_text + " must be greater of equal to " + self[f2].help_text])
+
+        check('ct', 'lt')
+        check('lt', 'at')
+        check('cr', 'lr')
+        check('lr', 'ar')
+
+        return data
 
 @with_db_session
 def view_coordinator(session, request, language):
@@ -123,10 +166,17 @@ def view_coordinator(session, request, language):
     if request.method == "POST":
         if 'cancel' in request.POST:
             return redirect('ddtss_index_lang', language)
-        if 'submit' in request.POST:
+        if 'update' in request.POST:
             form = CoordinatorAdminForm(data=request.POST)
             if form.is_valid():
-                pass
+                # This little dance is needed because just changing the model doesn't mark the object dirty
+                model = lang.translation_model
+                session.expire(lang, ['translation_model'])
+                model.from_form_fields(form.cleaned_data)
+                lang.translation_model = model
+
+                messages.info(request, 'Translation model configuration updated')
+                session.commit()
         if 'add' in request.POST:
             # Add user as language coordinator
             new_user = session.query(Users).get(request.POST.get('username'))
@@ -152,7 +202,7 @@ def view_coordinator(session, request, language):
                 session.commit()
 
     if not form:
-        form = CoordinatorAdminForm()
+        form = CoordinatorAdminForm(lang.translation_model.to_form_fields())
 
     return render_to_response("ddtss/coordinator.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))

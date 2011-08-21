@@ -130,3 +130,20 @@ table.tablesorter {
   line-height: 15px;
   text-align: center;
 }
+
+input.intinput {
+    width: 2em;
+    text-align: right;
+}
+
+table#coordinator_scores th {
+    text-align: left;
+}
+
+table#coordinator_scores td {
+    text-align: right;
+}
+
+table#coordinator_scores input.error {
+    background: red;
+}

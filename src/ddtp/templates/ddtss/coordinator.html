@@ -29,6 +29,36 @@ Coordinators:
 {% endfor %}
 </table>
 <p>
+<form method="post" action="{% url ddtss_coordinate lang.language %}" enctype="multipart/form-data">
+Scores for controlling the acceptence of translations:
+{% for errors in form.errors.itervalues %}
+{{errors}}
+{% endfor %}
+<table id="coordinator_scores">
+<tr><th></th><th>Translate</th><th>Review</th></tr>
+<tr><th>Trusted user/Coordinator</th><td>{{form.ct}}</td><td>{{form.cr}}</td></tr>
+<tr><th>Logged-in user</th><td>{{form.lt}}</td><td>{{form.lr}}</td></tr>
+<tr><th>Anonymous user</th><td>{{form.at}}</td><td>{{form.ar}}</td></tr>
+<tr><th>Stability bonus</th><td>{{form.stable}}</td><td>(per week)</td></tr>
+<tr><th>Acceptence threshold</th><td>{{form.accept}}</td><td><input type=submit name="update" value="Update"></td></tr>
+</table>
+
+Rules:
+<ul>
+<li>Acceptence always requires at least one review.
+<li>Trusted users must score greater than or equal to logged-in users, which
+must be greater than or equal to anonymous users.
+<li>A score of -1 means that type of user is forbidden to do that task.
+<li>A score of 0 means the user may do it, but has no effect on acceptence
+of translation.
+<li>Stability bonus means that translation where nothing has happened for a
+while will gain point which may trigger acceptence. Setting to zero disables.
+One review is still required.
+<li>When the score of a translation reaches the threshold it is accepted
+(there may be a delay).
+</ul>
+</form>
+<p>
 Trusted users:
 <table id="trustedusers">
 <tr><th>Username</th><th>Name</th><th></th></tr>
