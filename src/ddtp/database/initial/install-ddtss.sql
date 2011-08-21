@@ -22,8 +22,6 @@ SET default_with_oids = false;
 CREATE TABLE languages_tb (
     language character varying NOT NULL,
     fullname character varying NOT NULL,
-    numreviewers integer NOT NULL,
-    requirelogin boolean NOT NULL,
     enabled_ddtss boolean NOT NULL,
     translation_model text NOT NULL
 );

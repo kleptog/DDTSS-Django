@@ -41,8 +41,6 @@ class LanguageAdminForm(forms.Form):
     """
     language = forms.RegexField(label='Language code', regex=r'^\w\w(_\w\w)?$', help_text="Language code")
     name = forms.CharField(label="Name", max_length=30, help_text = "Human understandable name for language.")
-    numreviewers = forms.RegexField(label='Number of Reviewer', regex=r'^\d$', help_text="Number of needed reviewer")
-    login = forms.BooleanField(label="Require login", required=False, help_text="Require login for DDTSS")
     enabled = forms.BooleanField(label="Enabled", required=False, help_text="Enabled for DDTSS")
 
 @with_db_session
@@ -67,8 +65,6 @@ def view_admin_lang(session, request, language):
             if form.is_valid():
                 # Modify language
                 lang.fullname = form.cleaned_data['name']
-                lang.numreviewers = form.cleaned_data['numreviewers']
-                lang.requirelogin = form.cleaned_data['login']
                 lang.enabled_ddtss = form.cleaned_data['enabled']
 
                 session.commit()
@@ -98,7 +94,7 @@ def view_admin_lang(session, request, language):
                 messages.info(request, 'User %s now only trusted' % new_user.username)
                 session.commit()
 
-    form = LanguageAdminForm(dict(language=language, name=lang.fullname, numreviewers=lang.numreviewers, login=lang.requirelogin, enabled=lang.enabled_ddtss))
+    form = LanguageAdminForm(dict(language=language, name=lang.fullname, enabled=lang.enabled_ddtss))
 
     return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))
@@ -107,8 +103,6 @@ class CoordinatorAdminForm(forms.Form):
     """
     A form that manages the superuser view of languages
     """
-    numreviewers = forms.RegexField(label='Number of Reviewer', regex=r'^\d$', help_text="Number of needed reviewer")
-    login = forms.BooleanField(label="Require login", required=False, help_text="Require login for DDTSS")
 
 @with_db_session
 def view_coordinator(session, request, language):
@@ -125,19 +119,14 @@ def view_coordinator(session, request, language):
     if not lang or not lang.enabled_ddtss:
         raise Http404()
 
+    form = None
     if request.method == "POST":
         if 'cancel' in request.POST:
             return redirect('ddtss_index_lang', language)
         if 'submit' in request.POST:
             form = CoordinatorAdminForm(data=request.POST)
             if form.is_valid():
-                # Modify language
-                lang.numreviewers = form.cleaned_data['numreviewers']
-                lang.requirelogin = form.cleaned_data['login']
-
-                session.commit()
-
-                return redirect('ddtss_index_lang', language)
+                pass
         if 'add' in request.POST:
             # Add user as language coordinator
             new_user = session.query(Users).get(request.POST.get('username'))
@@ -162,7 +151,8 @@ def view_coordinator(session, request, language):
                 messages.info(request, 'User %s no longer trusted' % new_user.username)
                 session.commit()
 
-    form = CoordinatorAdminForm(dict(numreviewers=lang.numreviewers, login=lang.requirelogin))
+    if not form:
+        form = CoordinatorAdminForm()
 
     return render_to_response("ddtss/coordinator.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))

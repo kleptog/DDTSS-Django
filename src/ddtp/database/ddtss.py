@@ -75,8 +75,6 @@ class Languages(Base):
 
     language = Column(String, primary_key=True)
     fullname = Column(String, nullable=False)
-    numreviewers = Column(Integer, nullable=False)
-    requirelogin = Column(Boolean, nullable=False, default=False)
     enabled_ddtss = Column(Boolean, nullable=False, default=True)  # disabled
     translation_model = Column(TranslationModelType, nullable=False)
 
