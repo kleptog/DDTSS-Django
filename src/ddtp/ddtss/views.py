@@ -13,7 +13,7 @@ from django.http import Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion
-from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users
+from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
 from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
@@ -165,24 +165,54 @@ def view_index_lang(session, request, language):
     pending_review.sort(key=lambda t: t.lastupdate, reverse=False)
     pending_translations.sort(key=lambda t: t.firstupdate, reverse=False)
 
+    global_messages = session.query(Messages) \
+                          .filter(Messages.to_user=='') \
+                          .filter(Messages.language=='') \
+                          .filter(Messages.for_description==None) \
+                          .order_by(-Messages.timestamp) \
+                          .limit(20) \
+                          .all()
+
+    team_messages = session.query(Messages) \
+                          .filter(Messages.language==language) \
+                          .order_by(-Messages.timestamp) \
+                          .limit(20) \
+                          .all()
+
+    user_messages = session.query(Messages) \
+                          .filter(Messages.to_user==user.username) \
+                          .order_by(-Messages.timestamp) \
+                          .limit(20) \
+                          .all()
+
     return render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
         user=user,
         auth=user.get_authority(language),
         pending_translations=pending_translations,
         pending_review=pending_review,
-        reviewed=reviewed), context_instance=RequestContext(request))
+        reviewed=reviewed,
+        global_messages=global_messages,
+        team_messages=team_messages,
+        user_messages=user_messages), context_instance=RequestContext(request))
 
 def show_message_screen(request, msg, redirect, *args):
     """ Display a message to user, and redirect to a new page after 5 seconds """
-    url = reverse(redirect, args=args)
+    if redirect == 'close':
+        response = render_to_response("ddtss/message.html", dict(
+            msg=msg,
+            close=True),
+            context_instance=RequestContext(request))
+    else:
+        url = reverse(redirect, args=args)
 
-    response = render_to_response("ddtss/message.html", dict(
-        msg=msg,
-        url=url),
-        context_instance=RequestContext(request))
+        response = render_to_response("ddtss/message.html", dict(
+            msg=msg,
+            close=False,
+            url=url),
+            context_instance=RequestContext(request))
 
-    response['Refresh'] = '5; ' + request.build_absolute_uri(url)
+        response['Refresh'] = '5; ' + request.build_absolute_uri(url)
 
     return response
 
@@ -264,13 +294,20 @@ def view_translate(session, request, language, description_id):
     if trans.short is None:
         trans.short, trans.long = PendingTranslation.make_suggestion(descr, language)
 
+    descr_messages = session.query(Messages) \
+                          .filter(Messages.language==language) \
+                          .filter(Messages.for_description==description_id) \
+                          .order_by(-Messages.timestamp) \
+                          .all()
+
     session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
         forreview=False,
         lang=lang,
         descr=descr,
-        trans=trans), context_instance=RequestContext(request))
+        trans=trans,
+        descr_messages=descr_messages), context_instance=RequestContext(request))
 
 def generate_line_diff(old, new):
     """ Given two lines, generate a diff between them. Intends for short
@@ -429,10 +466,106 @@ def view_review(session, request, language, description_id):
     if trans.oldlong and trans.for_display(trans.oldlong) != trans.for_display(trans.long):
         diff_long = generate_long_description_diff(trans.for_display(trans.oldlong), trans.for_display(trans.long))
 
+
+    descr_messages = session.query(Messages) \
+                         .filter(Messages.for_description==description_id) \
+                         .filter(Messages.language==language) \
+                         .order_by(-Messages.timestamp) \
+                         .all()
+
     return render_to_response("ddtss/translate.html", dict(
         forreview=True,
         diff_short=diff_short,
         diff_long=diff_long,
         lang=lang,
         descr=descr,
-        trans=trans), context_instance=RequestContext(request))
+        trans=trans,
+        descr_messages=descr_messages), context_instance=RequestContext(request))
+
+
+class writeMessage(forms.Form):
+    """ This form is used to encapsulate the results of form submission """
+    message = forms.CharField(required=False)
+    to_user = forms.CharField(required=False)
+    for_description = forms.CharField(required=False)
+    language = forms.CharField(required=False)
+    cancel = forms.CharField(required=False)
+    submit = forms.CharField(required=False)
+
+    _charset_ = forms.CharField(required=False)
+    timestamp = forms.IntegerField(required=False)
+
+@with_db_session
+def view_write_message(session, request):
+    """ write a message to a user """
+
+    user = get_user(request, session)
+
+    if request.method == 'POST':
+        form = writeMessage(request.POST)
+
+        if not form.is_valid():
+            # Maybe return HTTP 400 - Bad request?
+            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index')
+
+        if form.cleaned_data['cancel']:
+            return show_message_screen(request, 'message canceled' , 'close')
+
+        # check to_user
+        to_user=form.cleaned_data['to_user']
+
+        # check language
+        language=form.cleaned_data['language']
+
+        # check for_description
+        for_description=form.cleaned_data['for_description']
+        #if not for_description:
+            #for_description=None
+        #else:
+            #if not language:
+                #for_description=None
+                #return show_message_screen(request, 'Bad request: language not set' , 'close')
+
+        # check message
+        message = form.cleaned_data['message']
+        if not message:
+            return render_to_response("ddtss/post_message.html", dict(
+                title="kkk",
+                language=language,
+                for_description=for_description,
+                to_user=to_user
+                ), context_instance=RequestContext(request))
+
+        if form.cleaned_data['submit']:
+
+            if message:
+                message = Messages(
+                        message=message,
+                        to_user=to_user,
+                        language=language,
+                        from_user=user.username,
+                        timestamp=int(time.time()))
+                if for_description: # workaround....
+                    message.for_description=for_description
+
+                session.add(message)
+
+                session.commit()
+                return show_message_screen(request, 'imessage send: %s %s %s ' % ( to_user, str(for_description), language) , 'close')
+
+            session.commit()
+            return show_message_screen(request, 'message send: %s %s %s ' % ( to_user, str(for_description), language) , 'close')
+
+    return show_message_screen(request, 'Bad request' , 'ddtss_index')
+
+@with_db_session
+def view_delmessage(session, request, message_id ):
+    """ del a message """
+
+    # check user, permission:
+    # user can remove own message
+    # lang admin can remove team message
+    # admin can remove all messages
+
+    return redirect('ddtss_index')
+

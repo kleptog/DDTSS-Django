@@ -7,6 +7,12 @@
 </head>
 <body>
 <h1>{{msg}}</h1>
+<ul>
+</ul>
+{% if close %}
+<form action=""> <input type="button" value="close window" onclick="self.close()"> </form>
+{% else %}
 <a href="{{url}}">Continue</a>
+{% endif %}
 </body>
 </html>

@@ -5,6 +5,15 @@
 <head>
 <title>DDTSS ({{lang.language}}): Translating {{descr.package}}</title>
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<script type="text/javascript">//<![CDATA[
+function popup (url) {
+ fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
+ fenster.focus();
+ return true;
+}
+
+ 
+//]]></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="document.forms[0].submit.disabled=1">
@@ -72,5 +81,27 @@ in with the charset of the submitted form. Useful to check browsers are
 actually returning UTF-8 as promised -->
 <input type="hidden" name="_charset_" value=""  />
 </form>
+<div class=messages>
+    <h2>Messages for this description <div class="help" title="Messages from other users for this description">?</div>  </h2>
+<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="Write a Description-Message" />
+        <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+  </form>
+{% for message in descr_messages %}
+{% if forloop.first %}<ul>{% endif %}
+    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <input type="submit" value="{{message.from_user}}+Description"/>
+        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+        <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
+    <b>{{message.message}}</b>
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+</div> 
 </body>
 </html>

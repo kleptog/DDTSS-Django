@@ -269,11 +269,13 @@ class Messages(Base):
     message_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # Specify who sees it:
-    # Both NULL: global
+    # all NULL: global
     # Language: for that language only
-    # User: for that user only
+    # for_description and language: for the description and lang
+    # User: for that user 
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
+    for_description = Column(String, ForeignKey('description_tb.description_id'))
     to_user = Column(String, ForeignKey('users_tb.username'))
 
     from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
