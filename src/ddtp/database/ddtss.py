@@ -276,7 +276,7 @@ class Messages(Base):
     # User: for that user 
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
-    for_description = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
+    for_description = Column(Integer, ForeignKey('description_tb.description_id'))
     to_user = Column(String, ForeignKey('users_tb.username'))
 
     from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
