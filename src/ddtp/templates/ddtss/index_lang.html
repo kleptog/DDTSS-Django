@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>DDTSS ({{lang.language}})</title>
+<meta http-equiv="refresh" content="30;">
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
 <script type="text/javascript">//<![CDATA[
 function popup (url) {
@@ -24,36 +25,59 @@ function popup (url) {
 
 </h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
 -->
-<div class=messages>
-    <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>  </h2>
-<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="Write a Project-Messages" />
-  </form>
+
+<!-- Project Messages -->
 {% for message in global_messages %}
-{% if forloop.first %}<ul>{% endif %}
-    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="{{message.from_user}}" />
-        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
-  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
-    <b>{{message.message}}</b>
-    </li>
-{% if forloop.last %}</ul>{% endif %}
-{% empty %}
-    None
-{% endfor %}
+{% if forloop.first %}
+<div class=messages>
+{% if user.superuser %}
+    <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
+            <span style="font-size:80%">
+                <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">(New)</a>
+            </span>
+        </h2>
+    </form>
+{% else %}
+    <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>  </h2>
+{% endif %}
+    <ul>
+{% endif %}
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" >
+            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <span style="font-size:80%">
+                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}}
+                <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+                <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+            </span>
+        </form>
+        </li>
+{% if forloop.last %}
+    </ul>
 </div> 
+{% endif %}
+{% empty %}
+{% endfor %}
+<!-- End Project Messages -->
+
+
+{% if not user.logged_in %}
+<span style="font-size:120%">
+    <b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
+</span>
+<p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+{% endif %}
+
+
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %}<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="{{user.username}}" />
-        <input type="hidden" name="to_user" value="{{user.username}}"  />
-  </form> {%if not forloop.last%}, {% endif %}
+{% for user in lang.coordinators %} <a href="{% url ddtss_message %}?to_user={{user.username}}" onclick="return popup(this.action)" target="msgwindow">{{user.username}}</a>
+{%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
-{% if not user %}
-<b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
-<p>
-{% endif %}
-<p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+
+
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
@@ -61,26 +85,47 @@ Coordinators for {{lang.language}}:
     {% endfor %}
 </ul>
 {% endif %}
-<div class=messages>
-    <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
-<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="Write a Team-Messages" />
-        <input type="hidden" name="language" value="{{lang.language}}"  />
-  </form>
+
+<!-- Team Messages -->
 {% for message in team_messages %}
-{% if forloop.first %}<ul>{% endif %}
-    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="{{message.from_user}}" />
-        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
-  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
-    <b>{{message.message}}</b>
-    </li>
-{% if forloop.last %}</ul>{% endif %}
-{% empty %}
-    None
-{% endfor %}
+{% if forloop.first %}
+<div class=messages>
+    {% if auth.is_coordinator %}
+    <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <h2>Team Messages<div class="help" title="Team Messages">?</div>
+            <span style="font-size:80%">
+            <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">(New)</a>
+            </span>
+            <input type="hidden" name="language" value="{{lang.language}}"  />
+        </h2>
+    </form>
+    {% else %}
+    <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
+    {% endif %}
+    <ul>
+{% endif %}
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <span style="font-size:80%">
+                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}}
+                <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+                <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+            </span>
+        </form>
+        </li>
+{% if forloop.last %}
+    </ul>
 </div> 
-<table><col width="60%" /><col width="40%" />
+{% endif %}
+{% empty %}
+{% endfor %}
+<!-- End Team Messages -->
+
+
+<table>
+    <col width="60%" /><col width="40%" />
 <tr>
   <td valign='top' >
   <div class=untranslated>
@@ -139,9 +184,22 @@ Coordinators for {{lang.language}}:
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
-<li>Account: {{user.username}}
-{% if auth.is_coordinator %} (<a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}</a>){% endif %}
-{% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
+<li>Account: {{user.username}}</li>
+{% if auth.is_coordinator %} 
+<li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
+<li> <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">Write a new team-messages</a>
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+    </form>
+</li>
+{% endif %}
+{% if user.superuser %} 
+<li><a href="{% url ddtss_admin %}">Admin-Page</a></li>
+<li> <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+    <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">Write a new project-messages</a>
+</form>
+</li>
+{% endif %}
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
@@ -151,14 +209,21 @@ Coordinators for {{lang.language}}:
 </ul>
 </div>
 <div class=messages>
-    <h2>Messages for you (0)  <div class="help" title="Messages from other users for you">?</div>  </h2>
+    <h2>Messages for you<div class="help" title="Messages from other users for you">?</div>  </h2>
 {% for message in user_messages %}
 {% if forloop.first %}<ul>{% endif %}
-    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="{{message.from_user}}"/>
-        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
-  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
-    <b>{{message.message}}</b>
+    <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <b title="{{message.parent.message}}">{{message.message}}</b><br>
+        <span style="font-size:80%">
+            from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+            {% if message.for_description %}
+            to the description <a href="{% url ddtss_forreview message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
+            {% endif %}
+            at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+            <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+            <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+        </span>
+    </form>
     </li>
 {% if forloop.last %}</ul>{% endif %}
 {% empty %}
@@ -188,14 +253,15 @@ Coordinators for {{lang.language}}:
 -->
 </td></tr>
 </table>
-<a href="{% url ddtss_index_lang lang.language %}">Refresh</a>
-<a href="{% url ddtss_index_lang 'xx' %}">Another language</a>
-<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a>
-<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a>
+<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> | 
+<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> | 
+<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> | 
+<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> | 
+<a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> | 
 {% if user.logged_in %}
 <a href="{% url ddtss_logout %}">Logout</a>
 {% else %}
-<a href="{% url ddtss_login %}">Login</a>
+<a href="{% url ddtss_login %}">Login</a> | 
 <a href="{% url ddtss_create_user %}">Create Login</a>
 {% endif %}
 </body>

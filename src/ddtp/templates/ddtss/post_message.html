@@ -22,15 +22,13 @@ function popup (url) {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
 </head> 
 <body> 
-    <h1>Message {{title}}</h1>
-    <li>lang:{{language}}</li>
-    <li>user:{{to_user}}</li>
-    <li>desc:{{for_description}}</li>
+    <h1>{{title}}</h1>
     <form method="post" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <textarea name="message"  rows="4" cols="45"></textarea><br />
         <input type="hidden" name="to_user" value="{{to_user}}"  />
         <input type="hidden" name="for_description" value="{{for_description}}"  />
         <input type="hidden" name="language" value="{{language}}"  />
+        <input type="hidden" name="in_reply_to" value="{{in_reply_to}}"  />
         <input type="submit" name="submit" value="send message" />
         <input type="submit" name="cancel" value="Cancel" />
     </form> 

@@ -81,27 +81,44 @@ in with the charset of the submitted form. Useful to check browsers are
 actually returning UTF-8 as promised -->
 <input type="hidden" name="_charset_" value=""  />
 </form>
+
+<!-- new description comments per Messages -->
 <div class=messages>
-    <h2>Messages for this description <div class="help" title="Messages from other users for this description">?</div>  </h2>
-<form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="Write a Description-Message" />
+    <h2>Comments for this description <div class="help" title="Messages from other users for this description">?</div>  </h2>
+    {% for message in descr_messages %}
+    {% if forloop.first %}
+    <ul>
+    {% endif %}
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <span style="font-size:80%">
+                from {{message.from_user}} <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">(Write a reply)</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+                <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+                <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
+                <input type="hidden" name="language" value="{{lang.language}}"  />
+            </span>
+        </form>
+        </li>
+    {% if forloop.last %}
+    </ul>
+    <form method="post" id="descmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <a href="javascript:popup(this.action);self.descmsg.submit();" target="msgwindow">Add a Comment</a>
         <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
         <input type="hidden" name="language" value="{{lang.language}}"  />
-  </form>
-{% for message in descr_messages %}
-{% if forloop.first %}<ul>{% endif %}
-    <li><form method="post" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <input type="submit" value="{{message.from_user}}+Description"/>
-        <input type="hidden" name="to_user" value="{{message.from_user}}"  />
-        <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
-        <input type="hidden" name="language" value="{{lang.language}}"  />
-  </form> {{message.timestamp}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a><br>
-    <b>{{message.message}}</b>
-    </li>
-{% if forloop.last %}</ul>{% endif %}
-{% empty %}
+    </form>
+    {% endif %}
+    {% empty %}
     None
-{% endfor %}
+    <form method="post" id="descmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <a href="javascript:popup(this.action);self.descmsg.submit();" target="msgwindow">Add a Comment</a>
+        <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+    </form>
+    {% endfor %}
 </div> 
+<!-- end new description comments per Messages -->
+
 </body>
 </html>

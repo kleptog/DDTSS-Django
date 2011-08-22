@@ -9,11 +9,12 @@ import re
 from django import forms
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
+from urlparse import urlsplit
 from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
@@ -166,8 +167,8 @@ def view_index_lang(session, request, language):
     pending_translations.sort(key=lambda t: t.firstupdate, reverse=False)
 
     global_messages = session.query(Messages) \
-                          .filter(Messages.to_user=='') \
-                          .filter(Messages.language=='') \
+                          .filter(Messages.to_user==None) \
+                          .filter(Messages.language==None) \
                           .filter(Messages.for_description==None) \
                           .order_by(-Messages.timestamp) \
                           .limit(20) \
@@ -175,6 +176,7 @@ def view_index_lang(session, request, language):
 
     team_messages = session.query(Messages) \
                           .filter(Messages.language==language) \
+                          .filter(Messages.for_description==None) \
                           .order_by(-Messages.timestamp) \
                           .limit(20) \
                           .all()
@@ -297,7 +299,7 @@ def view_translate(session, request, language, description_id):
     descr_messages = session.query(Messages) \
                           .filter(Messages.language==language) \
                           .filter(Messages.for_description==description_id) \
-                          .order_by(-Messages.timestamp) \
+                          .order_by(Messages.timestamp) \
                           .all()
 
     session.commit()
@@ -470,7 +472,7 @@ def view_review(session, request, language, description_id):
     descr_messages = session.query(Messages) \
                          .filter(Messages.for_description==description_id) \
                          .filter(Messages.language==language) \
-                         .order_by(-Messages.timestamp) \
+                         .order_by(Messages.timestamp) \
                          .all()
 
     return render_to_response("ddtss/translate.html", dict(
@@ -489,6 +491,7 @@ class writeMessage(forms.Form):
     to_user = forms.CharField(required=False)
     for_description = forms.CharField(required=False)
     language = forms.CharField(required=False)
+    in_reply_to = forms.CharField(required=False)
     cancel = forms.CharField(required=False)
     submit = forms.CharField(required=False)
 
@@ -500,6 +503,26 @@ def view_write_message(session, request):
     """ write a message to a user """
 
     user = get_user(request, session)
+
+    if request.method == 'GET':
+        form = writeMessage(request.GET)
+
+        if not form.is_valid():
+            # Maybe return HTTP 400 - Bad request?
+            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index')
+
+        # check to_user
+        to_user=form.cleaned_data['to_user']
+
+        if not to_user:
+            return show_message_screen(request, 'Bad request' , 'ddtss_index')
+
+        title='Send to user %s' % to_user
+
+        return render_to_response("ddtss/post_message.html", dict(
+            title=title,
+            to_user=to_user
+            ), context_instance=RequestContext(request))
 
     if request.method == 'POST':
         form = writeMessage(request.POST)
@@ -519,21 +542,32 @@ def view_write_message(session, request):
 
         # check for_description
         for_description=form.cleaned_data['for_description']
-        #if not for_description:
-            #for_description=None
-        #else:
-            #if not language:
-                #for_description=None
-                #return show_message_screen(request, 'Bad request: language not set' , 'close')
+
+        # check in_reply_to
+        in_reply_to=form.cleaned_data['in_reply_to']
 
         # check message
         message = form.cleaned_data['message']
         if not message:
+            if for_description:
+                title='Send to description'
+                if to_user:
+                    title='Send to description and user %s' % to_user
+                else:
+                    title='Send to description'
+            elif to_user:
+                title='Send to user %s' % to_user
+            elif language:
+                title='Send %s team message' % language
+            else:
+                title='Send project message'
+
             return render_to_response("ddtss/post_message.html", dict(
-                title="kkk",
+                title=title,
                 language=language,
                 for_description=for_description,
-                to_user=to_user
+                to_user=to_user,
+                in_reply_to=in_reply_to
                 ), context_instance=RequestContext(request))
 
         if form.cleaned_data['submit']:
@@ -541,20 +575,17 @@ def view_write_message(session, request):
             if message:
                 message = Messages(
                         message=message,
-                        to_user=to_user,
-                        language=language,
+                        to_user=to_user or None,
+                        language=language or None,
+                        for_description=for_description or None,
                         from_user=user.username,
+                        in_reply_to=in_reply_to or None,
                         timestamp=int(time.time()))
-                if for_description: # workaround....
-                    message.for_description=for_description
 
                 session.add(message)
 
                 session.commit()
-                return show_message_screen(request, 'imessage send: %s %s %s ' % ( to_user, str(for_description), language) , 'close')
-
-            session.commit()
-            return show_message_screen(request, 'message send: %s %s %s ' % ( to_user, str(for_description), language) , 'close')
+                return show_message_screen(request, 'message send: %s %s %s %s ' % ( to_user, str(for_description), language, in_reply_to) , 'close')
 
     return show_message_screen(request, 'Bad request' , 'ddtss_index')
 
@@ -562,10 +593,52 @@ def view_write_message(session, request):
 def view_delmessage(session, request, message_id ):
     """ del a message """
 
-    # check user, permission:
-    # user can remove own message
-    # lang admin can remove team message
-    # admin can remove all messages
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer is None:
+        redirect_to='ddtss_index'
+    try:
+        redirect_to = urlsplit(referer, 'http', False)[2]
+    except IndexError:
+        redirect_to='ddtss_index'
 
-    return redirect('ddtss_index')
+    user = get_user(request, session)
+
+    message = session.query(Messages) \
+            .filter(Messages.message_id==message_id) \
+            .one()
+
+    auth = user.get_authority(message.language)
+
+    # special, if to_user and for_description set...
+    # remove only the to_user
+    if (message.to_user and message.for_description) \
+            and (user.superuser or auth.auth_level == auth.AUTH_LEVEL_COORDINATOR or user.username == message.to_user or user.username == message.from_user):
+        message.to_user=None;
+        session.commit()
+
+        return redirect(redirect_to)
+
+
+    # superuser can remove all messages
+    # user can remove own message
+    if user.superuser \
+            or user.username == message.to_user \
+            or user.username == message.from_user:
+        session.delete(message)
+        session.commit()
+
+        return redirect(redirect_to)
+
+    # lang admin can remove team message
+    if auth.auth_level == auth.AUTH_LEVEL_COORDINATOR \
+            and message.to_user == None \
+            and message.description_id == None:
+        session.delete(message)
+        session.commit()
+
+        return redirect(redirect_to)
+
+    # 
+
+    return HttpResponseForbidden('<h1>Forbidden</h1>')
 

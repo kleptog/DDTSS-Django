@@ -9,9 +9,10 @@ import difflib
 from .db import Base, with_db_session
 from .ddtp import Description
 from django.conf import settings
-from sqlalchemy.orm import relationship, collections
+from sqlalchemy.orm import relationship, collections, backref, relation
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
+from datetime import datetime
 
 # __/config/*
 class Languages(Base):
@@ -275,9 +276,20 @@ class Messages(Base):
     # User: for that user 
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
-    for_description = Column(String, ForeignKey('description_tb.description_id'))
+    for_description = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
     to_user = Column(String, ForeignKey('users_tb.username'))
 
     from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
+    in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)
+
+    description = relationship("Description")
+    parent = relation('Messages', remote_side=[message_id], backref="children")
+
+    @property
+    def datetime(self):
+        return datetime.fromtimestamp(self.timestamp)
+
+    def __repr__(self):
+        return 'Messages(%d, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
