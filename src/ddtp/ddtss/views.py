@@ -100,7 +100,7 @@ def view_index_lang(session, request, language):
         if form.cleaned_data['package']:
             pack = form.cleaned_data['package']
             force = form.cleaned_data['force']
-            
+
             if re.match('^\d+$', pack) :
                 description_id=pack
             else :
