@@ -91,6 +91,10 @@ class DefaultTranslationModel(ddtss.TranslationModel):
 
         points = self.points[owner_level][self.ACTION_TRANSLATE]
 
+        # If no reviews, then it can't be accepted
+        if len(translation.reviews) == 0:
+            return False
+
         # Count points for reviewers
         for review in translation.reviews:
             if review.user:
