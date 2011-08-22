@@ -210,6 +210,9 @@ def view_translate(session, request, language, description_id):
 
     user = get_user(request, session)
 
+    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_REVIEW):
+        return show_message_screen(request, 'User is not permitted to translate', 'ddtss_index_lang', language)
+
     # Select FOR UPDATE, to avoid concurrency issues.
     trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
     if not trans:
@@ -378,6 +381,9 @@ def view_review(session, request, language, description_id):
         return show_message_screen(request, 'Translation not ready for review', 'ddtss_index_lang', language)
 
     user = get_user(request, session)
+
+    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_REVIEW):
+        return show_message_screen(request, 'User is not permitted to review', 'ddtss_index_lang', language)
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
