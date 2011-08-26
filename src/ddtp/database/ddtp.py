@@ -70,6 +70,21 @@ class Description(Base):
     # Provides access to translations, as a dict
     translation = relationship('Translation', collection_class=collections.attribute_mapped_collection('language'))
 
+    def nice_package_versions(self):
+        """ Returns all versions in a nice format """
+        output = ""
+        outputdict = dict()
+        for package_version in self.package_versions:
+            if package_version.package not in outputdict:
+                outputdict[package_version.package] = list()
+            outputdict[package_version.package].append(package_version.version)
+        for package in outputdict:
+            output += package+" ("
+            for version in outputdict[package]:
+                output += version+", "
+            output += ") "
+        return output
+
     def short(self):
         """ Returns the title of the description """
         return self.description.partition("\n")[0]
@@ -162,6 +177,7 @@ class Packages(Base):
     __tablename__ = 'packages_tb'
 
     packages_id = Column(Integer, primary_key=True)
+    # The package column shouldn't be used!
     package = Column(String, nullable=False)
     source = Column(String, nullable=False)
     version = Column(String, nullable=False)

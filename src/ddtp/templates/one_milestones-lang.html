@@ -21,7 +21,7 @@
             <a href="{% url ddtss_translate lang descr.description_id %}">Fetched for translation</a>
         {% endif %}
     </td>
-    <td>{% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %} </td> </tr>
+    <td>{{ descr.nice_package_versions }}</td> </tr>
 {% endfor %}
 </table>
 <br>

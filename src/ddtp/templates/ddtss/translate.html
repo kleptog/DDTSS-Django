@@ -29,7 +29,7 @@ go</font>
   <li><tt># Source: {{descr.source}}</tt></li>
 <!--  <li><tt># Package(s): fmit</tt></li> -->
   <li><tt># Prioritize: {{descr.prioritize}}</tt></li>
-  <li><tt># Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}</tt>
+  <li><tt># Versions: {{descr.nice_package_versions}}</tt>
 </li>
 </ul>
 {% if forreview %}

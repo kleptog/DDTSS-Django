@@ -5,17 +5,17 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
-from sqlalchemy import func
+from ddtp.database.ddtp import with_db_session, Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
+from sqlalchemy import func, distinct
 
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
 def view_browse(session, request, prefix):
     """ Does overview pages (<foo>.html) """
-    resultset = session.query(Description.package, Description.description_id, DescriptionTag). \
-                        filter(Description.description_id==DescriptionTag.description_id). \
-                        filter(Description.package.like(prefix+'%')). \
-                        order_by(Description.package, Description.description_id, DescriptionTag.tag).all()
+    resultset = session.query(PackageVersion.package, PackageVersion.description_id, DescriptionTag). \
+                        filter(PackageVersion.description_id==DescriptionTag.description_id). \
+                        filter(PackageVersion.package.like(prefix+'%')). \
+                        order_by(PackageVersion.package, PackageVersion.description_id, DescriptionTag.tag).all()
 
     # defaultdict would be better here, but django can't iterate over defaultdicts
     params = dict()
@@ -50,7 +50,8 @@ def view_index(session, request):
     result = session.query(func.count(Description.description_id)).one()
     params['description_count'] = result[0]
 
-    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
+    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
 
     return render_to_response("index.html", params, context_instance=RequestContext(request))
 
@@ -58,11 +59,14 @@ def view_index(session, request):
 def view_package(session, request, package_name):
     """ Show the page for a single package """
     params = dict()
-    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
+    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
 
-    resultset = session.query(Description, ActiveDescription.description_id). \
-                        filter(Description.package==package_name). \
+    resultset = session.query(Description, PackageVersion, ActiveDescription.description_id). \
+                        filter(PackageVersion.package==package_name). \
+                        outerjoin(PackageVersion, PackageVersion.description_id == Description.description_id). \
                         outerjoin(ActiveDescription, ActiveDescription.description_id == Description.description_id). \
+                        distinct(-Description.description_id). \
                         order_by(-Description.description_id)
 
     params['package'] = resultset
@@ -74,13 +78,15 @@ def view_package(session, request, package_name):
 def view_descr(session, request, descr_id):
     """ Show the page for a single description """
     params = dict()
-    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
+    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
 
     # This description
     descr = session.query(Description). \
                         filter(Description.description_id==descr_id).one()
     params['descr'] = descr
 
+    # FIXME... don't use Description.package
     # Other descriptions for this package
     resultset = session.query(Description). \
                         filter(Description.package==descr.package).all()
@@ -96,7 +102,8 @@ def view_descr(session, request, descr_id):
 def view_transdescr(session, request, descr_id, lang):
     """ Show the page for a single translated description """
     params = dict()
-    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
+    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
 
     # This description
     descr = session.query(Description). \
@@ -163,10 +170,12 @@ def view_onepart(session, request, part_md5, lang):
 def view_source(session, request, source_name):
     """ Show the page for a single source package """
     params = dict()
-    params['prefixlist'] = map(chr, range(ord('a'), ord('z')+1))
+    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
+    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
 
     params['source_name'] = source_name
 
+    # FIXME... don't use Description.package
     # All Packages of this source package
     descriptions = session.query(Description.package). \
                         filter(Description.source==source_name).group_by(Description.package).order_by(Description.package).all()

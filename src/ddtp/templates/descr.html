@@ -12,7 +12,7 @@
 <pre>
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
-Versions: {% for version in descr.package_versions %}{{version.package}} ({{version.version}}){% if not forloop.last %}, {% endif %}{% endfor %}
+Versions: {{ descr.nice_package_versions }}
 Milestones: {% for milestone in descr.milestones %}{{milestone.milestone}}{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
 Description: {{descr.description}}
