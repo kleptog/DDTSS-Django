@@ -12,10 +12,11 @@ from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponseForbidden
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion
+from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion, DescriptionMilestone
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
 from urlparse import urlsplit
 from sqlalchemy import func
+from sqlalchemy import or_
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
@@ -187,6 +188,71 @@ def view_index_lang(session, request, language):
                           .limit(20) \
                           .all()
 
+    team_mile_hight = session.query(DescriptionMilestone.milestone,func.count(Translation.description_id)). \
+                        join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
+                        filter(Translation.language==lang.language).\
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
+    team_mile_hight2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
+                        filter(or_(DescriptionMilestone.milestone==lang.milestone_high,\
+                        DescriptionMilestone.milestone==lang.milestone_medium,\
+                        DescriptionMilestone.milestone==lang.milestone_low,\
+                        DescriptionMilestone.milestone==user.milestone)).\
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
+    resultdict = dict(team_mile_hight)
+
+    stat_user_milestone = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==user.milestone).all();
+    stat_lang_milestone_high = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==lang.milestone_high).all();
+    stat_lang_milestone_medium = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==lang.milestone_medium).all();
+    stat_lang_milestone_low = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==lang.milestone_low).all();
+
+    newmilestones = dict()
+    for r in team_mile_hight2:
+        if r[0] == user.milestone:
+            newmilestones['user_milestone']=dict()
+            newmilestones['user_milestone']['type']='user_milestone'
+            newmilestones['user_milestone']['name']=r[0]
+            newmilestones['user_milestone']['total']=r[1]
+            newmilestones['user_milestone']['translated']=resultdict.get(r[0],0)
+            newmilestones['user_milestone']['percent']=resultdict.get(r[0],0)*100/r[1]
+            newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data();
+        if r[0] == lang.milestone_high:
+            newmilestones['lang_milestone_high']=dict()
+            newmilestones['lang_milestone_high']['type']='lang_milestone_high'
+            newmilestones['lang_milestone_high']['name']=r[0]
+            newmilestones['lang_milestone_high']['total']=r[1]
+            newmilestones['lang_milestone_high']['translated']=resultdict.get(r[0],0)
+            newmilestones['lang_milestone_high']['percent']=resultdict.get(r[0],0)*100/r[1]
+            newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data();
+        if r[0] == lang.milestone_medium:
+            newmilestones['lang_milestone_medium']=dict()
+            newmilestones['lang_milestone_medium']['type']='lang_milestone_medium'
+            newmilestones['lang_milestone_medium']['name']=r[0]
+            newmilestones['lang_milestone_medium']['total']=r[1]
+            newmilestones['lang_milestone_medium']['translated']=resultdict.get(r[0],0)
+            newmilestones['lang_milestone_medium']['percent']=resultdict.get(r[0],0)*100/r[1]
+            newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data();
+        if r[0] == lang.milestone_low:
+            newmilestones['lang_milestone_low']=dict()
+            newmilestones['lang_milestone_low']['type']='lang_milestone_low'
+            newmilestones['lang_milestone_low']['name']=r[0]
+            newmilestones['lang_milestone_low']['total']=r[1]
+            newmilestones['lang_milestone_low']['translated']=resultdict.get(r[0],0)
+            newmilestones['lang_milestone_low']['percent']=resultdict.get(r[0],0)*100/r[1]
+            newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data();
+
+    # now sort it
+    milestones = list()
+    if 'user_milestone' in newmilestones:
+        milestones.append(newmilestones['user_milestone'])
+    if 'lang_milestone_high' in newmilestones:
+        milestones.append(newmilestones['lang_milestone_high'])
+    if 'lang_milestone_medium' in newmilestones:
+        milestones.append(newmilestones['lang_milestone_medium'])
+    if 'lang_milestone_low' in newmilestones:
+        milestones.append(newmilestones['lang_milestone_low'])
+
     return render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
         user=user,
@@ -194,6 +260,7 @@ def view_index_lang(session, request, language):
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed,
+        milestones=milestones,
         global_messages=global_messages,
         team_messages=team_messages,
         user_messages=user_messages), context_instance=RequestContext(request))
