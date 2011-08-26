@@ -150,6 +150,7 @@ def view_index_lang(session, request, language):
                           .group_by(PendingTranslation) \
                           .options(subqueryload(PendingTranslation.reviews)) \
                           .options(subqueryload(PendingTranslation.description)) \
+                          .options(subqueryload('description.milestones')) \
                           .all()
 
     pending_translations = []
