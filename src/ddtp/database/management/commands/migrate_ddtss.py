@@ -14,6 +14,7 @@ from django.core.management.base import NoArgsCommand
 
 from ddtp.database import db, ddtp, ddtss
 from sqlalchemy import Table, Column, Integer, String, Date, LargeBinary, MetaData, ForeignKey
+from ddtp.ddtss.translationmodel import DefaultTranslationModel
 
 class DDTSS(db.Base):
     __tablename__ = 'ddtss'
@@ -61,6 +62,7 @@ def handle_langs(a,b):
     for lang in languages:
         lang.enabled_ddtss = (lang.language in langs)
         lang.fullname = lang_names.get(lang.language,'')
+        lang.translationmodel = DefaultTranslationModel()
 
 def handle_package_state(a,b):
     state = b[0].split(',')
@@ -80,7 +82,8 @@ keymap = (
    (r'^aliases/([\w.]+)/(active|password)$', r'', ignore),
    (r'^aliases/([\w.]+)/isadmin$', r'', ignore),  # TODO
    (r'^aliases/([\w.]+)/messages$', r'', ignore),  # TODO
-   (r'^(\w+)/config/(numreviewers|requirelogin)$', r'^(\d+)$', lambda a,b: setattr(languages[a[0]],a[1],b[0])),
+   (r'^(\w+)/config/numreviewers$', r'^(\d+)$', lambda a,b: languages[a[0]].translation_model.set_threshold(int(b[0]))),
+   (r'^(\w+)/config/requirelogin$', r'^(\d+)$', lambda a,b: languages[a[0]].translation_model.set_login_required(int(b[0]))),
    (r'^(\w+)/config/minuntranslated$', r'', ignore),
    (r'^(\w+)/done/', r'', ignore),
    (r'^(\w+)/logs/', r'', ignore),
@@ -115,7 +118,7 @@ class Command(NoArgsCommand):
         packages = defaultdict(ddtss.PendingTranslation)
 
         res = session.query(ddtss.Languages).all()
-        languages = defaultdict( ddtss.Languages, ((r.language, r) for r in res) )
+        languages = defaultdict( lambda: ddtss.Languages(translation_model=DefaultTranslationModel()), ((r.language, r) for r in res) )
 
         for key, val in session.query(DDTSS.key, DDTSS.value).yield_per(100):
             for key_regex, val_regex, func in keymap:
@@ -145,7 +148,6 @@ class Command(NoArgsCommand):
                 user.lastlanguage_ref = None
             user.active = True
             user.username = username
-            user.md5password = 'password'
             save_users.append(user)
 
         print "%d users saved" % len(save_users)

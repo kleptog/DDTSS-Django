@@ -9,10 +9,65 @@ import difflib
 from .db import Base, with_db_session
 from .ddtp import Description, DescriptionMilestone
 from django.conf import settings
+from sqlalchemy import types
 from sqlalchemy.orm import relationship, collections, backref, relation
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
 from datetime import datetime
+
+class TranslationModel(object):
+    """ Represents a model used to control the model used for translating """
+
+    models = dict()
+    model_name = ''
+
+    ACTION_TRANSLATE = 0
+    ACTION_REVIEW = 1
+
+    # These are serialisation and deserialisation to the database. The A is
+    # in case we support multiple models in the future.
+    def to_string(self):
+        assert False, "Not implemented"
+
+    @classmethod
+    def from_string(cls, s):
+        type = s[0]
+        if type in cls.models:
+            return cls.models[type].from_string(s)
+        raise Exception("Unknown translation accept model %s" % type)
+
+    @classmethod
+    def register_model(cls, model):
+        assert len(model.model_name) == 1, "Model name must be single character"
+        cls.models[model.model_name] = model
+
+    def __str__(self):
+        return self.to_string()
+
+    def __repr__(self):
+        return '<%s %r>' % (type(self).__name__, self.to_string())
+
+    def user_allowed(self, user, language, action):
+        """ Returns true of user is permitted to do action """
+        # user is User object
+        # action is one of the ACTION_* constants in this class
+        assert False, "Not implemented"
+
+    def translation_accepted(self, translation):
+        """ Returns true if translation is accepted """
+        # translation is PendingTranslation object
+        assert False, "Not implemented"
+
+class TranslationModelType(types.TypeDecorator):
+    """ Represents the translation from the model in the database to in memory """
+
+    impl = types.Unicode
+
+    def process_bind_param(self, value, dialect):
+        return value.to_string()
+
+    def process_result_value(self, value, dialect):
+        return TranslationModel.from_string(value)
 
 # __/config/*
 class Languages(Base):
@@ -21,9 +76,8 @@ class Languages(Base):
 
     language = Column(String, primary_key=True)
     fullname = Column(String, nullable=False)
-    numreviewers = Column(Integer, nullable=False)
-    requirelogin = Column(Boolean, nullable=False, default=False)
     enabled_ddtss = Column(Boolean, nullable=False, default=True)  # disabled
+    translation_model = Column(TranslationModelType, nullable=False)
     milestone_high = Column(String, ForeignKey('description_milestone_tb.milestone'))
     milestone_medium = Column(String, ForeignKey('description_milestone_tb.milestone'))
     milestone_low = Column(String, ForeignKey('description_milestone_tb.milestone'))

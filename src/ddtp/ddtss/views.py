@@ -20,6 +20,8 @@ from sqlalchemy import or_
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
+from ddtp.ddtss.translationmodel import DefaultTranslationModel
+
 @with_db_session
 def view_index(session, request, lang=None):
     """ Does the main index page for DDTSS, with list of languages and stats """
@@ -100,7 +102,7 @@ def view_index_lang(session, request, language):
         if form.cleaned_data['package']:
             pack = form.cleaned_data['package']
             force = form.cleaned_data['force']
-            
+
             if re.match('^\d+$', pack) :
                 description_id=pack
             else :
@@ -148,6 +150,7 @@ def view_index_lang(session, request, language):
                           .group_by(PendingTranslation) \
                           .options(subqueryload(PendingTranslation.reviews)) \
                           .options(subqueryload(PendingTranslation.description)) \
+                          .options(subqueryload('description.milestones')) \
                           .all()
 
     pending_translations = []
@@ -306,6 +309,9 @@ def view_translate(session, request, language, description_id):
         raise Http404()
 
     user = get_user(request, session)
+
+    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_REVIEW):
+        return show_message_screen(request, 'User is not permitted to translate', 'ddtss_index_lang', language)
 
     # Select FOR UPDATE, to avoid concurrency issues.
     trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
@@ -482,6 +488,9 @@ def view_review(session, request, language, description_id):
         return show_message_screen(request, 'Translation not ready for review', 'ddtss_index_lang', language)
 
     user = get_user(request, session)
+
+    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_REVIEW):
+        return show_message_screen(request, 'User is not permitted to review', 'ddtss_index_lang', language)
 
     if request.method == 'POST':
         form = ReviewForm(request.POST)
