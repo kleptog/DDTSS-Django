@@ -24,7 +24,10 @@ CREATE TABLE languages_tb (
     fullname character varying NOT NULL,
     numreviewers integer NOT NULL,
     requirelogin boolean NOT NULL,
-    enabled_ddtss boolean NOT NULL
+    enabled_ddtss boolean NOT NULL,
+    milestone_high character varying,
+    milestone_medium character varying,
+    milestone_low character varying
 );
 
 
@@ -134,7 +137,8 @@ CREATE TABLE users_tb (
     md5password character varying NOT NULL,
     lastseen integer NOT NULL,
     lastlanguage character varying,
-    superuser boolean NOT NULL DEFAULT false
+    superuser boolean NOT NULL DEFAULT false,
+    milestone character varying
 );
 
 

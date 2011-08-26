@@ -7,7 +7,7 @@ import time
 import difflib
 
 from .db import Base, with_db_session
-from .ddtp import Description
+from .ddtp import Description, DescriptionMilestone
 from django.conf import settings
 from sqlalchemy.orm import relationship, collections, backref, relation
 from sqlalchemy.orm.session import Session
@@ -24,6 +24,9 @@ class Languages(Base):
     numreviewers = Column(Integer, nullable=False)
     requirelogin = Column(Boolean, nullable=False, default=False)
     enabled_ddtss = Column(Boolean, nullable=False, default=True)  # disabled
+    milestone_high = Column(String, ForeignKey('description_milestone_tb.milestone'))
+    milestone_medium = Column(String, ForeignKey('description_milestone_tb.milestone'))
+    milestone_low = Column(String, ForeignKey('description_milestone_tb.milestone'))
 
     @property
     def coordinators(self):
@@ -55,6 +58,7 @@ class Users(Base):
     lastseen = Column(Integer, nullable=False)   # timestamp
     lastlanguage_ref = Column('lastlanguage', String, ForeignKey('languages_tb.language'))
     superuser = Column(Boolean, nullable=False, default=False)
+    milestone = Column(String, ForeignKey('description_milestone_tb.milestone'))
 
     lastlanguage = relationship(Languages)
 

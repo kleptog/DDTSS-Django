@@ -254,6 +254,18 @@ class Translation(Base):
     def __repr__(self):
         return 'Translation(%d, descr=%d, lang=%s)' % (self.translation_id, self.description_id, self.language)
 
+class Statistic(Base):
+    """ Records for statistic data """
+    __tablename__ = 'statistic_tb'
+
+    statistic_id = Column(Integer, primary_key=True)
+    value = Column(Integer, nullable=False)
+    date = Column(Date, nullable=False)
+    stat = Column(String, nullable=False)
+
+    def __repr__(self):
+        return 'Statistic(value=%d, date=%d, stat=%s)' % (self.value, self.date, self.stat)
+
 class DescriptionMilestone(Base):
     """ Records for referenc description and milestone """
     __tablename__ = 'description_milestone_tb'
@@ -261,20 +273,46 @@ class DescriptionMilestone(Base):
     description_milestone_id = Column(Integer, primary_key=True)
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
     milestone = Column(String, nullable=False)
+
     description = relationship(Description, backref='milestones')
 
-    def translated(self, lang, mile):
-        """ Return the the count of translated description in one milestone """
-        """ still unused """
-        return session.query(func.count(Translation.description_id)).join(DescriptionMilestone, DescriptionMilestone.description_id == Translation.description_id).\
-                  filter_by(milestone = mile).\
-                  filter_by(language = lang).one()
+    def Get_flot_data(self):
+        """ Returns all versions in a nice format """
+        # SELECT B.value*1000/A.value AS Promil,A.value,A.stat,B.value,B.stat,B.date from statistic_tb AS A,statistic_tb AS B where A.stat='mile:part:1-de' and B.stat like 'mile:part:1-de:trans-de' and B.date=A.date order by A.stat;
 
-    def count(self, mile):
-        """ Return the the count of description in one milestone """
-        """ still unused """
-        return session.query(func.count(DescriptionMilestone.description_id)).\
-                  filter_by(milestone = mile).one()
+        max_counter=6
+
+        output_prozt = 'var prozt = ['
+        output_total = 'var total = ['
+        output_trans = 'var trans = ['
+
+        session = Session.object_session(self)
+
+        values = list();
+        Statistic2 = aliased(Statistic)
+        values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
+                filter(Statistic.stat == 'mile:'+self.milestone). \
+                filter(Statistic2.stat == 'mile:'+self.milestone+':trans-de'). \
+                filter(Statistic.date == Statistic2.date). \
+                limit(max_counter). \
+                all()
+        count=0
+        for stat in values:
+            output_prozt += '[ '+str(count)+' ,'+str(stat[0]/10)+']'
+            output_total += '[ '+str(count)+' ,'+str(stat[1])+']'
+            output_trans += '[ '+str(count)+' ,'+str(stat[2])+']'
+            count=count+1
+            # maybe we have some nice 'lastloop' ?
+            if count==max_counter:
+                output_prozt += '];'
+                output_total += '];'
+                output_trans += '];'
+            else:
+                output_prozt += ', '
+                output_total += ', '
+                output_trans += ', '
+
+        return output_prozt+output_total+output_trans
 
     def __repr__(self):
         return 'DescriptionMilestone(%d, milestone=%s, description_id=%d)' % (self.description_milestone_id, self.milestone, self.description_id)

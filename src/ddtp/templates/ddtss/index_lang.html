@@ -13,11 +13,29 @@ function popup (url) {
  return true;
 }
 
+function reset_flot (url) {
+{% if user.milestone == None %}
+ document.getElementById('placeholderuser_milestone').style.display='none'
+ document.getElementById('placeholderlang_milestone_medium').style.display='none'
+ document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById(url).style.display='block'
+{% else %}
+ document.getElementById('placeholderuser_milestone').style.display='none'
+ document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById('placeholderlang_milestone_medium').style.display='none'
+ document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById(url).style.display='block'
+{% endif %}
+ return true;
+}
  
 //]]></script>
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
-<body>
+<body onload="return reset_flot('placeholderlang_milestone_high')" >
 <h1>DDTSS for {{lang.language}}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -123,6 +141,58 @@ Coordinators for {{lang.language}}:
 {% endfor %}
 <!-- End Team Messages -->
 
+<!-- Milestones -->
+<table>
+    <col width="60%" /><col width="40%" />
+<tr><td alian="top">
+
+<table id="table" cellspacing="1" class="tablesorter" style="height:150px;">
+<thead>
+<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
+</thead>
+<tbody>
+{% for milestoneinfo in milestones %}
+<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('placeholder{{milestoneinfo.type}}')">
+    <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
+    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
+    <td>{{milestoneinfo.translated}}</td>
+    <td> {{milestoneinfo.total}}</td>
+    <td> <div class="progress_bar">
+            <strong>{{milestoneinfo.percent}}%</strong>
+            <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
+        </div>
+    </td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+</td><td>
+
+{% for milestoneinfo in milestones %}
+<div id="placeholder{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
+
+<script type="text/javascript"> 
+$(function () {
+    {{milestoneinfo.flot}}
+    $.plot($("#placeholder{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
+                                                      {label: "Total"     , yaxis: 2, data: total},
+                                                      {label: "Translated", yaxis: 2, data: trans} ],
+                                { 
+yaxis: { },
+y2axis: {show:1 },
+//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
+                                  xaxis: {show:0 },
+                                  legend: { show: 1, position: "nw" } 
+                                });
+
+
+});
+</script> 
+{% endfor %}
+</td></tr>
+</table>
+<!-- End Milestones -->
+
 
 <table>
     <col width="60%" /><col width="40%" />
@@ -136,7 +206,15 @@ Coordinators for {{lang.language}}:
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
-    (priority {{trans.description.prioritize}}{% if trans.is_locked %}, locked{% endif %})</li>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
+    {% if trans.is_locked %} (locked){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
     None
@@ -165,7 +243,16 @@ Coordinators for {{lang.language}}:
 {% for trans in pending_review %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
     {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
+
     </li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
@@ -237,6 +324,14 @@ Coordinators for {{lang.language}}:
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
     {% if trans.owner_username == user.username %}(owner){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
