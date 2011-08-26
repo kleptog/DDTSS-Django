@@ -7,12 +7,13 @@ import time
 import difflib
 
 from .db import Base, with_db_session
-from .ddtp import Description
+from .ddtp import Description, DescriptionMilestone
 from django.conf import settings
 from sqlalchemy import types
-from sqlalchemy.orm import relationship, collections
+from sqlalchemy.orm import relationship, collections, backref, relation
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
+from datetime import datetime
 
 class TranslationModel(object):
     """ Represents a model used to control the model used for translating """
@@ -77,6 +78,9 @@ class Languages(Base):
     fullname = Column(String, nullable=False)
     enabled_ddtss = Column(Boolean, nullable=False, default=True)  # disabled
     translation_model = Column(TranslationModelType, nullable=False)
+    milestone_high = Column(String, ForeignKey('description_milestone_tb.milestone'))
+    milestone_medium = Column(String, ForeignKey('description_milestone_tb.milestone'))
+    milestone_low = Column(String, ForeignKey('description_milestone_tb.milestone'))
 
     @property
     def coordinators(self):
@@ -108,6 +112,7 @@ class Users(Base):
     lastseen = Column(Integer, nullable=False)   # timestamp
     lastlanguage_ref = Column('lastlanguage', String, ForeignKey('languages_tb.language'))
     superuser = Column(Boolean, nullable=False, default=False)
+    milestone = Column(String, ForeignKey('description_milestone_tb.milestone'))
 
     lastlanguage = relationship(Languages)
 
@@ -323,13 +328,26 @@ class Messages(Base):
     message_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # Specify who sees it:
-    # Both NULL: global
+    # all NULL: global
     # Language: for that language only
-    # User: for that user only
+    # for_description and language: for the description and lang
+    # User: for that user 
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
+    for_description = Column(Integer, ForeignKey('description_tb.description_id'))
     to_user = Column(String, ForeignKey('users_tb.username'))
 
     from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
+    in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)
+
+    description = relationship("Description")
+    parent = relation('Messages', remote_side=[message_id], backref="children")
+
+    @property
+    def datetime(self):
+        return datetime.fromtimestamp(self.timestamp)
+
+    def __repr__(self):
+        return 'Messages(%d, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))

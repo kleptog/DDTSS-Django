@@ -24,6 +24,9 @@ CREATE TABLE languages_tb (
     fullname character varying NOT NULL,
     enabled_ddtss boolean NOT NULL,
     translation_model text NOT NULL
+    milestone_high character varying,
+    milestone_medium character varying,
+    milestone_low character varying
 );
 
 
@@ -37,7 +40,9 @@ CREATE TABLE messages_tb (
     message_id integer NOT NULL,
     language character varying,
     to_user character varying,
+    for_description integer,
     from_user character varying NOT NULL,
+    in_reply_to integer,
     "timestamp" integer NOT NULL,
     message character varying NOT NULL
 );
@@ -131,7 +136,8 @@ CREATE TABLE users_tb (
     md5password character varying NOT NULL,
     lastseen integer NOT NULL,
     lastlanguage character varying,
-    superuser boolean NOT NULL DEFAULT false
+    superuser boolean NOT NULL DEFAULT false,
+    milestone character varying
 );
 
 

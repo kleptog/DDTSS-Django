@@ -4,10 +4,38 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>DDTSS ({{lang.language}})</title>
+<meta http-equiv="refresh" content="30;">
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+<script type="text/javascript">//<![CDATA[
+function popup (url) {
+ fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
+ fenster.focus();
+ return true;
+}
+
+function reset_flot (url) {
+{% if user.milestone == None %}
+ document.getElementById('placeholderuser_milestone').style.display='none'
+ document.getElementById('placeholderlang_milestone_medium').style.display='none'
+ document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById(url).style.display='block'
+{% else %}
+ document.getElementById('placeholderuser_milestone').style.display='none'
+ document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById('placeholderlang_milestone_medium').style.display='none'
+ document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById(url).style.display='block'
+{% endif %}
+ return true;
+}
+ 
+//]]></script>
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
-<body>
+<body onload="return reset_flot('placeholderlang_milestone_high')" >
 <h1>DDTSS for {{lang.language}}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -15,15 +43,59 @@
 
 </h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
 -->
+
+<!-- Project Messages -->
+{% for message in global_messages %}
+{% if forloop.first %}
+<div class=messages>
+{% if user.superuser %}
+    <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
+            <span style="font-size:80%">
+                <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">(New)</a>
+            </span>
+        </h2>
+    </form>
+{% else %}
+    <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>  </h2>
+{% endif %}
+    <ul>
+{% endif %}
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" >
+            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <span style="font-size:80%">
+                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}}
+                <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+                <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+            </span>
+        </form>
+        </li>
+{% if forloop.last %}
+    </ul>
+</div> 
+{% endif %}
+{% empty %}
+{% endfor %}
+<!-- End Project Messages -->
+
+
+{% if not user.logged_in %}
+<span style="font-size:120%">
+    <b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
+</span>
+<p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+{% endif %}
+
+
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %}{{user.username}}{%if not forloop.last%}, {% endif %}
+{% for user in lang.coordinators %} <a href="{% url ddtss_message %}?to_user={{user.username}}" onclick="return popup(this.action)" target="msgwindow">{{user.username}}</a>
+{%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
-{% if not user %}
-<b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
-<p>
-{% endif %}
-<p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+
+
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
@@ -31,12 +103,99 @@ Coordinators for {{lang.language}}:
     {% endfor %}
 </ul>
 {% endif %}
-<!-- Message not implemented for now
+
+<!-- Team Messages -->
+{% for message in team_messages %}
+{% if forloop.first %}
 <div class=messages>
-<h3>nl-Team-Messages (0): <div class="help" title="Messages from your language team">?</div>
-</h3>None
--->
-<table><col width="60%" /><col width="40%" />
+    {% if auth.is_coordinator %}
+    <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <h2>Team Messages<div class="help" title="Team Messages">?</div>
+            <span style="font-size:80%">
+            <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">(New)</a>
+            </span>
+            <input type="hidden" name="language" value="{{lang.language}}"  />
+        </h2>
+    </form>
+    {% else %}
+    <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
+    {% endif %}
+    <ul>
+{% endif %}
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <span style="font-size:80%">
+                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}}
+                <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+                <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+            </span>
+        </form>
+        </li>
+{% if forloop.last %}
+    </ul>
+</div> 
+{% endif %}
+{% empty %}
+{% endfor %}
+<!-- End Team Messages -->
+
+<!-- Milestones -->
+<table>
+    <col width="60%" /><col width="40%" />
+<tr><td alian="top">
+
+<table id="table" cellspacing="1" class="tablesorter" style="height:150px;">
+<thead>
+<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
+</thead>
+<tbody>
+{% for milestoneinfo in milestones %}
+<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('placeholder{{milestoneinfo.type}}')">
+    <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
+    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
+    <td>{{milestoneinfo.translated}}</td>
+    <td> {{milestoneinfo.total}}</td>
+    <td> <div class="progress_bar">
+            <strong>{{milestoneinfo.percent}}%</strong>
+            <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
+        </div>
+    </td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+</td><td>
+
+{% for milestoneinfo in milestones %}
+<div id="placeholder{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
+
+<script type="text/javascript"> 
+$(function () {
+    {{milestoneinfo.flot}}
+    $.plot($("#placeholder{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
+                                                      {label: "Total"     , yaxis: 2, data: total},
+                                                      {label: "Translated", yaxis: 2, data: trans} ],
+                                { 
+yaxis: { },
+y2axis: {show:1 },
+//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
+                                  xaxis: {show:0 },
+                                  legend: { show: 1, position: "nw" } 
+                                });
+
+
+});
+</script> 
+{% endfor %}
+</td></tr>
+</table>
+<!-- End Milestones -->
+
+
+<table>
+    <col width="60%" /><col width="40%" />
 <tr>
   <td valign='top' >
   <div class=untranslated>
@@ -47,7 +206,15 @@ Coordinators for {{lang.language}}:
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
-    (priority {{trans.description.prioritize}}{% if trans.is_locked %}, locked{% endif %})</li>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
+    {% if trans.is_locked %} (locked){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
     None
@@ -76,7 +243,16 @@ Coordinators for {{lang.language}}:
 {% for trans in pending_review %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
     {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
+
     </li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
@@ -95,9 +271,22 @@ Coordinators for {{lang.language}}:
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
-<li>Account: {{user.username}}
-{% if auth.is_coordinator %} (<a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}</a>){% endif %}
-{% if user.superuser %} (<a href="{% url ddtss_admin %}">Admin</a>){% endif %}</li>
+<li>Account: {{user.username}}</li>
+{% if auth.is_coordinator %} 
+<li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
+<li> <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">Write a new team-messages</a>
+        <input type="hidden" name="language" value="{{lang.language}}"  />
+    </form>
+</li>
+{% endif %}
+{% if user.superuser %} 
+<li><a href="{% url ddtss_admin %}">Admin-Page</a></li>
+<li> <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+    <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">Write a new project-messages</a>
+</form>
+</li>
+{% endif %}
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
@@ -106,11 +295,28 @@ Coordinators for {{lang.language}}:
 {% endif %}
 </ul>
 </div>
-<!-- Messages not yet done
 <div class=messages>
-<h2>Messages for you (0)  <div class="help" title="Messages from other users for you">?</div>
-</h2>None
--->
+    <h2>Messages for you<div class="help" title="Messages from other users for you">?</div>  </h2>
+{% for message in user_messages %}
+{% if forloop.first %}<ul>{% endif %}
+    <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <b title="{{message.parent.message}}">{{message.message}}</b><br>
+        <span style="font-size:80%">
+            from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+            {% if message.for_description %}
+            to the description <a href="{% url ddtss_forreview message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
+            {% endif %}
+            at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+            <input type="hidden" name="to_user" value="{{message.from_user}}"  />
+            <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
+        </span>
+    </form>
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% empty %}
+    None
+{% endfor %}
+</div> 
   <div class=reviewed>
   <h2>Reviewed by you ({{ reviewed|length }})
     <div class="help" title="List of translations you have already reviewed. You can still make changes though.">?</div>
@@ -118,6 +324,14 @@ Coordinators for {{lang.language}}:
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
     <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+
+{% for mile in trans.description.milestones %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% endfor %}
+
     {% if trans.owner_username == user.username %}(owner){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
@@ -134,14 +348,15 @@ Coordinators for {{lang.language}}:
 -->
 </td></tr>
 </table>
-<a href="{% url ddtss_index_lang lang.language %}">Refresh</a>
-<a href="{% url ddtss_index_lang 'xx' %}">Another language</a>
-<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a>
-<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a>
+<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> | 
+<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> | 
+<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> | 
+<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> | 
+<a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> | 
 {% if user.logged_in %}
 <a href="{% url ddtss_logout %}">Logout</a>
 {% else %}
-<a href="{% url ddtss_login %}">Login</a>
+<a href="{% url ddtss_login %}">Login</a> | 
 <a href="{% url ddtss_create_user %}">Create Login</a>
 {% endif %}
 </body>

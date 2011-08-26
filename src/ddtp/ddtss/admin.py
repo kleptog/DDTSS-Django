@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, UserAuthority
+from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, UserAuthority, DescriptionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
 
 @with_db_session
@@ -39,9 +39,19 @@ class LanguageAdminForm(forms.Form):
     """
     A form that manages the superuser view of languages
     """
+
+    def __init__(self, session, *args, **kwargs):
+        super(LanguageAdminForm, self).__init__(*args, **kwargs)
+        self.fields['milestone_high'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+        self.fields['milestone_medium'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+        self.fields['milestone_low'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+
     language = forms.RegexField(label='Language code', regex=r'^\w\w(_\w\w)?$', help_text="Language code")
     name = forms.CharField(label="Name", max_length=30, help_text = "Human understandable name for language.")
     enabled = forms.BooleanField(label="Enabled", required=False, help_text="Enabled for DDTSS")
+    milestone_high = forms.ChoiceField(label="1. Milestone", required=False, help_text="1. Milestone");
+    milestone_medium = forms.ChoiceField(label="2. Milestone", required=False, help_text="2. Milestone");
+    milestone_low = forms.ChoiceField(label="3. Milestone", required=False, help_text="3. Milestone");
 
 @with_db_session
 def view_admin_lang(session, request, language):
@@ -61,11 +71,14 @@ def view_admin_lang(session, request, language):
         if 'cancel' in request.POST:
             return redirect('ddtss_admin')
         if 'submit' in request.POST:
-            form = LanguageAdminForm(data=request.POST)
+            form = LanguageAdminForm(session,data=request.POST)
             if form.is_valid():
                 # Modify language
                 lang.fullname = form.cleaned_data['name']
                 lang.enabled_ddtss = form.cleaned_data['enabled']
+                lang.milestone_high = form.cleaned_data['milestone_high']
+                lang.milestone_medium = form.cleaned_data['milestone_medium']
+                lang.milestone_low = form.cleaned_data['milestone_low']
 
                 session.commit()
 
@@ -94,7 +107,14 @@ def view_admin_lang(session, request, language):
                 messages.info(request, 'User %s now only trusted' % new_user.username)
                 session.commit()
 
-    form = LanguageAdminForm(dict(language=language, name=lang.fullname, enabled=lang.enabled_ddtss))
+    form = LanguageAdminForm(session,dict( \
+        language=language, \
+        name=lang.fullname, \
+        enabled=lang.enabled_ddtss, \
+        milestone_high=lang.milestone_high,\
+        milestone_medium=lang.milestone_medium,\
+        milestone_low=lang.milestone_low \
+        ))
 
     return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))
@@ -104,6 +124,10 @@ class CoordinatorAdminForm(forms.Form):
     A form that manages the superuser view of languages
     """
     error_css_class = 'error'
+
+    milestone_high = forms.ChoiceField(label="1. Milestone", required=False, help_text="1. Milestone");
+    milestone_medium = forms.ChoiceField(label="2. Milestone", required=False, help_text="2. Milestone");
+    milestone_low = forms.ChoiceField(label="3. Milestone", required=False, help_text="3. Milestone");
 
     ct = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for coordinator translation")
     lt = forms.IntegerField(min_value=-1, max_value=10, initial=1, help_text="Points for logged-in translation")
@@ -125,11 +149,14 @@ class CoordinatorAdminForm(forms.Form):
     stable.widget.attrs['class'] = 'intinput'
     accept.widget.attrs['class'] = 'intinput'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, session, *args, **kwargs):
         super(CoordinatorAdminForm, self).__init__(*args, **kwargs)
         # This little peice of magic sets te class on any field that has an error
         for f_name in self.errors:
             self.fields[f_name].widget.attrs['class'] += ' error'
+        self.fields['milestone_high'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+        self.fields['milestone_medium'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+        self.fields['milestone_low'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
 
     def clean(self):
         data = self.cleaned_data
@@ -167,8 +194,12 @@ def view_coordinator(session, request, language):
         if 'cancel' in request.POST:
             return redirect('ddtss_index_lang', language)
         if 'update' in request.POST:
-            form = CoordinatorAdminForm(data=request.POST)
+            form = CoordinatorAdminForm(session,data=request.POST)
             if form.is_valid():
+                # Modify language
+                lang.milestone_high = form.cleaned_data['milestone_high']
+                lang.milestone_medium = form.cleaned_data['milestone_medium']
+                lang.milestone_low = form.cleaned_data['milestone_low']
                 # This little dance is needed because just changing the model doesn't mark the object dirty
                 model = lang.translation_model
                 session.expire(lang, ['translation_model'])
@@ -202,7 +233,11 @@ def view_coordinator(session, request, language):
                 session.commit()
 
     if not form:
-        form = CoordinatorAdminForm(lang.translation_model.to_form_fields())
+        form_fields = dict(milestone_high=lang.milestone_high,\
+                           milestone_medium=lang.milestone_medium,\
+                           milestone_low=lang.milestone_low)
+        form_fields.update(lang.translation_model.to_form_fields())
+        form = CoordinatorAdminForm(session, form_fields)
 
     return render_to_response("ddtss/coordinator.html", { 'lang': lang, 'form': form },
                               context_instance=RequestContext(request))
