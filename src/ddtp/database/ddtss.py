@@ -7,7 +7,7 @@ import time
 import difflib
 
 from .db import Base, with_db_session
-from .ddtp import Description, DescriptionMilestone
+from .ddtp import Description, DescriptionMilestone, Translation, PartDescription, Part, description_to_parts
 from django.conf import settings
 from sqlalchemy import types
 from sqlalchemy.orm import relationship, collections, backref, relation
@@ -249,6 +249,10 @@ class PendingTranslation(Base):
         self.owner_locktime = None
         return
 
+    @property
+    def parts(self):
+        return description_to_parts(self.short + "\n" + self.long)
+
     # Display methods
     #
     # When editting we make slight changes to the text we display.
@@ -307,6 +311,36 @@ class PendingTranslation(Base):
             self.state = PendingTranslation.STATE_PENDING_REVIEW
 
         return
+
+    # Accept translation. Note: does not check policy, that is the caller's responsibility.
+    def accept_translation(self):
+        """ Accepts translation by pushing it into the DDTP """
+        session = Session.object_session(self)
+
+        parts = self.description.get_description_part_objects()
+        translated_parts = self.parts
+
+        # First create translation object, updating existing if necessary
+        if self.language_ref in self.description.translation:
+            translation = self.description.translation[self.language_ref]
+        else:
+            translation = Translation(description_id=self.description_id, language=self.language_ref)
+            session.add(translation)
+        translation.translation = self.short + "\n" + self.long + "\n"
+
+        # Then update the parts
+        for text, hash, part in parts:
+            # Create Part object if missing
+            if part is None:
+                part = PartDescription(description_id=self.description_id, part_md5=hash)
+                session.add(part)
+            # Can't use magic here, because the PartDescription object might
+            # have just been created but the Part already exists.
+            part_trans = session.query(Part).filter_by(part_md5=hash, language=self.language_ref).first()
+            if not part_trans:
+                part_trans = Part(part_md5=hash, language=self.language_ref)
+                session.add(part_trans)
+            part_trans.part = translated_parts.pop(0)
 
 class PendingTranslationReview(Base):
     """ A review of a translation """
