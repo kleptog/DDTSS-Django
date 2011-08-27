@@ -417,3 +417,24 @@ class Messages(Base):
 
     def __repr__(self):
         return 'Messages(%s, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
+
+    @classmethod
+    def global_messages(cls, session):
+        return session.query(cls) \
+                          .filter(cls.to_user==None) \
+                          .filter(cls.language==None) \
+                          .filter(cls.for_description==None) \
+                          .filter(cls.from_user!=None)
+
+    @classmethod
+    def team_messages(cls, session, language):
+        return session.query(cls) \
+                          .filter(cls.language==language) \
+                          .filter(cls.for_description==None) \
+                          .filter(cls.from_user!=None)
+
+    @classmethod
+    def user_messages(cls, session, username):
+        return session.query(cls) \
+                          .filter(cls.to_user==username) \
+                          .filter(cls.from_user!=None)

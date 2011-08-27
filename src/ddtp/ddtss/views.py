@@ -170,23 +170,17 @@ def view_index_lang(session, request, language):
     pending_review.sort(key=lambda t: t.lastupdate, reverse=False)
     pending_translations.sort(key=lambda t: t.firstupdate, reverse=False)
 
-    global_messages = session.query(Messages) \
-                          .filter(Messages.to_user==None) \
-                          .filter(Messages.language==None) \
-                          .filter(Messages.for_description==None) \
+    global_messages = Messages.global_messages(session) \
                           .order_by(-Messages.timestamp) \
                           .limit(20) \
                           .all()
 
-    team_messages = session.query(Messages) \
-                          .filter(Messages.language==language) \
-                          .filter(Messages.for_description==None) \
+    team_messages = Messages.team_messages(session, language) \
                           .order_by(-Messages.timestamp) \
                           .limit(20) \
                           .all()
 
-    user_messages = session.query(Messages) \
-                          .filter(Messages.to_user==user.username) \
+    user_messages = Messages.user_messages(session, user.username) \
                           .order_by(-Messages.timestamp) \
                           .limit(20) \
                           .all()
