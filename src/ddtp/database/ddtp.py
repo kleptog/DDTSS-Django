@@ -296,21 +296,9 @@ class DescriptionMilestone(Base):
                 filter(Statistic.date == Statistic2.date). \
                 limit(max_counter). \
                 all()
-        count=0
-        for stat in values:
-            output_prozt += '[ '+str(count)+' ,'+str(stat[0]/10)+']'
-            output_total += '[ '+str(count)+' ,'+str(stat[1])+']'
-            output_trans += '[ '+str(count)+' ,'+str(stat[2])+']'
-            count=count+1
-            # maybe we have some nice 'lastloop' ?
-            if count==max_counter:
-                output_prozt += '];'
-                output_total += '];'
-                output_trans += '];'
-            else:
-                output_prozt += ', '
-                output_total += ', '
-                output_trans += ', '
+        output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
+        output_total = "var total=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_trans = "var trans=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans
 
