@@ -4,7 +4,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
 <title>DDTSS ({{lang.language}})</title>
-<meta http-equiv="refresh" content="30;">
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
 <script type="text/javascript">//<![CDATA[
 function popup (url) {
@@ -15,16 +14,15 @@ function popup (url) {
 
 function reset_flot (url) {
 {% if user.milestone == None %}
- document.getElementById('placeholderuser_milestone').style.display='none'
- document.getElementById('placeholderlang_milestone_medium').style.display='none'
- document.getElementById('placeholderlang_milestone_low').style.display='none'
- document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById('flot_lang_milestone_medium').style.display='none'
+ document.getElementById('flot_lang_milestone_low').style.display='none'
+ document.getElementById('flot_lang_milestone_high').style.display='none'
  document.getElementById(url).style.display='block'
 {% else %}
- document.getElementById('placeholderuser_milestone').style.display='none'
- document.getElementById('placeholderlang_milestone_high').style.display='none'
- document.getElementById('placeholderlang_milestone_medium').style.display='none'
- document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById('flot_user_milestone').style.display='none'
+ document.getElementById('flot_lang_milestone_high').style.display='none'
+ document.getElementById('flot_lang_milestone_medium').style.display='none'
+ document.getElementById('flot_lang_milestone_low').style.display='none'
  document.getElementById(url).style.display='block'
 {% endif %}
  return true;
@@ -35,7 +33,7 @@ function reset_flot (url) {
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
-<body onload="return reset_flot('placeholderlang_milestone_high')" >
+<body onload="return reset_flot('flot_lang_milestone_high')" >
 <h1>DDTSS for {{lang.language}}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -50,7 +48,7 @@ function reset_flot (url) {
 <div class=messages>
 {% if user.superuser %}
     <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
+        <h2>Project Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
             <span style="font-size:80%">
                 <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">(New)</a>
             </span>
@@ -146,17 +144,18 @@ Coordinators for {{lang.language}}:
     <col width="60%" /><col width="40%" />
 <tr><td alian="top">
 
-<table id="table" cellspacing="1" class="tablesorter" style="height:150px;">
+<table id="milestonetable" cellspacing="1" class="tablesorter" style="height:150px;">
 <thead>
-<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
+<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>pending</th> <th>total</th> <th>progress</th></tr>
 </thead>
 <tbody>
 {% for milestoneinfo in milestones %}
-<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('placeholder{{milestoneinfo.type}}')">
+<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
     <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
     <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
-    <td>{{milestoneinfo.translated}}</td>
-    <td> {{milestoneinfo.total}}</td>
+    <td align='right'>{{milestoneinfo.translated}}</td>
+    <td align='right'>{{milestoneinfo.pending}}</td>
+    <td align='right'> {{milestoneinfo.total}}</td>
     <td> <div class="progress_bar">
             <strong>{{milestoneinfo.percent}}%</strong>
             <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
@@ -169,12 +168,12 @@ Coordinators for {{lang.language}}:
 </td><td>
 
 {% for milestoneinfo in milestones %}
-<div id="placeholder{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
+<div id="flot_{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
 
 <script type="text/javascript"> 
 $(function () {
     {{milestoneinfo.flot}}
-    $.plot($("#placeholder{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
+    $.plot($("#flot_{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
                                                       {label: "Total"     , yaxis: 2, data: total},
                                                       {label: "Translated", yaxis: 2, data: trans} ],
                                 { 
