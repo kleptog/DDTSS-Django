@@ -146,15 +146,16 @@ Coordinators for {{lang.language}}:
 
 <table id="milestonetable" cellspacing="1" class="tablesorter" style="height:150px;">
 <thead>
-<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
+<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>pending</th> <th>total</th> <th>progress</th></tr>
 </thead>
 <tbody>
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
     <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
     <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
-    <td>{{milestoneinfo.translated}}</td>
-    <td> {{milestoneinfo.total}}</td>
+    <td align='right'>{{milestoneinfo.translated}}</td>
+    <td align='right'>{{milestoneinfo.pending}}</td>
+    <td align='right'> {{milestoneinfo.total}}</td>
     <td> <div class="progress_bar">
             <strong>{{milestoneinfo.percent}}%</strong>
             <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
