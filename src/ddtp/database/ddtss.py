@@ -399,4 +399,4 @@ class Messages(Base):
         return datetime.fromtimestamp(self.timestamp)
 
     def __repr__(self):
-        return 'Messages(%d, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
+        return 'Messages(%s, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
