@@ -23,14 +23,13 @@ CREATE TABLE languages_tb (
     language character varying NOT NULL,
     fullname character varying NOT NULL,
     enabled_ddtss boolean NOT NULL,
-    translation_model text NOT NULL
+    translation_model text NOT NULL,
     milestone_high character varying,
     milestone_medium character varying,
     milestone_low character varying
 );
 
 
-ALTER TABLE public.languages_tb OWNER TO kleptog;
 
 --
 -- Name: messages_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -48,7 +47,6 @@ CREATE TABLE messages_tb (
 );
 
 
-ALTER TABLE public.messages_tb OWNER TO kleptog;
 
 --
 -- Name: messages_tb_message_id_seq; Type: SEQUENCE; Schema: public; Owner: kleptog
@@ -62,7 +60,6 @@ CREATE SEQUENCE messages_tb_message_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.messages_tb_message_id_seq OWNER TO kleptog;
 
 --
 -- Name: messages_tb_message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kleptog
@@ -81,7 +78,6 @@ CREATE TABLE pendingtranslationreview_tb (
 );
 
 
-ALTER TABLE public.pendingtranslationreview_tb OWNER TO kleptog;
 
 --
 -- Name: pendingtranslations_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -106,7 +102,6 @@ CREATE TABLE pendingtranslations_tb (
 );
 
 
-ALTER TABLE public.pendingtranslations_tb OWNER TO kleptog;
 
 --
 -- Name: userauthority_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -119,7 +114,6 @@ CREATE TABLE userauthority_tb (
 );
 
 
-ALTER TABLE public.userauthority_tb OWNER TO kleptog;
 
 --
 -- Name: users_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -141,7 +135,6 @@ CREATE TABLE users_tb (
 );
 
 
-ALTER TABLE public.users_tb OWNER TO kleptog;
 
 --
 -- Name: message_id; Type: DEFAULT; Schema: public; Owner: kleptog

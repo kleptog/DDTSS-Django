@@ -15,16 +15,17 @@
 <BODY>
 <h1>milestones for {{lang}}</h1>
 <a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
-<table id="table" cellspacing="1" class="tablesorter">
+<table id="milestonetable" cellspacing="1" class="tablesorter">
 <thead>
-<tr><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
+<tr><th>milestone</th> <th>translated</th> <th>pending</th>  <th>total</th> <th>progress</th></tr>
 </thead>
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
     <td><a href="{% url ddt_stats_one_milestones_lang lang milestone %}">{{milestone}}</a></td>
-    <td>{{milestoneinfo.translated}}</td>
-    <td> {{milestoneinfo.total}}</td>
+    <td align='right'>{{milestoneinfo.translated}}</td>
+    <td align='right'>{{milestoneinfo.pending}}</td>
+    <td align='right'> {{milestoneinfo.total}}</td>
     <td> <div class="progress_bar">
             <strong>{{milestoneinfo.percent}}%</strong>
             <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>

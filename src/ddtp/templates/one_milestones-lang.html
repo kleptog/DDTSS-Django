@@ -18,7 +18,11 @@
     <td>{% if transinfo.translate > 0 %}
             <a href="{% url ddt_transdescr transinfo.translate lang %}">translated</a>
         {% else %}
+        {% if transinfo.pending > 0 %}
+            <a href="{% url ddtss_forreview lang descr.description_id %}">pending</a>
+        {% else %}
             <a href="{% url ddtss_translate lang descr.description_id %}">Fetched for translation</a>
+        {% endif %}
         {% endif %}
     </td>
     <td>{{ descr.nice_package_versions }}</td> </tr>

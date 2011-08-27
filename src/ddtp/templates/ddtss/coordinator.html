@@ -3,12 +3,12 @@
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-<title>DDTSS Coordinate language {{lang.language}}</title>
+<title>DDTSS Language Coordination {{lang.language}}</title>
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/ddtss/ddtss.css" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<h1>DDTSS Coordinate language {{lang.language}}</h1>
+<h1>DDTSS Language Coordination {{lang.language}}</h1>
 <p>
 {% if messages %}
 <ul class="messages">
@@ -30,10 +30,16 @@ Coordinators:
 </table>
 <p>
 <form method="post" action="{% url ddtss_coordinate lang.language %}" enctype="multipart/form-data">
-Scores for controlling the acceptence of translations:
 {% for errors in form.errors.itervalues %}
 {{errors}}
 {% endfor %}
+Milestones for the language:
+<table id="coordinator_milestones">
+<tr><th>high milestone</th><td>{{form.milestone_high}}</td></tr>
+<tr><th>medium milestone</td><td>{{form.milestone_medium}}</td></tr>
+<tr><th>low milestone</td><td>{{form.milestone_low}}</td></tr>
+</table>
+Scores for controlling the acceptence of translations:
 <table id="coordinator_scores">
 <tr><th></th><th>Translate</th><th>Review</th></tr>
 <tr><th>Trusted user/Coordinator</th><td>{{form.ct}}</td><td>{{form.cr}}</td></tr>

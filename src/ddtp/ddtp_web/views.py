@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import with_db_session, Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
+from ddtp.database.ddtss import PendingTranslation
 from sqlalchemy import func, distinct
 
 @cache_page(60*60)   # Cache for an hour
@@ -192,13 +193,19 @@ def stats_milestones_lang(session, request, lang):
                         filter(Translation.language==lang).\
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
+    resultset1 = session.query(DescriptionMilestone.milestone,func.count(PendingTranslation.description_id)). \
+                        join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
+                        filter(PendingTranslation.language_ref == lang). \
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
     resultset2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
     params = dict()
     resultdict = dict(resultset)
+    resultdict1 = dict(resultset1)
     params['lang'] = lang
-    params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
+    params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'pending': resultdict1.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
 
@@ -212,6 +219,12 @@ def stats_one_milestones_lang(session, request, lang, mile):
                         filter(DescriptionMilestone.milestone==mile).\
                         order_by(Description.prioritize).all()
 
+    resultset1 = session.query(DescriptionMilestone.description_id,PendingTranslation.description_id). \
+                        join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
+                        filter(PendingTranslation.language_ref==lang).\
+                        filter(DescriptionMilestone.milestone==mile).\
+                        all()
+
     resultset2 = session.query(DescriptionMilestone.description_id,DescriptionMilestone.description_id). \
                         join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
                         filter(Translation.language==lang).\
@@ -224,9 +237,9 @@ def stats_one_milestones_lang(session, request, lang, mile):
 
     params = dict()
     resultdict = dict(resultset2)
-    #params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0)}) for r in resultset]
+    resultdict1 = dict(resultset1)
     params['lang'] = lang
     params['milestone'] = mile
-    params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0)}) for r in resultset]
+    params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0), 'pending': resultdict1.get(r.description_id,0)}) for r in resultset]
 
     return render_to_response("one_milestones-lang.html", params, context_instance=RequestContext(request))

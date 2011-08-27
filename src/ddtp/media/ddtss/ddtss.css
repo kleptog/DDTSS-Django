@@ -136,6 +136,15 @@ input.intinput {
     text-align: right;
 }
 
+table#coordinator_milestones th {
+    text-align: left;
+}
+
+table#milestonetable th {
+    padding-left: 5px;
+    padding-right:5px;
+}
+
 table#coordinator_scores th {
     text-align: left;
 }

@@ -206,7 +206,7 @@ class Command(NoArgsCommand):
         for lang in languages:
             languages[lang].language = lang
             if languages[lang].fullname is None:
-                languages[lang].fullname = ""
+                languages[lang].fullname = lang_names.get(languages[lang].language,'')
         session.add_all(languages.values())
 
         # Update users

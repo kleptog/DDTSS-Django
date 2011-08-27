@@ -190,6 +190,11 @@ def view_index_lang(session, request, language):
                         filter(Translation.language==lang.language).\
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
+    team_mile_hight1 = session.query(DescriptionMilestone.milestone,func.count(PendingTranslation.description_id)). \
+                        join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
+                        filter(PendingTranslation.language_ref == lang.language). \
+                        group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
+
     team_mile_hight2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
                         filter(or_(DescriptionMilestone.milestone==lang.milestone_high,\
                         DescriptionMilestone.milestone==lang.milestone_medium,\
@@ -198,6 +203,7 @@ def view_index_lang(session, request, language):
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
     resultdict = dict(team_mile_hight)
+    resultdict1 = dict(team_mile_hight1)
 
     stat_user_milestone = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==user.milestone).all();
     stat_lang_milestone_high = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==lang.milestone_high).all();
@@ -211,6 +217,7 @@ def view_index_lang(session, request, language):
             newmilestones['user_milestone']['type']='user_milestone'
             newmilestones['user_milestone']['name']=r[0]
             newmilestones['user_milestone']['total']=r[1]
+            newmilestones['user_milestone']['pending']=resultdict1.get(r[0],0)
             newmilestones['user_milestone']['translated']=resultdict.get(r[0],0)
             newmilestones['user_milestone']['percent']=resultdict.get(r[0],0)*100/r[1]
             newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data();
@@ -219,6 +226,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_high']['type']='lang_milestone_high'
             newmilestones['lang_milestone_high']['name']=r[0]
             newmilestones['lang_milestone_high']['total']=r[1]
+            newmilestones['lang_milestone_high']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_high']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_high']['percent']=resultdict.get(r[0],0)*100/r[1]
             newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data();
@@ -227,6 +235,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_medium']['type']='lang_milestone_medium'
             newmilestones['lang_milestone_medium']['name']=r[0]
             newmilestones['lang_milestone_medium']['total']=r[1]
+            newmilestones['lang_milestone_medium']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_medium']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_medium']['percent']=resultdict.get(r[0],0)*100/r[1]
             newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data();
@@ -235,6 +244,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_low']['type']='lang_milestone_low'
             newmilestones['lang_milestone_low']['name']=r[0]
             newmilestones['lang_milestone_low']['total']=r[1]
+            newmilestones['lang_milestone_low']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_low']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_low']['percent']=resultdict.get(r[0],0)*100/r[1]
             newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data();
@@ -348,6 +358,7 @@ def view_translate(session, request, language, description_id):
 
         if form.cleaned_data['submit']:
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
+            trans.lastupdate=int(time.time())
             trans.comment = form.cleaned_data['comment']
             trans.unlock()
 
@@ -498,6 +509,7 @@ def view_review(session, request, language, description_id):
 
         if form.cleaned_data['nothing']:
             trans.comment = form.cleaned_data['comment']
+            trans.lastupdate=int(time.time())
             session.commit()
             return show_message_screen(request, 'Changed comment only', 'ddtss_index_lang', language)
 
@@ -517,6 +529,7 @@ def view_review(session, request, language, description_id):
             trans.reviews.append( PendingTranslationReview(username=user.username) )
             # count review
             user.countreviews += 1
+            trans.lastupdate=int(time.time())
 
             if lang.translation_model.translation_accepted(trans):
                 # Translation has been accepted, yay!
@@ -531,6 +544,7 @@ def view_review(session, request, language, description_id):
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
             trans.comment = form.cleaned_data['comment']
             trans.owner_username = user.username
+            trans.lastupdate=int(time.time())
             # Clear reviews
             for review in trans.reviews:
                 session.delete(review)
