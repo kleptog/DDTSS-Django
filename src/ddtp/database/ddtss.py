@@ -354,6 +354,20 @@ class PendingTranslation(Base):
                 session.add(part_trans)
             part_trans.part = translated_parts.pop(0)
 
+        # Add a message indicating acceptance
+        message = "Translation Accepted\n" \
+                  "Translators/Reviewers: %s\n" \
+                  "Description: %s\n" \
+                  "%s\n" % (", ".join([self.owner_username] + [r.username for r in self.reviews]),
+                  self.short,
+                  self.long)
+        message = Messages(message=message,
+                           language=self.language_ref,
+                           for_description=self.description_id,
+                           timestamp=int(time.time()))
+
+        session.add(message)
+
 class PendingTranslationReview(Base):
     """ A review of a translation """
     __tablename__ = 'pendingtranslationreview_tb'
