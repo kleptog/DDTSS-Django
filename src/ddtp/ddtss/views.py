@@ -524,6 +524,12 @@ def view_review(session, request, language, description_id):
             # count review
             user.countreviews += 1
 
+            if lang.translation_model.translation_accepted(trans):
+                # Translation has been accepted, yay!
+                trans.accept_translation()
+                session.commit()
+                return show_message_screen(request, 'Translation accepted', 'ddtss_index_lang', language)
+
             session.commit()
             return show_message_screen(request, 'Translation reviewed', 'ddtss_index_lang', language)
 
