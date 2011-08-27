@@ -14,15 +14,15 @@ function popup (url) {
 
 function reset_flot (url) {
 {% if user.milestone == None %}
- document.getElementById('placeholderlang_milestone_medium').style.display='none'
- document.getElementById('placeholderlang_milestone_low').style.display='none'
- document.getElementById('placeholderlang_milestone_high').style.display='none'
+ document.getElementById('flot_lang_milestone_medium').style.display='none'
+ document.getElementById('flot_lang_milestone_low').style.display='none'
+ document.getElementById('flot_lang_milestone_high').style.display='none'
  document.getElementById(url).style.display='block'
 {% else %}
- document.getElementById('placeholderuser_milestone').style.display='none'
- document.getElementById('placeholderlang_milestone_high').style.display='none'
- document.getElementById('placeholderlang_milestone_medium').style.display='none'
- document.getElementById('placeholderlang_milestone_low').style.display='none'
+ document.getElementById('flot_user_milestone').style.display='none'
+ document.getElementById('flot_lang_milestone_high').style.display='none'
+ document.getElementById('flot_lang_milestone_medium').style.display='none'
+ document.getElementById('flot_lang_milestone_low').style.display='none'
  document.getElementById(url).style.display='block'
 {% endif %}
  return true;
@@ -33,7 +33,7 @@ function reset_flot (url) {
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
-<body onload="return reset_flot('placeholderlang_milestone_high')" >
+<body onload="return reset_flot('flot_lang_milestone_high')" >
 <h1>DDTSS for {{lang.language}}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -150,7 +150,7 @@ Coordinators for {{lang.language}}:
 </thead>
 <tbody>
 {% for milestoneinfo in milestones %}
-<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('placeholder{{milestoneinfo.type}}')">
+<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
     <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
     <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td>{{milestoneinfo.translated}}</td>
@@ -167,12 +167,12 @@ Coordinators for {{lang.language}}:
 </td><td>
 
 {% for milestoneinfo in milestones %}
-<div id="placeholder{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
+<div id="flot_{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
 
 <script type="text/javascript"> 
 $(function () {
     {{milestoneinfo.flot}}
-    $.plot($("#placeholder{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
+    $.plot($("#flot_{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
                                                       {label: "Total"     , yaxis: 2, data: total},
                                                       {label: "Translated", yaxis: 2, data: trans} ],
                                 { 
