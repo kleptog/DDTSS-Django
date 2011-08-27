@@ -96,6 +96,9 @@ class Languages(Base):
                 filter(UserAuthority.language_ref==self.language).\
                 filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_TRUSTED).all()
 
+    def __repr__(self):
+        return '<Languages %s (%s)>' % (self.language, self.fullname)
+
 # /aliases/*
 class Users(Base):
     """ Each user which can login has a record """
@@ -133,6 +136,9 @@ class Users(Base):
             return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
         return auth
 
+    def __repr__(self):
+        return '<Users %s (%s)>' % (self.username, self.email)
+
 class UserAuthority(Base):
     """ Stores the trust level of each user for each language """
     __tablename__ = 'userauthority_tb'
@@ -166,6 +172,9 @@ class UserAuthority(Base):
     @property
     def is_coordinator(self):
         return self.auth_level >= UserAuthority.AUTH_LEVEL_COORDINATOR
+
+    def __repr__(self):
+        return '<UserAuthority %s:%s>' % (self.language_ref, self.auth_level)
 
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed
@@ -203,6 +212,9 @@ class PendingTranslation(Base):
 
     STATE_PENDING_TRANSLATION = 0
     STATE_PENDING_REVIEW = 1
+
+    def __repr__(self):
+        return '<PendingTranslation %s/%s %r owner=%r>' % (self.language_ref, self.description_id, self.short, self.owner_username)
 
     @classmethod
     def make_suggestion(self, description, language):
@@ -351,6 +363,9 @@ class PendingTranslationReview(Base):
 
     user = relationship(Users, primaryjoin=(username == Users.username), foreign_keys=[username], uselist=False)
     translation = relationship(PendingTranslation, backref='reviews')
+
+    def __repr__(self):
+        return '<PendingTranslationReview %s/%s by %s>' % (self.translation.language_ref, self.translation.description_id, self.username)
 
     # In the future we might have different kinds of review, we could store
     # that data here
