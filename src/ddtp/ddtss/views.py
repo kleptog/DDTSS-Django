@@ -509,6 +509,11 @@ def view_review(session, request, language, description_id):
 
         if form.cleaned_data['accept']:
             trans.comment = form.cleaned_data['comment']
+            # Owner can't review own description
+            if user == trans.user:
+                session.commit()
+                return show_message_screen(request, 'Translation was translated by you', 'ddtss_index_lang', language)
+
             # Check if user has already reviewed it
             for r in trans.reviews:
                 if r.username == user.username:
