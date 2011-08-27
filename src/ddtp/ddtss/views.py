@@ -171,17 +171,17 @@ def view_index_lang(session, request, language):
     pending_translations.sort(key=lambda t: t.firstupdate, reverse=False)
 
     global_messages = Messages.global_messages(session) \
-                          .order_by(-Messages.timestamp) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
     team_messages = Messages.team_messages(session, language) \
-                          .order_by(-Messages.timestamp) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
     user_messages = Messages.user_messages(session, user.username) \
-                          .order_by(-Messages.timestamp) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
