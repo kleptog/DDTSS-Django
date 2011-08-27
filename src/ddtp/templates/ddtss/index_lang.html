@@ -47,10 +47,10 @@ function reset_flot (url) {
 {% if forloop.first %}
 <div class=messages>
 {% if user.superuser %}
-    <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+    <form method="post" id="globmsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <h2>Project Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
             <span style="font-size:80%">
-                <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">(New)</a>
+                <input type="submit" value="(New)" />
             </span>
         </h2>
     </form>
@@ -59,10 +59,10 @@ function reset_flot (url) {
 {% endif %}
     <ul>
 {% endif %}
-        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" >
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8" >
             <b title="{{message.parent.message}}">{{message.message}}</b><br>
             <span style="font-size:80%">
-                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                from <input type="submit" value="{{message.from_user}}" />
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
                 <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
                 <input type="hidden" name="to_user" value="{{message.from_user}}"  />
@@ -88,7 +88,7 @@ function reset_flot (url) {
 
 
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %} <a href="{% url ddtss_message %}?to_user={{user.username}}" onclick="return popup(this.action)" target="msgwindow">{{user.username}}</a>
+{% for user in lang.coordinators %} <a href="{% url ddtss_message %}?to_user={{user.username}}">{{user.username}}</a>
 {%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
@@ -107,10 +107,10 @@ Coordinators for {{lang.language}}:
 {% if forloop.first %}
 <div class=messages>
     {% if auth.is_coordinator %}
-    <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+    <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <h2>Team Messages<div class="help" title="Team Messages">?</div>
             <span style="font-size:80%">
-            <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">(New)</a>
+                <input type="submit" value="(New)" />
             </span>
             <input type="hidden" name="language" value="{{lang.language}}"  />
         </h2>
@@ -120,10 +120,10 @@ Coordinators for {{lang.language}}:
     {% endif %}
     <ul>
 {% endif %}
-        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
             <b title="{{message.parent.message}}">{{message.message}}</b><br>
             <span style="font-size:80%">
-                from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+                from <input type="submit" value="{{message.from_user}}" />
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
                 <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
                 <input type="hidden" name="to_user" value="{{message.from_user}}"  />
@@ -273,16 +273,17 @@ y2axis: {show:1 },
 <li>Account: {{user.username}}</li>
 {% if auth.is_coordinator %} 
 <li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
-<li> <form method="post" id="teammsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <a href="javascript:popup(this.action);self.teammsg.submit();" target="msgwindow">Write a new team-messages</a>
+<li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
+        <input type="submit" value="Write a new team messages" />
         <input type="hidden" name="language" value="{{lang.language}}"  />
+
     </form>
 </li>
 {% endif %}
 {% if user.superuser %} 
 <li><a href="{% url ddtss_admin %}">Admin-Page</a></li>
-<li> <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-    <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">Write a new project-messages</a>
+<li> <form method="post" id="globmsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
+    <input type="submit" value="Write a new project messages" />
 </form>
 </li>
 {% endif %}
@@ -298,10 +299,10 @@ y2axis: {show:1 },
     <h2>Messages for you<div class="help" title="Messages from other users for you">?</div>  </h2>
 {% for message in user_messages %}
 {% if forloop.first %}<ul>{% endif %}
-    <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+    <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <b title="{{message.parent.message}}">{{message.message}}</b><br>
         <span style="font-size:80%">
-            from <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">{{message.from_user}}</a>
+            from <input type="submit" value="{{message.from_user}}" />
             {% if message.for_description %}
             to the description <a href="{% url ddtss_forreview message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
             {% endif %}
