@@ -367,6 +367,9 @@ class PendingTranslation(Base):
                            timestamp=int(time.time()))
 
         session.add(message)
+        session.delete(self)
+        for review in self.reviews:
+            session.delete(review)
 
 class PendingTranslationReview(Base):
     """ A review of a translation """
