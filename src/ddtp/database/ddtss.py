@@ -386,7 +386,7 @@ class Messages(Base):
     for_description = Column(Integer, ForeignKey('description_tb.description_id'))
     to_user = Column(String, ForeignKey('users_tb.username'))
 
-    from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
+    from_user =  Column(String, ForeignKey('users_tb.username'))
     in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)
