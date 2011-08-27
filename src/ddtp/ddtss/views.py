@@ -354,6 +354,7 @@ def view_translate(session, request, language, description_id):
 
         if form.cleaned_data['submit']:
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
+            trans.lastupdate=int(time.time())
             trans.comment = form.cleaned_data['comment']
             trans.unlock()
 
@@ -504,6 +505,7 @@ def view_review(session, request, language, description_id):
 
         if form.cleaned_data['nothing']:
             trans.comment = form.cleaned_data['comment']
+            trans.lastupdate=int(time.time())
             session.commit()
             return show_message_screen(request, 'Changed comment only', 'ddtss_index_lang', language)
 
@@ -518,6 +520,7 @@ def view_review(session, request, language, description_id):
             trans.reviews.append( PendingTranslationReview(username=user.username) )
             # count review
             user.countreviews += 1
+            trans.lastupdate=int(time.time())
 
             session.commit()
             return show_message_screen(request, 'Translation reviewed', 'ddtss_index_lang', language)
@@ -526,6 +529,7 @@ def view_review(session, request, language, description_id):
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
             trans.comment = form.cleaned_data['comment']
             trans.owner_username = user.username
+            trans.lastupdate=int(time.time())
             # Clear reviews
             for review in trans.reviews:
                 session.delete(review)
