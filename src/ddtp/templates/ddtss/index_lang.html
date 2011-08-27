@@ -48,7 +48,7 @@ function reset_flot (url) {
 <div class=messages>
 {% if user.superuser %}
     <form method="post" id="globmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <h2>Project-Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
+        <h2>Project Messages<div class="help" title="Projekt Messages for the DDTP">?</div>
             <span style="font-size:80%">
                 <a href="javascript:popup(this.action);self.globmsg.submit();" target="msgwindow">(New)</a>
             </span>
@@ -144,7 +144,7 @@ Coordinators for {{lang.language}}:
     <col width="60%" /><col width="40%" />
 <tr><td alian="top">
 
-<table id="table" cellspacing="1" class="tablesorter" style="height:150px;">
+<table id="milestonetable" cellspacing="1" class="tablesorter" style="height:150px;">
 <thead>
 <tr><th>Type</th><th>milestone</th> <th>translated</th> <th>total</th> <th>process</th></tr>
 </thead>
