@@ -30,10 +30,16 @@ Coordinators:
 </table>
 <p>
 <form method="post" action="{% url ddtss_coordinate lang.language %}" enctype="multipart/form-data">
-Scores for controlling the acceptence of translations:
 {% for errors in form.errors.itervalues %}
 {{errors}}
 {% endfor %}
+Milestones for the language:
+<table id="coordinator_milestones">
+<tr><th>high milestone</th><td>{{form.milestone_high}}</td></tr>
+<tr><th>medium milestone</td><td>{{form.milestone_medium}}</td></tr>
+<tr><th>low milestone</td><td>{{form.milestone_low}}</td></tr>
+</table>
+Scores for controlling the acceptence of translations:
 <table id="coordinator_scores">
 <tr><th></th><th>Translate</th><th>Review</th></tr>
 <tr><th>Trusted user/Coordinator</th><td>{{form.ct}}</td><td>{{form.cr}}</td></tr>
