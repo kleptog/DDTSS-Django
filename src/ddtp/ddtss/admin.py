@@ -42,16 +42,10 @@ class LanguageAdminForm(forms.Form):
 
     def __init__(self, session, *args, **kwargs):
         super(LanguageAdminForm, self).__init__(*args, **kwargs)
-        self.fields['milestone_high'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
-        self.fields['milestone_medium'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
-        self.fields['milestone_low'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
 
     language = forms.RegexField(label='Language code', regex=r'^\w\w(_\w\w)?$', help_text="Language code")
     name = forms.CharField(label="Name", max_length=30, help_text = "Human understandable name for language.")
     enabled = forms.BooleanField(label="Enabled", required=False, help_text="Enabled for DDTSS")
-    milestone_high = forms.ChoiceField(label="1. Milestone", required=False, help_text="1. Milestone");
-    milestone_medium = forms.ChoiceField(label="2. Milestone", required=False, help_text="2. Milestone");
-    milestone_low = forms.ChoiceField(label="3. Milestone", required=False, help_text="3. Milestone");
 
 @with_db_session
 def view_admin_lang(session, request, language):
@@ -76,9 +70,6 @@ def view_admin_lang(session, request, language):
                 # Modify language
                 lang.fullname = form.cleaned_data['name']
                 lang.enabled_ddtss = form.cleaned_data['enabled']
-                lang.milestone_high = form.cleaned_data['milestone_high']
-                lang.milestone_medium = form.cleaned_data['milestone_medium']
-                lang.milestone_low = form.cleaned_data['milestone_low']
 
                 session.commit()
 
@@ -110,10 +101,7 @@ def view_admin_lang(session, request, language):
     form = LanguageAdminForm(session,dict( \
         language=language, \
         name=lang.fullname, \
-        enabled=lang.enabled_ddtss, \
-        milestone_high=lang.milestone_high,\
-        milestone_medium=lang.milestone_medium,\
-        milestone_low=lang.milestone_low \
+        enabled=lang.enabled_ddtss \
         ))
 
     return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
