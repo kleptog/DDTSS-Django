@@ -10,7 +10,7 @@
 <ul>
 </ul>
 {% if close %}
-<form action=""> <input type="button" value="close window" onclick="self.close()"> </form>
+<form action=""> <input type="button" value="close window" onclick="history.go(-2)"> </form>
 {% else %}
 <a href="{{url}}">Continue</a>
 {% endif %}

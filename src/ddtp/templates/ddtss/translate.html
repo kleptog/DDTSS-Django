@@ -89,10 +89,10 @@ actually returning UTF-8 as promised -->
     {% if forloop.first %}
     <ul>
     {% endif %}
-        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
+        <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8" >
             <b title="{{message.parent.message}}">{{message.message}}</b><br>
             <span style="font-size:80%">
-                from {{message.from_user}} <a href="javascript:popup(this.action);self.msg{{message.message_id}}.submit();" target="msgwindow">(Write a reply)</a>
+                from {{message.from_user}} <input type="submit" value="(Write a reply)">
                 at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
                 <input type="hidden" name="to_user" value="{{message.from_user}}"  />
                 <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
@@ -103,16 +103,16 @@ actually returning UTF-8 as promised -->
         </li>
     {% if forloop.last %}
     </ul>
-    <form method="post" id="descmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <a href="javascript:popup(this.action);self.descmsg.submit();" target="msgwindow">Add a Comment</a>
+    <form method="post" id="descmsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8" >
+        <input type="submit" value="Add a Comment">
         <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
         <input type="hidden" name="language" value="{{lang.language}}"  />
     </form>
     {% endif %}
     {% empty %}
     None
-    <form method="post" id="descmsg" action="{% url ddtss_message %}" target="msgwindow" enctype="multipart/form-data" accept-charset="utf-8" onsubmit="return popup(this.action)">
-        <a href="javascript:popup(this.action);self.descmsg.submit();" target="msgwindow">Add a Comment</a>
+    <form method="post" id="descmsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8" >
+        <input type="submit" value="Add a Comment">
         <input type="hidden" name="for_description" value="{{descr.description_id}}"  />
         <input type="hidden" name="language" value="{{lang.language}}"  />
     </form>
