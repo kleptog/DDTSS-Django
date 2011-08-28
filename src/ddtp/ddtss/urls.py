@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^(\w\w(?:_\w\w)?)/forreview/(\d+)$', ddtss_views.view_review, name='ddtss_forreview'),
     url(r'^coordinate$', ddtss_admin.view_coordinator, name='ddtss_coordinate'),
     url(r'^createlogin$', ddtss_users.view_create_user, name='ddtss_create_user'),
+    url(r'^preferenc$', ddtss_users.view_preferenc, name='ddtss_preferenc'),
     url(r'^login$', ddtss_users.view_login, name='ddtss_login'),
     url(r'^logout$', ddtss_users.view_logout, name='ddtss_logout'),
     url(r'^admin$', ddtss_admin.view_admin, name='ddtss_admin'),

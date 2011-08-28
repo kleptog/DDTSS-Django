@@ -1,0 +1,32 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+    <title>DDTSS User Preferenc {{user.realname}} ({{user.username}})</title>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/ddtss/ddtss.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+{% include "navigation.html" %}
+<h1>DDTSS User Preferenc {{user.realname}} ({{user.username}})</h1>
+<p>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+<p>
+{% endif %}
+<form method="post" action="{% url ddtss_preferenc %}" enctype="multipart/form-data">
+<table id="login">
+{{form}}
+</table>
+<input type="submit" name="submit" value="Submit" />
+<input type="submit" name="cancel" value="Cancel" />
+</form>
+<p>
+
+</body>
+</html>

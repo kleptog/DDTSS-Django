@@ -11,8 +11,8 @@ from django import forms
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users
-from ddtp.ddtss.views import show_message_screen
+from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, DescriptionMilestone
+from ddtp.ddtss.views import show_message_screen, get_user
 
 class UserCreationForm(forms.Form):
     """
@@ -147,4 +147,67 @@ def view_logout(request):
         del request.session['username']
 
     return redirect('ddtss_index')
+
+class UserPreferenc(forms.Form):
+    """
+    A form change the user preferenc
+    """
+    milestone = forms.ChoiceField(label="Milestone", required=False, help_text="personal Milestone")
+    realname  = forms.CharField(label="Realname", help_text="your real name")
+    password1 = forms.CharField(label="Password", required=False, widget=forms.PasswordInput,
+        help_text = "Change Passwort")
+    password2 = forms.CharField(label="Retype password", required=False, widget=forms.PasswordInput,
+        help_text = "Enter the same password as above, for verification.")
+
+    def __init__(self, session, *args, **kwargs):
+        super(UserPreferenc, self).__init__(*args, **kwargs)
+
+        self.fields['milestone'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+
+    def clean_password2(self):
+        password1 = self.cleaned_data["password1"]
+        password2 = self.cleaned_data["password2"]
+
+        if password1 != password2:
+            raise forms.ValidationError("Entered passwords don't match")
+
+        return password1
+
+@with_db_session
+def view_preferenc(session, request):
+    """ Handle user login """
+
+    user = get_user(request, session)
+    
+    if not user.logged_in:
+        return show_message_screen(request, 'Only for login user', 'ddtss_login')
+
+    if request.method == "POST":
+        if request.POST.get('cancel'):
+            return redirect('ddtss_index')
+
+        form = UserPreferenc(session,data=request.POST)
+        if form.is_valid():
+            user.milestone=form.cleaned_data['milestone']
+            user.realname=form.cleaned_data['realname']
+
+            if (form.cleaned_data['password1']):
+                user.md5password = hashlib.md5(user.key + form.cleaned_data['password1']).hexdigest()
+
+            session.commit()
+            messages.success(request, "Preferenc changed")
+            return redirect('ddtss_index')
+    else:
+        form_fields = dict(milestone=user.milestone,
+                realname=user.realname,
+                )
+        form = UserPreferenc(session,form_fields)
+
+    context = {
+        'user': user,
+        'form': form,
+    }
+    return render_to_response("ddtss/user_preference.html", context,
+                              context_instance=RequestContext(request))
+
 
