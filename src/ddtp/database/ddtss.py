@@ -7,7 +7,7 @@ import time
 import difflib
 
 from .db import Base, with_db_session
-from .ddtp import Description, DescriptionMilestone
+from .ddtp import Description, DescriptionMilestone, Translation, PartDescription, Part, description_to_parts
 from django.conf import settings
 from django.utils.timesince import timesince
 from sqlalchemy import types
@@ -97,6 +97,9 @@ class Languages(Base):
                 filter(UserAuthority.language_ref==self.language).\
                 filter(UserAuthority.auth_level==UserAuthority.AUTH_LEVEL_TRUSTED).all()
 
+    def __repr__(self):
+        return '<Languages %s (%s)>' % (self.language, self.fullname)
+
 # /aliases/*
 class Users(Base):
     """ Each user which can login has a record """
@@ -143,7 +146,7 @@ class Users(Base):
         return self.get_authority(self.lastlanguage_ref).is_coordinator
 
     def __repr__(self):
-        return 'Users(%s, realname=%s, lastlang:%s)' % (self.username, self.realname, self.lastlanguage_ref)
+        return '<Users %s (%s)>' % (self.username, self.email)
 
 class UserAuthority(Base):
     """ Stores the trust level of each user for each language """
@@ -178,6 +181,9 @@ class UserAuthority(Base):
     @property
     def is_coordinator(self):
         return self.auth_level >= UserAuthority.AUTH_LEVEL_COORDINATOR
+
+    def __repr__(self):
+        return '<UserAuthority %s:%s>' % (self.language_ref, self.auth_level)
 
 # __/done/*  Log of results, do we want this? Only submitter/reviewer info
 # __/logs/*  Logs of email comms, not needed
@@ -215,6 +221,9 @@ class PendingTranslation(Base):
 
     STATE_PENDING_TRANSLATION = 0
     STATE_PENDING_REVIEW = 1
+
+    def __repr__(self):
+        return '<PendingTranslation %s/%s %r owner=%r>' % (self.language_ref, self.description_id, self.short, self.owner_username)
 
     @classmethod
     def make_suggestion(self, description, language):
@@ -260,6 +269,10 @@ class PendingTranslation(Base):
         """ Remove lock from record """
         self.owner_locktime = None
         return
+
+    @property
+    def parts(self):
+        return description_to_parts(self.short + "\n" + self.long)
 
     # Display methods
     #
@@ -324,6 +337,53 @@ class PendingTranslation(Base):
 
         return
 
+    # Accept translation. Note: does not check policy, that is the caller's responsibility.
+    def accept_translation(self):
+        """ Accepts translation by pushing it into the DDTP """
+        session = Session.object_session(self)
+
+        parts = self.description.get_description_part_objects()
+        translated_parts = self.parts
+
+        # First create translation object, updating existing if necessary
+        if self.language_ref in self.description.translation:
+            translation = self.description.translation[self.language_ref]
+        else:
+            translation = Translation(description_id=self.description_id, language=self.language_ref)
+            session.add(translation)
+        translation.translation = self.short + "\n" + self.long + "\n"
+
+        # Then update the parts
+        for text, hash, part in parts:
+            # Create Part object if missing
+            if part is None:
+                part = PartDescription(description_id=self.description_id, part_md5=hash)
+                session.add(part)
+            # Can't use magic here, because the PartDescription object might
+            # have just been created but the Part already exists.
+            part_trans = session.query(Part).filter_by(part_md5=hash, language=self.language_ref).first()
+            if not part_trans:
+                part_trans = Part(part_md5=hash, language=self.language_ref)
+                session.add(part_trans)
+            part_trans.part = translated_parts.pop(0)
+
+        # Add a message indicating acceptance
+        message = "Translation Accepted\n" \
+                  "Translators/Reviewers: %s\n" \
+                  "Description: %s\n" \
+                  "%s\n" % (", ".join([self.owner_username] + [r.username for r in self.reviews]),
+                  self.short,
+                  self.long)
+        message = Messages(message=message,
+                           language=self.language_ref,
+                           for_description=self.description_id,
+                           timestamp=int(time.time()))
+
+        session.add(message)
+        session.delete(self)
+        for review in self.reviews:
+            session.delete(review)
+
 class PendingTranslationReview(Base):
     """ A review of a translation """
     __tablename__ = 'pendingtranslationreview_tb'
@@ -333,6 +393,9 @@ class PendingTranslationReview(Base):
 
     user = relationship(Users, primaryjoin=(username == Users.username), foreign_keys=[username], uselist=False)
     translation = relationship(PendingTranslation, backref='reviews')
+
+    def __repr__(self):
+        return '<PendingTranslationReview %s/%s by %s>' % (self.translation.language_ref, self.translation.description_id, self.username)
 
     # In the future we might have different kinds of review, we could store
     # that data here
@@ -353,7 +416,7 @@ class Messages(Base):
     for_description = Column(Integer, ForeignKey('description_tb.description_id'))
     to_user = Column(String, ForeignKey('users_tb.username'))
 
-    from_user =  Column(String, ForeignKey('users_tb.username'), nullable=False)
+    from_user =  Column(String, ForeignKey('users_tb.username'))
     in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)
@@ -366,4 +429,25 @@ class Messages(Base):
         return datetime.fromtimestamp(self.timestamp)
 
     def __repr__(self):
-        return 'Messages(%d, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
+        return 'Messages(%s, message=%s, reply:%s)' % (self.message_id, self.message, str(self.in_reply_to))
+
+    @classmethod
+    def global_messages(cls, session):
+        return session.query(cls) \
+                          .filter(cls.to_user==None) \
+                          .filter(cls.language==None) \
+                          .filter(cls.for_description==None) \
+                          .filter(cls.from_user!=None)
+
+    @classmethod
+    def team_messages(cls, session, language):
+        return session.query(cls) \
+                          .filter(cls.language==language) \
+                          .filter(cls.for_description==None) \
+                          .filter(cls.from_user!=None)
+
+    @classmethod
+    def user_messages(cls, session, username):
+        return session.query(cls) \
+                          .filter(cls.to_user==username) \
+                          .filter(cls.from_user!=None)
