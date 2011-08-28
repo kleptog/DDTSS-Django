@@ -4,9 +4,7 @@
 <TITLE>Debian Description Tracking  --- package: {{package_name}} --- </TITLE>
 </HEAD>
 <BODY>
-{% for prefix in prefixlist %}
-<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
-{% endfor %}
+{% include "navigation.html" %}
 <br><h3>{{package_name}}</h3>
 
 {% for description, active in package %}

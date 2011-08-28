@@ -4,9 +4,7 @@
 <TITLE>Debian Description Tracking  --- source: {{source_name}} --- </TITLE>
 </HEAD>
 <BODY>
-{% for prefix in prefixlist %}
-<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
-{% endfor %}
+{% include "navigation.html" %}
 <br><h3>{{source_name}}</h3>
 {% for description in descriptions %}
 Package: <a href="{% url ddt_package description.package %}">{{description.package}}</a><br>

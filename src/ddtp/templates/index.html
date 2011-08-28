@@ -3,9 +3,7 @@
 <TITLE>Debian Description Tracking</TITLE>
 </HEAD>
 <BODY>
-{% for prefix in prefixlist %}
-    <a href="{% url ddt_overview prefix %}"> {{prefix}} </a> |
-{% endfor %}
+{% include "navigation.html" %}
 <hr>
 <a href="{% url ddtss_index %}">to the ddtss (a web interface for the ddtp)<a/><br>
 Daily description translation stats for 

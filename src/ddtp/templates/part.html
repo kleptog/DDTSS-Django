@@ -4,6 +4,7 @@
 <TITLE>Debian Description Tracking  --- part: {{part_md5}} - lang: {{lang}} --- </TITLE>
 </HEAD>
 <BODY>
+{% include "navigation.html" %}
 <h2>{{part_md5}}</h2>
 {% for part in parts %}
 <h3><a href="{% url ddt_onepart part_md5 part.language %}">{{part_md5}} in {{part.language}}</a></h3>
