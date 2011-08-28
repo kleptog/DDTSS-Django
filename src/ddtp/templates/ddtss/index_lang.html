@@ -303,6 +303,7 @@ y2axis: {show:1 },
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}</li>
+<li>Realname: {{user.realname}}</li>
 <li><a href="{% url ddtss_preferenc %}">Preferenc Page</a></li>
 <li><a href="javascript:toggle_size();">toggle display size</a></li>
 <li><a href="javascript:toggle_age();">toggle display ages</a></li>
@@ -325,6 +326,7 @@ y2axis: {show:1 },
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
+<li><a href="{% url ddtss_logout %}">Logout</a></li>
 {% else %}
 <li>not logged in (<a href="{% url ddtss_login %}">Login</a>)</li>
 {% endif %}

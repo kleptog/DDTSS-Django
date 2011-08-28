@@ -27,6 +27,14 @@
 <input type="submit" name="cancel" value="Cancel" />
 </form>
 <p>
+<h2>the collection of the user milestone user:{{user.username}}</h2>
+        <ul>
+    {% for collectionmilestone in collectionmilestones %}
+    <li>{{ collectionmilestone.collection }} <a href="{% url ddtss_delusermilestone collectionmilestone.collection %}">
+        <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"\></a> </li>
+    {% endfor %}
+        </ul>
+
 
 </body>
 </html>

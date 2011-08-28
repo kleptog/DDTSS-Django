@@ -27,5 +27,9 @@ urlpatterns = patterns(
     url(r'^admin/(\w\w(?:_\w\w)?)$', ddtss_admin.view_admin_lang, name='ddtss_admin_lang'),
     url(r'^message/$',ddtss_views.view_write_message, name='ddtss_message'),
     url(r'^delmessage/(\d+)$',ddtss_views.view_delmessage, name='ddtss_delmessage'),
+    url(r'^addusermilestone/(\w+)/(.+)$',ddtss_users.view_addusermilestone, name='ddtss_addusermilestone'),
+    url(r'^delusermilestone/(.+)$',ddtss_users.view_delusermilestone, name='ddtss_delusermilestone'),
+    url(r'^addlangmilestone/(\w+)/(.+)$',ddtss_admin.view_addlangmilestone, name='ddtss_addlangmilestone'),
+    url(r'^dellangmilestone/(.+)$',ddtss_admin.view_dellangmilestone, name='ddtss_dellangmilestone'),
 )
 

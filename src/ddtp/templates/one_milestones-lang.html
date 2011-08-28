@@ -3,9 +3,28 @@
     <TITLE>Debian Description Tracking  --- milestones'{{milestone}}' for {{lang}}</TITLE>
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
 </HEAD>
+<script type="text/javascript">//<![CDATA[
+function show_coordinator() {
+    var onlycoordinators = document.getElementsByName("onlycoordinator");
+    for(i=0, l=onlycoordinators.length; i<l; i++) {
+        onlycoordinators[i].style.display = "inline";
+    }
+}
+
+//]]></script>
+</HEAD>
+{% if user.is_coordinator %} 
+<BODY onload="return show_coordinator()" >
+{% else %}
 <BODY>
+{% endif %}
 {% include "navigation.html" %}
-    <h1>milestones '{{milestone}}' for {{lang}}</h1>
+<h1>milestones '{{milestone}}' for {{lang}}
+        <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"\></a>
+        <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"\></a></span>
+</h1>
 <a href="{% url ddt_stats_milestones_lang %}">back to the milestones for {{lang}}</a><br>
 <a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
 <table class="tablesorter">
@@ -25,6 +44,10 @@
             <a href="{% url ddtss_translate lang descr.description_id %}">Fetched for translation</a>
         {% endif %}
         {% endif %}
+        <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"\></a>
+        <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"\></a></span>
     </td>
     <td>{{ descr.nice_package_versions }}</td> </tr>
 {% endfor %}

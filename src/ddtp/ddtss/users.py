@@ -12,7 +12,9 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib import messages
 from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, DescriptionMilestone
+from ddtp.database.ddtp import with_db_session, CollectionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
+from urlparse import urlsplit
 
 class UserCreationForm(forms.Form):
     """
@@ -203,11 +205,76 @@ def view_preferenc(session, request):
                 )
         form = UserPreferenc(session,form_fields)
 
+    collectionmilestones = session.query(CollectionMilestone).\
+            filter(CollectionMilestone.nametype==1). \
+            filter(CollectionMilestone.name==user.username).all()
+
     context = {
         'user': user,
         'form': form,
+        'collectionmilestones': collectionmilestones,
     }
     return render_to_response("ddtss/user_preference.html", context,
                               context_instance=RequestContext(request))
 
+
+@with_db_session
+def view_addusermilestone(session, request, collectiontype, collection):
+    """ Handle user login """
+
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer is None:
+        redirect_to='ddtss_index'
+    try:
+        redirect_to = urlsplit(referer, 'http', False)[2]
+    except IndexError:
+        redirect_to='ddtss_index'
+
+    user = get_user(request, session)
+
+    if not user.logged_in:
+        return show_message_screen(request, 'Only for login user', 'ddtss_login')
+
+    collectionmilestone = CollectionMilestone(name=user.username,
+        nametype=1,
+        collection=collectiontype+':'+collection)
+    session.add(collectionmilestone)
+    try:
+        session.commit()
+    except:
+        messages.error(request, "Error")
+
+    return redirect(redirect_to)
+
+
+@with_db_session
+def view_delusermilestone(session, request, collection):
+    """ Handle user login """
+
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer is None:
+        redirect_to='ddtss_index'
+    try:
+        redirect_to = urlsplit(referer, 'http', False)[2]
+    except IndexError:
+        redirect_to='ddtss_index'
+
+    user = get_user(request, session)
+
+    if not user.logged_in:
+        return show_message_screen(request, 'Only for login user', 'ddtss_login')
+
+    collectionmilestone = session.query(CollectionMilestone) \
+            .filter(CollectionMilestone.collection==collection) \
+            .filter(CollectionMilestone.name==user.username) \
+            .filter(CollectionMilestone.nametype==1) \
+            .one()
+
+    if collectionmilestone:
+        session.delete(collectionmilestone)
+        session.commit()
+
+        return redirect(redirect_to)
+
+    return HttpResponseForbidden('<h1>Forbidden</h1>')
 
