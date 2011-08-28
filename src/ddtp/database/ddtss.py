@@ -134,6 +134,17 @@ class Users(Base):
             return UserAuthority(username=self.username, language_ref=language, auth_level=UserAuthority.AUTH_LEVEL_NONE)
         return auth
 
+    @property
+    def is_trusted(self):
+        return self.get_authority(self.lastlanguage_ref).is_trusted
+
+    @property
+    def is_coordinator(self):
+        return self.get_authority(self.lastlanguage_ref).is_coordinator
+
+    def __repr__(self):
+        return 'Users(%s, realname=%s, lastlang:%s)' % (self.username, self.realname, self.lastlanguage_ref)
+
 class UserAuthority(Base):
     """ Stores the trust level of each user for each language """
     __tablename__ = 'userauthority_tb'

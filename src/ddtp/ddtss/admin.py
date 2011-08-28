@@ -14,7 +14,9 @@ from django.http import Http404
 from django.template import RequestContext
 from django.contrib import messages
 from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, UserAuthority, DescriptionMilestone
+from ddtp.database.ddtp import with_db_session, CollectionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
+from urlparse import urlsplit
 
 @with_db_session
 def view_admin(session, request):
@@ -31,6 +33,7 @@ def view_admin(session, request):
     context = {
         'languages': langs,
         'admins': admins,
+        'user': user,
     }
     return render_to_response("ddtss/admin.html", context,
                               context_instance=RequestContext(request))
@@ -163,10 +166,11 @@ class CoordinatorAdminForm(forms.Form):
         return data
 
 @with_db_session
-def view_coordinator(session, request, language):
+def view_coordinator(session, request):
     """ Handle coordinator language management """
 
     user = get_user(request, session)
+    language = user.lastlanguage_ref
 
     auth = user.get_authority(language)
 
@@ -220,6 +224,10 @@ def view_coordinator(session, request, language):
                 messages.info(request, 'User %s no longer trusted' % new_user.username)
                 session.commit()
 
+    collectionmilestones = session.query(CollectionMilestone).\
+            filter(CollectionMilestone.nametype==2). \
+            filter(CollectionMilestone.name==language).all()
+
     if not form:
         form_fields = dict(milestone_high=lang.milestone_high,\
                            milestone_medium=lang.milestone_medium,\
@@ -227,5 +235,70 @@ def view_coordinator(session, request, language):
         form_fields.update(lang.translation_model.to_form_fields())
         form = CoordinatorAdminForm(session, form_fields)
 
-    return render_to_response("ddtss/coordinator.html", { 'lang': lang, 'form': form },
+    return render_to_response("ddtss/coordinator.html", {\
+            'lang': lang,\
+            'form': form,\
+            'collectionmilestones': collectionmilestones},\
                               context_instance=RequestContext(request))
+
+
+@with_db_session
+def view_addlangmilestone(session, request, collectiontype, collection):
+    """ Handle user login """
+
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer is None:
+        redirect_to='ddtss_index'
+    try:
+        redirect_to = urlsplit(referer, 'http', False)[2]
+    except IndexError:
+        redirect_to='ddtss_index'
+
+    user = get_user(request, session)
+
+    if not user.is_coordinator:
+        return HttpResponseForbidden('<h1>Forbidden</h1>')
+
+    collectionmilestone = CollectionMilestone(name=user.lastlanguage_ref,\
+            nametype=2,\
+            collection=collectiontype+':'+collection)
+    session.add(collectionmilestone)
+    try:
+        session.commit()
+    except:
+        messages.error(request, "Error")
+
+    return redirect(redirect_to)
+
+
+@with_db_session
+def view_dellangmilestone(session, request, collection):
+    """ Handle user login """
+
+    referer = request.META.get('HTTP_REFERER', None)
+    if referer is None:
+        redirect_to='ddtss_index'
+    try:
+        redirect_to = urlsplit(referer, 'http', False)[2]
+    except IndexError:
+        redirect_to='ddtss_index'
+
+    user = get_user(request, session)
+
+    if not user.is_coordinator:
+        return HttpResponseForbidden('<h1>Forbidden</h1>')
+
+    collectionmilestone = session.query(CollectionMilestone) \
+            .filter(CollectionMilestone.collection==collection) \
+            .filter(CollectionMilestone.name==user.lastlanguage_ref) \
+            .filter(CollectionMilestone.nametype==2) \
+            .one()
+
+    if collectionmilestone:
+        session.delete(collectionmilestone)
+        session.commit()
+
+        return redirect(redirect_to)
+
+    return HttpResponseForbidden('<h1>Forbidden</h1>')
+

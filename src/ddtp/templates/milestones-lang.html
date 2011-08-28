@@ -11,8 +11,22 @@
         $("#table").tablesorter();
 }); </script>
 
+<script type="text/javascript">//<![CDATA[
+function show_coordinator() {
+    var onlycoordinators = document.getElementsByName("onlycoordinator");
+    for(i=0, l=onlycoordinators.length; i<l; i++) {
+        onlycoordinators[i].style.display = "inline";
+    }
+}
+
+//]]></script>
 </HEAD>
+{% if user.is_coordinator %} 
+<BODY onload="return show_coordinator()" >
+{% else %}
 <BODY>
+{% endif %}
+{% include "navigation.html" %}
 <h1>milestones for {{lang}}</h1>
 <a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
 <table id="milestonetable" cellspacing="1" class="tablesorter">
@@ -22,7 +36,12 @@
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url ddt_stats_one_milestones_lang lang milestone %}">{{milestone}}</a></td>
+    <td><a href="{% url ddt_stats_one_milestones_lang milestone %}">{{milestone}}</a> 
+        <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"\></a>
+        <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"\></a></span>
+    </td>
     <td align='right'>{{milestoneinfo.translated}}</td>
     <td align='right'>{{milestoneinfo.pending}}</td>
     <td align='right'> {{milestoneinfo.total}}</td>

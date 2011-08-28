@@ -40,12 +40,26 @@ function toggle_age() {
     }
 }
 
+function toggle_size() {
+    var size_fields = document.getElementsByName("showsize");
+    for(i=0, l=size_fields.length; i<l; i++) {
+        if(size_fields[i].style.display == "inline") {
+            size_fields[i].style.display = "none";
+        }
+        else {
+            size_fields[i].style.display = "inline";
+        }
+    }
+}
+
 //]]></script>
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="return reset_flot('flot_lang_milestone_high')" >
+{% include "navigation.html" %}
+{{user}}
 <h1>DDTSS for {{lang.language}}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -118,7 +132,7 @@ Coordinators for {{lang.language}}:
 {% for message in team_messages %}
 {% if forloop.first %}
 <div class=messages>
-    {% if auth.is_coordinator %}
+    {% if user.is_coordinator %}
     <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <h2>Team Messages<div class="help" title="Team Messages">?</div>
             <span style="font-size:80%">
@@ -164,7 +178,7 @@ Coordinators for {{lang.language}}:
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
     <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
-    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
+    <td><a href="{% url ddt_stats_one_milestones_lang milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
     <td align='right'>{{milestoneinfo.pending}}</td>
     <td align='right'> {{milestoneinfo.total}}</td>
@@ -216,7 +230,9 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
@@ -245,7 +261,7 @@ y2axis: {show:1 },
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
   </form>
-  <a href="{% url ddt_stats_milestones_lang lang.language %}">Fetch per Milestones</a>
+  <a href="{% url ddt_stats_milestones_lang %}">Fetch per Milestones</a>
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})
@@ -254,7 +270,9 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_review %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
@@ -285,9 +303,12 @@ y2axis: {show:1 },
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}</li>
+<li>Realname: {{user.realname}}</li>
+<li><a href="{% url ddtss_preferenc %}">Preferenc Page</a></li>
+<li><a href="javascript:toggle_size();">toggle display size</a></li>
 <li><a href="javascript:toggle_age();">toggle display ages</a></li>
-{% if auth.is_coordinator %} 
-<li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
+{% if user.is_coordinator %} 
+<li><a href="{% url ddtss_coordinate %}">{{auth.auth_level_name}}-Page</a></li>
 <li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <input type="submit" value="Write a new team messages" />
         <input type="hidden" name="language" value="{{lang.language}}"  />
@@ -305,6 +326,7 @@ y2axis: {show:1 },
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
+<li><a href="{% url ddtss_logout %}">Logout</a></li>
 {% else %}
 <li>not logged in (<a href="{% url ddtss_login %}">Login</a>)</li>
 {% endif %}
@@ -338,7 +360,9 @@ y2axis: {show:1 },
   </h2>
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}

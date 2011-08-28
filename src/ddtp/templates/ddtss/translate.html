@@ -17,6 +17,7 @@ function popup (url) {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="document.forms[0].submit.disabled=1">
+{% include "navigation.html" %}
 {% if not forreview %}
 <h1>
   <font color="red">Note: If you decide not to go ahead with translating a

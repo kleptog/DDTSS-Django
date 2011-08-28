@@ -4,16 +4,14 @@
 <TITLE>Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{lang}} --- </TITLE>
 </HEAD>
 <BODY>
-{% for prefix in prefixlist %}
-<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
-{% endfor %}
+{% include "navigation.html" %}
 <br>
 <h3>{{descr.package}}</h3>
 <pre>
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
 Versions: {{ descr.nice_package_versions }}
-Milestones: {% for milestone in descr.milestones %}<a href="{% url ddt_stats_one_milestones_lang lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+Milestones: {% for milestone in descr.milestones %}<a href="{% url ddt_stats_one_milestones_lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
 Description: {{descr.description}}
 </pre>

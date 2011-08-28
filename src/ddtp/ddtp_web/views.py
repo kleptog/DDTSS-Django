@@ -2,17 +2,21 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import with_db_session, Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
-from ddtp.database.ddtss import PendingTranslation
+from ddtp.database.ddtss import PendingTranslation, Languages
 from sqlalchemy import func, distinct
+from ddtp.ddtss.views import get_user
 
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
 def view_browse(session, request, prefix):
     """ Does overview pages (<foo>.html) """
+
+    user = get_user(request, session)
+
     resultset = session.query(PackageVersion.package, PackageVersion.description_id, DescriptionTag). \
                         filter(PackageVersion.description_id==DescriptionTag.description_id). \
                         filter(PackageVersion.package.like(prefix+'%')). \
@@ -33,32 +37,28 @@ def view_browse(session, request, prefix):
                     for descr_id, tags in sorted(descrs.items())])
                for package,descrs in sorted(params.items())]
 
-    return render_to_response("overview.html", {'packages': params, 'prefix': prefix}, context_instance=RequestContext(request))
+    return render_to_response("overview.html", {'packages': params, 'prefix': prefix, 'user': user}, context_instance=RequestContext(request))
 
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
 def view_index(session, request):
     """ Main index.html, show summary info """
-    resultset = session.query(Translation.language, func.count(Translation.description_id), func.count(ActiveDescription.description_id)). \
-                        outerjoin(ActiveDescription, ActiveDescription.description_id == Translation.description_id). \
-                        group_by(Translation.language).order_by(Translation.language).all()
 
-    params = dict()
-    params['languages'] = [(r[0], {'total': r[1], 'active': r[2]}) for r in resultset]
-    params['translation_count'] = sum(r[1] for r in resultset)
-    params['active_count'] = sum(r[2] for r in resultset)
+    user = get_user(request, session)
+    lang = user.lastlanguage_ref
+    if lang is None:
+        lang = 'xx'
+    if lang != 'xx':
+        return redirect('ddtss_index_lang', lang)
 
-    result = session.query(func.count(Description.description_id)).one()
-    params['description_count'] = result[0]
-
-    params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
-    params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
-
-    return render_to_response("index.html", params, context_instance=RequestContext(request))
+    return redirect('ddtss_index')
 
 @with_db_session
 def view_package(session, request, package_name):
     """ Show the page for a single package """
+
+    user = get_user(request, session)
+
     params = dict()
     params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
     params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
@@ -72,12 +72,16 @@ def view_package(session, request, package_name):
 
     params['package'] = resultset
     params['package_name'] = package_name
+    params['user'] = user
 
     return render_to_response("package.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_descr(session, request, descr_id):
     """ Show the page for a single description """
+
+    user = get_user(request, session)
+
     params = dict()
     params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
     params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
@@ -96,12 +100,16 @@ def view_descr(session, request, descr_id):
     # All languages
     langs = session.query(Translation.language).group_by(Translation.language).order_by(Translation.language).all()
     params['langs'] = [l[0] for l in langs]
+    params['user'] = user
 
     return render_to_response("descr.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_transdescr(session, request, descr_id, lang):
     """ Show the page for a single translated description """
+
+    user = get_user(request, session)
+
     params = dict()
     params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
     params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
@@ -116,12 +124,16 @@ def view_transdescr(session, request, descr_id, lang):
                         filter(Translation.description_id==descr_id). \
                         filter(Translation.language==lang).one()
     params['translation'] = translation
+    params['user'] = user
 
     return render_to_response("transdescr.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_part(session, request, part_md5):
     """ Show a single translated part """
+
+    user = get_user(request, session)
+
     params = dict()
 
     params['part_md5'] = part_md5
@@ -137,12 +149,16 @@ def view_part(session, request, part_md5):
                         filter(PartDescription.part_md5==part_md5).\
                         all()
     params['descrs'] = descrs
+    params['user'] = user
 
     return render_to_response("part.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_onepart(session, request, part_md5, lang):
     """ Show a single translated part """
+
+    user = get_user(request, session)
+
     params = dict()
 
     params['lang'] = lang
@@ -164,12 +180,16 @@ def view_onepart(session, request, part_md5, lang):
                         filter(PartDescription.part_md5==part_md5).\
                         all()
     params['descrs'] = descrs
+    params['user'] = user
 
     return render_to_response("onepart.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def view_source(session, request, source_name):
     """ Show the page for a single source package """
+
+    user = get_user(request, session)
+
     params = dict()
     params['prefixlist'] = map(chr, range(ord('0'), ord('9')+1))
     params['prefixlist'] += map(chr, range(ord('a'), ord('z')+1))
@@ -181,21 +201,30 @@ def view_source(session, request, source_name):
     descriptions = session.query(Description.package). \
                         filter(Description.source==source_name).group_by(Description.package).order_by(Description.package).all()
     params['descriptions'] = descriptions
+    params['user'] = user
 
     return render_to_response("source.html", params, context_instance=RequestContext(request))
 
 @with_db_session
-def stats_milestones_lang(session, request, lang):
+def stats_milestones_lang(session, request):
     """ Does milestones stats page per language """
+
+    user = get_user(request, session)
+    language = user.lastlanguage_ref
+
+    if language is None:
+        language = 'xx'
+    if language == 'xx':
+        return redirect('ddtss_index')
 
     resultset = session.query(DescriptionMilestone.milestone,func.count(Translation.description_id)). \
                         join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
-                        filter(Translation.language==lang).\
+                        filter(Translation.language==language).\
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
     resultset1 = session.query(DescriptionMilestone.milestone,func.count(PendingTranslation.description_id)). \
                         join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
-                        filter(PendingTranslation.language_ref == lang). \
+                        filter(PendingTranslation.language_ref == language). \
                         group_by(DescriptionMilestone.milestone).order_by(DescriptionMilestone.milestone).all()
 
     resultset2 = session.query(DescriptionMilestone.milestone,func.count(DescriptionMilestone.description_id)). \
@@ -204,15 +233,24 @@ def stats_milestones_lang(session, request, lang):
     params = dict()
     resultdict = dict(resultset)
     resultdict1 = dict(resultset1)
-    params['lang'] = lang
+    params['lang'] = language
+    params['user'] = user
     params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'pending': resultdict1.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
 
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
-def stats_one_milestones_lang(session, request, lang, mile):
+def stats_one_milestones_lang(session, request, mile):
     """ Does milestones stats page per language """
+
+    user = get_user(request, session)
+    language = user.lastlanguage_ref
+
+    if language is None:
+        language = 'xx'
+    if language == 'xx':
+        return redirect('ddtss_index')
 
     resultset = session.query(Description). \
                         join(DescriptionMilestone, DescriptionMilestone.description_id == Description.description_id).\
@@ -221,13 +259,13 @@ def stats_one_milestones_lang(session, request, lang, mile):
 
     resultset1 = session.query(DescriptionMilestone.description_id,PendingTranslation.description_id). \
                         join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
-                        filter(PendingTranslation.language_ref==lang).\
+                        filter(PendingTranslation.language_ref==language).\
                         filter(DescriptionMilestone.milestone==mile).\
                         all()
 
     resultset2 = session.query(DescriptionMilestone.description_id,DescriptionMilestone.description_id). \
                         join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
-                        filter(Translation.language==lang).\
+                        filter(Translation.language==language).\
                         filter(DescriptionMilestone.milestone==mile).\
                         all()
 
@@ -238,7 +276,8 @@ def stats_one_milestones_lang(session, request, lang, mile):
     params = dict()
     resultdict = dict(resultset2)
     resultdict1 = dict(resultset1)
-    params['lang'] = lang
+    params['lang'] = language
+    params['user'] = user
     params['milestone'] = mile
     params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0), 'pending': resultdict1.get(r.description_id,0)}) for r in resultset]
 

@@ -3,17 +3,13 @@
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
-<title>DDTSS login</title>
+    <title>DDTSS User Preferenc {{user.realname}} ({{user.username}})</title>
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/ddtss/ddtss.css" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
 {% include "navigation.html" %}
-<h1>DDTSS login</h1>
-<p>
-A login on the DDTSS is only used so you can keep the status
-of what you've reviewed between machines.
-</p>
+<h1>DDTSS User Preferenc {{user.realname}} ({{user.username}})</h1>
 <p>
 {% if messages %}
 <ul class="messages">
@@ -23,15 +19,22 @@ of what you've reviewed between machines.
 </ul>
 <p>
 {% endif %}
-<p>
-(To create a account go to <a href="{% url ddtss_create_user %}">Create Login</a>)
-</p>
-<form method="post" action="{% url ddtss_login %}" enctype="multipart/form-data">
+<form method="post" action="{% url ddtss_preferenc %}" enctype="multipart/form-data">
 <table id="login">
 {{form}}
 </table>
 <input type="submit" name="submit" value="Submit" />
 <input type="submit" name="cancel" value="Cancel" />
 </form>
+<p>
+<h2>the collection of the user milestone user:{{user.username}}</h2>
+        <ul>
+    {% for collectionmilestone in collectionmilestones %}
+    <li>{{ collectionmilestone.collection }} <a href="{% url ddtss_delusermilestone collectionmilestone.collection %}">
+        <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"\></a> </li>
+    {% endfor %}
+        </ul>
+
+
 </body>
 </html>

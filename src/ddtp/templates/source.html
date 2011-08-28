@@ -4,10 +4,15 @@
 <TITLE>Debian Description Tracking  --- source: {{source_name}} --- </TITLE>
 </HEAD>
 <BODY>
-{% for prefix in prefixlist %}
-<a href="{% url ddt_overview prefix %}">{{prefix}}</a>
-{% endfor %}
-<br><h3>{{source_name}}</h3>
+{% include "navigation.html" %}
+<h3>{{source_name}}
+        <a href="{% url ddtss_addusermilestone 'source' source_name %}">
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"\></a>
+{% if user.is_coordinator %} 
+        <span name="onlycoordinator" style="display:inline"> <a href="{% url ddtss_addlangmilestone 'source' source_name %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"\></a></span>
+{% endif %}
+</h3>
 {% for description in descriptions %}
 Package: <a href="{% url ddt_package description.package %}">{{description.package}}</a><br>
 {% endfor %}
