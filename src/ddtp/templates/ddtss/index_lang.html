@@ -27,7 +27,19 @@ function reset_flot (url) {
 {% endif %}
  return true;
 }
- 
+
+function toggle_age() {
+    var age_fields = document.getElementsByName("showage");
+    for(i=0, l=age_fields.length; i<l; i++) {
+        if(age_fields[i].style.display == "inline") {
+            age_fields[i].style.display = "none";
+        }
+        else {
+            age_fields[i].style.display = "inline";
+        }
+    }
+}
+
 //]]></script>
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
@@ -213,6 +225,7 @@ y2axis: {show:1 },
 {% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
 {% endfor %}
 
+<span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.is_locked %} (locked){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}
@@ -250,6 +263,7 @@ y2axis: {show:1 },
 {% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
 {% endfor %}
 
+<span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
 
     </li>
@@ -271,6 +285,7 @@ y2axis: {show:1 },
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}</li>
+<li><a href="javascript:toggle_age();">toggle display ages</a></li>
 {% if auth.is_coordinator %} 
 <li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
 <li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
@@ -332,6 +347,7 @@ y2axis: {show:1 },
 {% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
 {% endfor %}
 
+<span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.owner_username == user.username %}(owner){% endif %}</li>
 {% if forloop.last %}</ol>{% endif %}
 {% empty %}

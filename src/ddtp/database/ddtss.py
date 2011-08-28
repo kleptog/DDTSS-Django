@@ -9,6 +9,7 @@ import difflib
 from .db import Base, with_db_session
 from .ddtp import Description, DescriptionMilestone
 from django.conf import settings
+from django.utils.timesince import timesince
 from sqlalchemy import types
 from sqlalchemy.orm import relationship, collections, backref, relation
 from sqlalchemy.orm.session import Session
@@ -279,6 +280,10 @@ class PendingTranslation(Base):
         s = s.replace(u"\r", u"")
         s = s.replace(u"\u00B7", u"\u00A0")
         return s
+
+    @property
+    def age(self):
+        return timesince(datetime.fromtimestamp(self.lastupdate),datetime.fromtimestamp(time.time()))
 
     # Update translation
     def update_translation(self, short, long):
