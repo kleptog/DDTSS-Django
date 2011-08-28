@@ -31,6 +31,7 @@ def view_admin(session, request):
     context = {
         'languages': langs,
         'admins': admins,
+        'user': user,
     }
     return render_to_response("ddtss/admin.html", context,
                               context_instance=RequestContext(request))
@@ -163,10 +164,11 @@ class CoordinatorAdminForm(forms.Form):
         return data
 
 @with_db_session
-def view_coordinator(session, request, language):
+def view_coordinator(session, request):
     """ Handle coordinator language management """
 
     user = get_user(request, session)
+    language = user.lastlanguage_ref
 
     auth = user.get_authority(language)
 
