@@ -120,7 +120,7 @@ Coordinators for {{lang.language}}:
 {% for message in team_messages %}
 {% if forloop.first %}
 <div class=messages>
-    {% if auth.is_coordinator %}
+    {% if user.is_coordinator %}
     <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <h2>Team Messages<div class="help" title="Team Messages">?</div>
             <span style="font-size:80%">
@@ -166,7 +166,7 @@ Coordinators for {{lang.language}}:
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
     <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
-    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
+    <td><a href="{% url ddt_stats_one_milestones_lang milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
     <td align='right'>{{milestoneinfo.pending}}</td>
     <td align='right'> {{milestoneinfo.total}}</td>
@@ -247,7 +247,7 @@ y2axis: {show:1 },
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
   </form>
-  <a href="{% url ddt_stats_milestones_lang lang.language %}">Fetch per Milestones</a>
+  <a href="{% url ddt_stats_milestones_lang %}">Fetch per Milestones</a>
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})

@@ -11,7 +11,7 @@
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
 Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
 Versions: {{ descr.nice_package_versions }}
-Milestones: {% for milestone in descr.milestones %}<a href="{% url ddt_stats_one_milestones_lang lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+Milestones: {% for milestone in descr.milestones %}<a href="{% url ddt_stats_one_milestones_lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
 Description: {{descr.description}}
 </pre>

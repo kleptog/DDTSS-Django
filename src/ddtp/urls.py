@@ -18,8 +18,8 @@ urlpatterns = patterns(
     url(r'^descr/(\d+)$', ddt_views.view_descr, name='ddt_descr'),
     url(r'^part/(\w+)$', ddt_views.view_part, name='ddt_part'),
     url(r'^part/(\w+)/(\w+)$', ddt_views.view_onepart, name='ddt_onepart'),
-    url(r'^stats/milestones/(\w\w(?:_\w\w)?)$', ddt_views.stats_milestones_lang, name='ddt_stats_milestones_lang'),
-    url(r'^stats/milestones/(\w\w(?:_\w\w)?)/(.+)$', ddt_views.stats_one_milestones_lang, name='ddt_stats_one_milestones_lang'),
+    url(r'^stats/milestones$', ddt_views.stats_milestones_lang, name='ddt_stats_milestones_lang'),
+    url(r'^stats/milestones/(.+)$', ddt_views.stats_one_milestones_lang, name='ddt_stats_one_milestones_lang'),
     url(r'^descr/(\d+)/(\w+)$', ddt_views.view_transdescr, name='ddt_transdescr'),
     url(r'^ddtss/', include(ddtss_urls)),
 )

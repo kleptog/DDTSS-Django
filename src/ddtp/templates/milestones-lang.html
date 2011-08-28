@@ -23,7 +23,7 @@
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url ddt_stats_one_milestones_lang lang milestone %}">{{milestone}}</a></td>
+    <td><a href="{% url ddt_stats_one_milestones_lang milestone %}">{{milestone}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
     <td align='right'>{{milestoneinfo.pending}}</td>
     <td align='right'> {{milestoneinfo.total}}</td>
