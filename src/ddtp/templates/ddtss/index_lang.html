@@ -288,8 +288,8 @@ y2axis: {show:1 },
 </h2><ul>
 <li>Account: {{user.username}}</li>
 <li><a href="javascript:toggle_age();">toggle display ages</a></li>
-{% if auth.is_coordinator %} 
-<li><a href="{% url ddtss_coordinate lang.language%}">{{auth.auth_level_name}}-Page</a></li>
+{% if user.is_coordinator %} 
+<li><a href="{% url ddtss_coordinate %}">{{auth.auth_level_name}}-Page</a></li>
 <li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <input type="submit" value="Write a new team messages" />
         <input type="hidden" name="language" value="{{lang.language}}"  />
