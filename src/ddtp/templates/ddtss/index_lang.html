@@ -40,6 +40,18 @@ function toggle_age() {
     }
 }
 
+function toggle_size() {
+    var size_fields = document.getElementsByName("showsize");
+    for(i=0, l=size_fields.length; i<l; i++) {
+        if(size_fields[i].style.display == "inline") {
+            size_fields[i].style.display = "none";
+        }
+        else {
+            size_fields[i].style.display = "inline";
+        }
+    }
+}
+
 //]]></script>
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
@@ -218,7 +230,9 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
@@ -256,7 +270,9 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_review %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
@@ -287,6 +303,7 @@ y2axis: {show:1 },
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
 </h2><ul>
 <li>Account: {{user.username}}</li>
+<li><a href="javascript:toggle_size();">toggle display size</a></li>
 <li><a href="javascript:toggle_age();">toggle display ages</a></li>
 {% if user.is_coordinator %} 
 <li><a href="{% url ddtss_coordinate %}">{{auth.auth_level_name}}-Page</a></li>
@@ -340,7 +357,9 @@ y2axis: {show:1 },
   </h2>
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
-    <li><a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <li>
+    <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
+    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
