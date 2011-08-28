@@ -170,24 +170,18 @@ def view_index_lang(session, request, language):
     pending_review.sort(key=lambda t: t.lastupdate, reverse=False)
     pending_translations.sort(key=lambda t: t.firstupdate, reverse=False)
 
-    global_messages = session.query(Messages) \
-                          .filter(Messages.to_user==None) \
-                          .filter(Messages.language==None) \
-                          .filter(Messages.for_description==None) \
-                          .order_by(-Messages.timestamp) \
+    global_messages = Messages.global_messages(session) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
-    team_messages = session.query(Messages) \
-                          .filter(Messages.language==language) \
-                          .filter(Messages.for_description==None) \
-                          .order_by(-Messages.timestamp) \
+    team_messages = Messages.team_messages(session, language) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
-    user_messages = session.query(Messages) \
-                          .filter(Messages.to_user==user.username) \
-                          .order_by(-Messages.timestamp) \
+    user_messages = Messages.user_messages(session, user.username) \
+                          .order_by(Messages.timestamp.desc()) \
                           .limit(20) \
                           .all()
 
@@ -521,6 +515,11 @@ def view_review(session, request, language, description_id):
 
         if form.cleaned_data['accept']:
             trans.comment = form.cleaned_data['comment']
+            # Owner can't review own description
+            if user == trans.user:
+                session.commit()
+                return show_message_screen(request, 'Translation was translated by you', 'ddtss_index_lang', language)
+
             # Check if user has already reviewed it
             for r in trans.reviews:
                 if r.username == user.username:
@@ -531,6 +530,12 @@ def view_review(session, request, language, description_id):
             # count review
             user.countreviews += 1
             trans.lastupdate=int(time.time())
+
+            if lang.translation_model.translation_accepted(trans):
+                # Translation has been accepted, yay!
+                trans.accept_translation()
+                session.commit()
+                return show_message_screen(request, 'Translation accepted', 'ddtss_index_lang', language)
 
             session.commit()
             return show_message_screen(request, 'Translation reviewed', 'ddtss_index_lang', language)
