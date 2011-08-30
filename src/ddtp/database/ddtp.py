@@ -276,11 +276,11 @@ class DescriptionMilestone(Base):
 
     description = relationship(Description, backref='milestones')
 
-    def Get_flot_data(self):
+    def Get_flot_data(self,language):
         """ Returns all versions in a nice format """
         # SELECT B.value*1000/A.value AS Promil,A.value,A.stat,B.value,B.stat,B.date from statistic_tb AS A,statistic_tb AS B where A.stat='mile:part:1-de' and B.stat like 'mile:part:1-de:trans-de' and B.date=A.date order by A.stat;
 
-        max_counter=6
+        max_counter=100
 
         output_prozt = 'var prozt = ['
         output_total = 'var total = ['
@@ -292,8 +292,9 @@ class DescriptionMilestone(Base):
         Statistic2 = aliased(Statistic)
         values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
                 filter(Statistic.stat == 'mile:'+self.milestone). \
-                filter(Statistic2.stat == 'mile:'+self.milestone+':trans-de'). \
+                filter(Statistic2.stat == 'mile:'+self.milestone+':trans-'+language). \
                 filter(Statistic.date == Statistic2.date). \
+                order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
         output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 

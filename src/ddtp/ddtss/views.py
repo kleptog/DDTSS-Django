@@ -220,7 +220,7 @@ def view_index_lang(session, request, language):
             newmilestones['user_milestone']['pending']=resultdict1.get(r[0],0)
             newmilestones['user_milestone']['translated']=resultdict.get(r[0],0)
             newmilestones['user_milestone']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data();
+            newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data(language);
         if r[0] == lang.milestone_high:
             newmilestones['lang_milestone_high']=dict()
             newmilestones['lang_milestone_high']['type']='lang_milestone_high'
@@ -229,7 +229,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_high']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_high']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_high']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data();
+            newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data(language);
         if r[0] == lang.milestone_medium:
             newmilestones['lang_milestone_medium']=dict()
             newmilestones['lang_milestone_medium']['type']='lang_milestone_medium'
@@ -238,7 +238,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_medium']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_medium']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_medium']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data();
+            newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data(language);
         if r[0] == lang.milestone_low:
             newmilestones['lang_milestone_low']=dict()
             newmilestones['lang_milestone_low']['type']='lang_milestone_low'
@@ -247,7 +247,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_low']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_low']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_low']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data();
+            newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data(language);
 
     # now sort it
     milestones = list()
