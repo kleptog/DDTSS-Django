@@ -384,12 +384,12 @@ def view_translate(session, request, language, description_id):
     for olddescr in descr.get_description_predecessors:
         oneolddiff = dict()
         oneolddiff['id'] = descr.description_id
-        oneolddiff['short'] = descr.short
-        oneolddiff['long'] = descr.long
+        oneolddiff['short'] = descr.short()
+        oneolddiff['long'] = descr.long()
         oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
         oneolddiff['oldid'] = olddescr.description_id
-        oneolddiff['oldshort'] = olddescr.short
-        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldshort'] = olddescr.short()
+        oneolddiff['oldlong'] = olddescr.long()
         oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
         oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
         oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
@@ -592,12 +592,12 @@ def view_review(session, request, language, description_id):
     for olddescr in descr.get_description_predecessors:
         oneolddiff = dict()
         oneolddiff['id'] = descr.description_id
-        oneolddiff['short'] = descr.short
-        oneolddiff['long'] = descr.long
+        oneolddiff['short'] = descr.short()
+        oneolddiff['long'] = descr.long()
         oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
         oneolddiff['oldid'] = olddescr.description_id
-        oneolddiff['oldshort'] = olddescr.short
-        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldshort'] = olddescr.short()
+        oneolddiff['oldlong'] = olddescr.long()
         oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
         oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
         oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
