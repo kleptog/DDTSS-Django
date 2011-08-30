@@ -85,11 +85,9 @@ class Description(Base):
             output += ") "
         return output
 
-    @property
     def short(self):
         """ Returns the title of the description """
         return self.description.partition("\n")[0]
-    @property
     def long(self):
         """ Returns the body of the description """
         return self.description.partition("\n")[2]
