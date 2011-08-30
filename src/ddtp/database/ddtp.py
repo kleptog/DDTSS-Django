@@ -85,9 +85,11 @@ class Description(Base):
             output += ") "
         return output
 
+    @property
     def short(self):
         """ Returns the title of the description """
         return self.description.partition("\n")[0]
+    @property
     def long(self):
         """ Returns the body of the description """
         return self.description.partition("\n")[2]
@@ -137,6 +139,39 @@ class Description(Base):
 
         result = [ (descr_map.get(trans.part_md5), trans) for trans, _ in related_parts ]
 
+        return result
+
+    @property
+    def get_description_predecessors(self):
+        """ get all descriptions of the predecessors """
+
+        session = Session.object_session(self)
+        PackageVersion2=aliased(PackageVersion)
+        #SELECT B.description_id from package_version_tb AS A LEFT JOIN package_version_tb AS B ON A.package = B.package where A.description_id='79246' group by B.description_id;
+        DescriptionIDs = [x for x, in session.query(PackageVersion2.description_id). \
+                join(PackageVersion, PackageVersion2.package == PackageVersion.package). \
+                filter(PackageVersion.description_id == self.description_id).\
+                filter(PackageVersion2.description_id != self.description_id). \
+                group_by(PackageVersion2.description_id).\
+                all()]
+
+        # START REMOVE AFTER FIX
+        # FIXME
+        # use later only package_version_tb and not the old package field
+        # SELECT B.description_id from description_tb AS A left join description_tb AS B ON A.package = B.package where A.description_id='79246' group by B.description_id;
+        Description2=aliased(Description)
+        DescriptionIDs2 = [x for x, in session.query(Description2.description_id). \
+                join(Description, Description2.package == Description.package). \
+                filter(Description.description_id == self.description_id).\
+                filter(Description.description_id != self.description_id). \
+                group_by(Description2.description_id). \
+                all()]
+
+        DescriptionIDs += DescriptionIDs2
+        # END REMOVE AFTER FIX
+        #return dict.fromkeys(DescriptionIDs).keys()
+
+        result = session.query(Description).filter(Description.description_id.in_(DescriptionIDs)).all()
         return result
 
     def __repr__(self):
@@ -276,11 +311,11 @@ class DescriptionMilestone(Base):
 
     description = relationship(Description, backref='milestones')
 
-    def Get_flot_data(self):
+    def Get_flot_data(self,language):
         """ Returns all versions in a nice format """
         # SELECT B.value*1000/A.value AS Promil,A.value,A.stat,B.value,B.stat,B.date from statistic_tb AS A,statistic_tb AS B where A.stat='mile:part:1-de' and B.stat like 'mile:part:1-de:trans-de' and B.date=A.date order by A.stat;
 
-        max_counter=6
+        max_counter=100
 
         output_prozt = 'var prozt = ['
         output_total = 'var total = ['
@@ -292,8 +327,9 @@ class DescriptionMilestone(Base):
         Statistic2 = aliased(Statistic)
         values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
                 filter(Statistic.stat == 'mile:'+self.milestone). \
-                filter(Statistic2.stat == 'mile:'+self.milestone+':trans-de'). \
+                filter(Statistic2.stat == 'mile:'+self.milestone+':trans-'+language). \
                 filter(Statistic.date == Statistic2.date). \
+                order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
         output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 

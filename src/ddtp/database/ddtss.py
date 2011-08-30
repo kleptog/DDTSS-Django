@@ -7,11 +7,11 @@ import time
 import difflib
 
 from .db import Base, with_db_session
-from .ddtp import Description, DescriptionMilestone, Translation, PartDescription, Part, description_to_parts
+from .ddtp import Description, DescriptionMilestone, Translation, PartDescription, Part, description_to_parts, Statistic
 from django.conf import settings
 from django.utils.timesince import timesince
 from sqlalchemy import types
-from sqlalchemy.orm import relationship, collections, backref, relation
+from sqlalchemy.orm import relationship, collections, backref, relation, aliased
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
 from datetime import datetime
@@ -125,6 +125,28 @@ class Users(Base):
     # real user (just IP address).
     logged_in = True
 
+    def Get_flot_data(self):
+        """ Returns all versions in a nice format """
+
+        max_counter=100
+
+        session = Session.object_session(self)
+
+        values = list();
+        Statistic2 = aliased(Statistic)
+        values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
+                filter(Statistic.stat == 'user:translations-'+self.username). \
+                filter(Statistic2.stat == 'user:reviews-'+self.username). \
+                filter(Statistic.date == Statistic2.date). \
+                order_by(Statistic.date.asc()). \
+                limit(max_counter). \
+                all()
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
+
+        return output_prozt+output_total+output_trans
+
     def get_authority(self, language):
         """ Get authority object """
         # If user is not persistant, no authority
@@ -230,6 +252,8 @@ class PendingTranslation(Base):
         """ From a description object and a language, make a suggestion for
         the description using existing parts """
 
+        if description and language in description.translation:
+            return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
         parts = description.get_description_part_objects()
         # A map from untranslated text, to translated text
         fuzzy_parts = dict( description.get_potential_fuzzy_matches(language) )
@@ -383,6 +407,28 @@ class PendingTranslation(Base):
         session.delete(self)
         for review in self.reviews:
             session.delete(review)
+
+    def Get_flot_data(self):
+        """ Returns all versions in a nice format """
+
+        max_counter=100
+
+        session = Session.object_session(self)
+
+        values = list();
+        Statistic2 = aliased(Statistic)
+        values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
+                filter(Statistic.stat == 'lang:pendingtranslation-'+self.language_ref). \
+                filter(Statistic2.stat == 'lang:pendingreview-'+self.language_ref). \
+                filter(Statistic.date == Statistic2.date). \
+                order_by(Statistic.date.asc()). \
+                limit(max_counter). \
+                all()
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
+
+        return output_prozt+output_total+output_trans
 
 class PendingTranslationReview(Base):
     """ A review of a translation """

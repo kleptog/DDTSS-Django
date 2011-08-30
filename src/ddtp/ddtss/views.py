@@ -220,7 +220,7 @@ def view_index_lang(session, request, language):
             newmilestones['user_milestone']['pending']=resultdict1.get(r[0],0)
             newmilestones['user_milestone']['translated']=resultdict.get(r[0],0)
             newmilestones['user_milestone']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data();
+            newmilestones['user_milestone']['flot']=stat_user_milestone[0].Get_flot_data(language);
         if r[0] == lang.milestone_high:
             newmilestones['lang_milestone_high']=dict()
             newmilestones['lang_milestone_high']['type']='lang_milestone_high'
@@ -229,7 +229,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_high']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_high']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_high']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data();
+            newmilestones['lang_milestone_high']['flot']=stat_lang_milestone_high[0].Get_flot_data(language);
         if r[0] == lang.milestone_medium:
             newmilestones['lang_milestone_medium']=dict()
             newmilestones['lang_milestone_medium']['type']='lang_milestone_medium'
@@ -238,7 +238,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_medium']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_medium']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_medium']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data();
+            newmilestones['lang_milestone_medium']['flot']=stat_lang_milestone_medium[0].Get_flot_data(language);
         if r[0] == lang.milestone_low:
             newmilestones['lang_milestone_low']=dict()
             newmilestones['lang_milestone_low']['type']='lang_milestone_low'
@@ -247,7 +247,7 @@ def view_index_lang(session, request, language):
             newmilestones['lang_milestone_low']['pending']=resultdict1.get(r[0],0)
             newmilestones['lang_milestone_low']['translated']=resultdict.get(r[0],0)
             newmilestones['lang_milestone_low']['percent']=resultdict.get(r[0],0)*100/r[1]
-            newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data();
+            newmilestones['lang_milestone_low']['flot']=stat_lang_milestone_low[0].Get_flot_data(language);
 
     # now sort it
     milestones = list()
@@ -380,6 +380,23 @@ def view_translate(session, request, language, description_id):
                           .order_by(Messages.timestamp) \
                           .all()
 
+    olddiffs = list()
+    for olddescr in descr.get_description_predecessors:
+        oneolddiff = dict()
+        oneolddiff['id'] = descr.description_id
+        oneolddiff['short'] = descr.short
+        oneolddiff['long'] = descr.long
+        oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
+        oneolddiff['oldid'] = olddescr.description_id
+        oneolddiff['oldshort'] = olddescr.short
+        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        olddiffs.append(oneolddiff)
+
     session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
@@ -387,6 +404,7 @@ def view_translate(session, request, language, description_id):
         lang=lang,
         descr=descr,
         trans=trans,
+        olddiffs=olddiffs,
         descr_messages=descr_messages), context_instance=RequestContext(request))
 
 def generate_line_diff(old, new):
@@ -570,6 +588,23 @@ def view_review(session, request, language, description_id):
                          .order_by(Messages.timestamp) \
                          .all()
 
+    olddiffs = list()
+    for olddescr in descr.get_description_predecessors:
+        oneolddiff = dict()
+        oneolddiff['id'] = descr.description_id
+        oneolddiff['short'] = descr.short
+        oneolddiff['long'] = descr.long
+        oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
+        oneolddiff['oldid'] = olddescr.description_id
+        oneolddiff['oldshort'] = olddescr.short
+        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        olddiffs.append(oneolddiff)
+
     return render_to_response("ddtss/translate.html", dict(
         forreview=True,
         diff_short=diff_short,
@@ -577,6 +612,7 @@ def view_review(session, request, language, description_id):
         lang=lang,
         descr=descr,
         trans=trans,
+        olddiffs=olddiffs,
         descr_messages=descr_messages), context_instance=RequestContext(request))
 
 
