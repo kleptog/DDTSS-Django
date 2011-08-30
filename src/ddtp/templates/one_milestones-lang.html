@@ -49,7 +49,7 @@ function show_coordinator() {
         <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
             <img src="/media/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"\></a></span>
     </td>
-    <td>{{ descr.nice_package_versions }}</td> </tr>
+    <td> <a style="text-decoration:none;" href="{% url ddt_descr descr.description_id %}">{{ descr.nice_package_versions }}</a></td> </tr>
 {% endfor %}
 </table>
 <br>
