@@ -380,6 +380,23 @@ def view_translate(session, request, language, description_id):
                           .order_by(Messages.timestamp) \
                           .all()
 
+    olddiffs = list()
+    for olddescr in descr.get_description_predecessors:
+        oneolddiff = dict()
+        oneolddiff['id'] = descr.description_id
+        oneolddiff['short'] = descr.short
+        oneolddiff['long'] = descr.long
+        oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
+        oneolddiff['oldid'] = olddescr.description_id
+        oneolddiff['oldshort'] = olddescr.short
+        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        olddiffs.append(oneolddiff)
+
     session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
@@ -387,6 +404,7 @@ def view_translate(session, request, language, description_id):
         lang=lang,
         descr=descr,
         trans=trans,
+        olddiffs=olddiffs,
         descr_messages=descr_messages), context_instance=RequestContext(request))
 
 def generate_line_diff(old, new):
@@ -570,6 +588,23 @@ def view_review(session, request, language, description_id):
                          .order_by(Messages.timestamp) \
                          .all()
 
+    olddiffs = list()
+    for olddescr in descr.get_description_predecessors:
+        oneolddiff = dict()
+        oneolddiff['id'] = descr.description_id
+        oneolddiff['short'] = descr.short
+        oneolddiff['long'] = descr.long
+        oneolddiff['transshort'], oneolddiff['translong'] = PendingTranslation.make_suggestion(descr, language)
+        oneolddiff['oldid'] = olddescr.description_id
+        oneolddiff['oldshort'] = olddescr.short
+        oneolddiff['oldlong'] = olddescr.long
+        oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_suggestion(olddescr, language)
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        olddiffs.append(oneolddiff)
+
     return render_to_response("ddtss/translate.html", dict(
         forreview=True,
         diff_short=diff_short,
@@ -577,6 +612,7 @@ def view_review(session, request, language, description_id):
         lang=lang,
         descr=descr,
         trans=trans,
+        olddiffs=olddiffs,
         descr_messages=descr_messages), context_instance=RequestContext(request))
 
 

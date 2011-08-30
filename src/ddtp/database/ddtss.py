@@ -252,6 +252,8 @@ class PendingTranslation(Base):
         """ From a description object and a language, make a suggestion for
         the description using existing parts """
 
+        if description and language in description.translation:
+            return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
         parts = description.get_description_part_objects()
         # A map from untranslated text, to translated text
         fuzzy_parts = dict( description.get_potential_fuzzy_matches(language) )

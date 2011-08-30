@@ -12,7 +12,48 @@ function popup (url) {
  return true;
 }
 
- 
+function showshortdiff (url) {
+    var boxes = document.getElementsByName("shortboxes");
+    for(i=0, l=boxes.length; i<l; i++) {
+        boxes[i].style.display = "none";
+    }
+ document.getElementById(url).style.display='block'
+ return true;
+}
+
+function showlongdiff (url) {
+    var boxes = document.getElementsByName("longboxes");
+    for(i=0, l=boxes.length; i<l; i++) {
+        boxes[i].style.display = "none";
+    }
+ document.getElementById(url).style.display='block'
+ return true;
+}
+
+function toggle_ShowShortDescr() {
+    var ShowDescr_fields = document.getElementsByName("ShowShortDescr");
+    for(i=0, l=ShowDescr_fields.length; i<l; i++) {
+        if(ShowDescr_fields[i].style.display == "block") {
+            ShowDescr_fields[i].style.display = "none";
+        }
+        else {
+            ShowDescr_fields[i].style.display = "block";
+        }
+    }
+}
+
+function toggle_ShowLongDescr() {
+    var ShowDescr_fields = document.getElementsByName("ShowLongDescr");
+    for(i=0, l=ShowDescr_fields.length; i<l; i++) {
+        if(ShowDescr_fields[i].style.display == "block") {
+            ShowDescr_fields[i].style.display = "none";
+        }
+        else {
+            ShowDescr_fields[i].style.display = "block";
+        }
+    }
+}
+
 //]]></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
@@ -39,22 +80,84 @@ go</font>
 <form method="post" action="{% url ddtss_translate lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% endif %}
 <h5>Short description</h5>
+<a href="javascript:showshortdiff('None')" >None</a> | 
+{% if diff_short %}
+<a href="javascript:showshortdiff('show-short-change-diff')" >Show Diff Changes</a> | 
+{% endif %}
+{% for olddiff in olddiffs %}
+<a href="javascript:showshortdiff('show-short-diff-{{olddiff.oldid}}')" >Show Diff to {{olddiff.oldid}}</a> | 
+{% if forloop.last %}
+<a href="javascript:toggle_ShowShortDescr();">(toggle full show)</a>
+{% endif %}
+{% endfor %}
+<p>
 <ul>
   <li>Untranslated:  <tt>{{descr.short}}</tt></li>
 {% if diff_short %}
+<span name="shortboxes" id="show-short-change-diff" style="display:none;border-style:solid;border-width:thin">
   <li><div class='diff'>Diff to previous revision <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
     <pre>{% for type, text in diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre></li>
+</span>
 {% endif %}
-  <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" /></li>
+{% for olddiff in olddiffs %}
+<span name="shortboxes" id="show-short-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
+    <li><div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
+    <pre>
+{% for type, text in olddiff.diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+---
+{% for type, text in olddiff.diff_transshort %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<span name="ShowShortDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
+English:
+<span class='old' >{{olddiff.oldshort}}</span>
+<span class='new' >{{olddiff.short}}</span>
+Translated:
+<span class='old' >{{olddiff.oldtransshort}}</span>
+<span class='new' >{{olddiff.transshort}}</span>
+</span>
+    </pre></li>
+</span>
+{% endfor %}
+  <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" /></div></li>
 </ul>
 <h5>Long description</h5>
+<a href="javascript:showlongdiff('None')" >None</a> | 
+{% if diff_long %}
+<a href="javascript:showlongdiff('show-long-change-diff')" >Show Diff Changes</a> | 
+{% endif %}
+{% for olddiff in olddiffs %}
+<a href="javascript:showlongdiff('show-long-diff-{{olddiff.oldid}}')" >Show Diff to {{olddiff.oldid}}</a> | 
+{% if forloop.last %}
+<a href="javascript:toggle_ShowLongDescr();">(toggle full show)</a>
+{% endif %}
+{% endfor %}
+<p>
 (Note: You must preserve the number of paragraphs)
 <ul>
   <li>Untranslated:  <pre>{{descr.long}}</pre></li>
 {% if diff_long %}
-  <li><div class='diff'>Diff to previous revision <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-    <pre>{% for type, text in diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre></li>
+<span name="longboxes" id="show-long-change-diff" style="display:none;border-style:solid;border-width:thin">
+    <li> <div class='diff'>Diff to previous revision <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
+    <pre>{% for type, text in diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre></div></li>
+</span>
 {% endif %}
+{% for olddiff in olddiffs %}
+<span name="longboxes" id="show-long-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
+    <li> <div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
+    <pre>
+{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+---
+{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<span name="ShowLongDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
+English:
+<span class='old' >{{olddiff.oldlong}}</span>
+<span class='new' >{{olddiff.long}}</span>
+Translated:
+<span class='old' >{{olddiff.oldtranslong}}</span>
+<span class='new' >{{olddiff.translong}}</span>
+</span>
+    </pre></li>
+</span>
+{% endfor %}
   <li>Translated ({{lang.language}}):
     <span class="tooltip" title="Due to bugs in some browsers, non-breaking spaces are displayed as '·' (middot). You should also enter them that way to make sure they get sent to the server. You can generally get it by composing the caret (^) with the space.">Non-breakspace note</span>
     <span class="tooltip" title="Debian policy states that lines without leading spaces may be wrapped by user-agents. So for lists, make sure you include a leading space to avoid splattered text.">Textwrapping note</span>

@@ -85,9 +85,11 @@ class Description(Base):
             output += ") "
         return output
 
+    @property
     def short(self):
         """ Returns the title of the description """
         return self.description.partition("\n")[0]
+    @property
     def long(self):
         """ Returns the body of the description """
         return self.description.partition("\n")[2]
@@ -137,6 +139,39 @@ class Description(Base):
 
         result = [ (descr_map.get(trans.part_md5), trans) for trans, _ in related_parts ]
 
+        return result
+
+    @property
+    def get_description_predecessors(self):
+        """ get all descriptions of the predecessors """
+
+        session = Session.object_session(self)
+        PackageVersion2=aliased(PackageVersion)
+        #SELECT B.description_id from package_version_tb AS A LEFT JOIN package_version_tb AS B ON A.package = B.package where A.description_id='79246' group by B.description_id;
+        DescriptionIDs = [x for x, in session.query(PackageVersion2.description_id). \
+                join(PackageVersion, PackageVersion2.package == PackageVersion.package). \
+                filter(PackageVersion.description_id == self.description_id).\
+                filter(PackageVersion2.description_id != self.description_id). \
+                group_by(PackageVersion2.description_id).\
+                all()]
+
+        # START REMOVE AFTER FIX
+        # FIXME
+        # use later only package_version_tb and not the old package field
+        # SELECT B.description_id from description_tb AS A left join description_tb AS B ON A.package = B.package where A.description_id='79246' group by B.description_id;
+        Description2=aliased(Description)
+        DescriptionIDs2 = [x for x, in session.query(Description2.description_id). \
+                join(Description, Description2.package == Description.package). \
+                filter(Description.description_id == self.description_id).\
+                filter(Description.description_id != self.description_id). \
+                group_by(Description2.description_id). \
+                all()]
+
+        DescriptionIDs += DescriptionIDs2
+        # END REMOVE AFTER FIX
+        #return dict.fromkeys(DescriptionIDs).keys()
+
+        result = session.query(Description).filter(Description.description_id.in_(DescriptionIDs)).all()
         return result
 
     def __repr__(self):
