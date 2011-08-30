@@ -14,11 +14,17 @@ function popup (url) {
 
 function reset_flot (url) {
 {% if user.milestone == None %}
+ document.getElementById('flot_user').style.display='none'
+ document.getElementById('flot_lang_trans').style.display='none'
+ document.getElementById('flot_lang_review').style.display='none'
  document.getElementById('flot_lang_milestone_medium').style.display='none'
  document.getElementById('flot_lang_milestone_low').style.display='none'
  document.getElementById('flot_lang_milestone_high').style.display='none'
  document.getElementById(url).style.display='block'
 {% else %}
+ document.getElementById('flot_user').style.display='none'
+ document.getElementById('flot_lang_trans').style.display='none'
+ document.getElementById('flot_lang_review').style.display='none'
  document.getElementById('flot_user_milestone').style.display='none'
  document.getElementById('flot_lang_milestone_high').style.display='none'
  document.getElementById('flot_lang_milestone_medium').style.display='none'
@@ -213,6 +219,28 @@ y2axis: {show:1 },
 });
 </script> 
 {% endfor %}
+<div id="flot_user" style="width:500px;height:150px;display:none"></div> 
+
+<script type="text/javascript"> 
+$(function () {
+    {{user.Get_flot_data}}
+    $.plot($("#flot_user"), [ {label: "Quote"   , yaxis: 1, data: quote},
+                                                      {label: "Translated"     , yaxis: 2, data: trans},
+                                                      {label: "Reviewed", yaxis: 2, data: revie} ],
+                                { 
+yaxis: { },
+y2axis: {show:1 },
+//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
+                                  xaxis: {show:0 },
+                                  legend: { show: 1, position: "nw" } 
+                                });
+
+
+});
+</script> 
+<div id="flot_lang_trans" style="width:500px;height:150px;display:none"></div> 
+<div id="flot_lang_review" style="width:500px;height:150px;display:none"></div> 
+
 </td></tr>
 </table>
 <!-- End Milestones -->
@@ -228,7 +256,25 @@ y2axis: {show:1 },
   </h2>
   <ol>
 {% for trans in pending_translations %}
-{% if forloop.first %}<ol>{% endif %}
+{% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_trans')">
+<script type="text/javascript"> 
+$(function () {
+    {{trans.Get_flot_data}}
+    $.plot($("#flot_lang_trans"), [ {label: "Quote"   , yaxis: 1, data: quote},
+                                                      {label: "Pending Translated"     , yaxis: 2, data: trans},
+                                                      {label: "Pending Reviewed", yaxis: 2, data: revie} ],
+                                { 
+yaxis: { },
+y2axis: {show:1 },
+//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
+                                  xaxis: {show:0 },
+                                  legend: { show: 1, position: "nw" } 
+                                });
+
+
+});
+</script> 
+    {% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
     <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
@@ -268,7 +314,25 @@ y2axis: {show:1 },
   </h2>
   <ol>
 {% for trans in pending_review %}
-{% if forloop.first %}<ol>{% endif %}
+{% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_review')">
+<script type="text/javascript"> 
+$(function () {
+    {{trans.Get_flot_data}}
+    $.plot($("#flot_lang_review"), [ {label: "Quote"   , yaxis: 1, data: quote},
+                                                      {label: "Pending Translated"     , yaxis: 2, data: trans},
+                                                      {label: "Pending Reviewed", yaxis: 2, data: revie} ],
+                                { 
+yaxis: { },
+y2axis: {show:1 },
+//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
+                                  xaxis: {show:0 },
+                                  legend: { show: 1, position: "nw" } 
+                                });
+
+
+});
+</script> 
+    {% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
     <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
@@ -300,7 +364,7 @@ y2axis: {show:1 },
 <td valign='top' >
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
-</h2><ul>
+</h2><ul onmouseover="return reset_flot('flot_user')">
 <li>Account: {{user.username}}</li>
 <li>Realname: {{user.realname}}</li>
 <li><a href="{% url ddtss_preferenc %}">Preferenc Page</a></li>
