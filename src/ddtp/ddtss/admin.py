@@ -142,12 +142,18 @@ class CoordinatorAdminForm(forms.Form):
 
     def __init__(self, session, *args, **kwargs):
         super(CoordinatorAdminForm, self).__init__(*args, **kwargs)
-        # This little peice of magic sets te class on any field that has an error
-        for f_name in self.errors:
-            self.fields[f_name].widget.attrs['class'] += ' error'
+
+        # Set choices before setting error classes, because self.errors runs
+        # the form validation.
         self.fields['milestone_high'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
         self.fields['milestone_medium'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
         self.fields['milestone_low'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
+
+        # This little peice of magic sets the class on any field that has an error
+        for f_name in self.errors:
+            if 'class' in self.fields[f_name].widget.attrs:
+                self.fields[f_name].widget.attrs['class'] += ' error'
+
 
     def clean(self):
         data = self.cleaned_data
