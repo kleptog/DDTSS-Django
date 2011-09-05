@@ -78,11 +78,8 @@ class Description(Base):
             if package_version.package not in outputdict:
                 outputdict[package_version.package] = list()
             outputdict[package_version.package].append(package_version.version)
-        for package in outputdict:
-            output += package+" ("
-            for version in outputdict[package]:
-                output += version+", "
-            output += ") "
+
+        output = ", ".join(package+" ("+", ".join(outputdict[package])+")" for package in outputdict)
         return output
 
     def short(self):

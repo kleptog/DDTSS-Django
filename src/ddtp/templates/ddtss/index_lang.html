@@ -65,7 +65,7 @@ function toggle_size() {
 </head>
 <body onload="return reset_flot('flot_lang_milestone_high')" >
 {% include "navigation.html" %}
-<h1>DDTSS for {{lang.language}}</h1>
+<h1>DDTSS for {{lang.language}} {% if lang.fullname %}({{lang.fullname}}){% endif %}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
 <h3>Project-Messages (2): <div class="help" title="Messages for the DDTP">?</div>
@@ -112,7 +112,7 @@ function toggle_size() {
 
 {% if not user.logged_in %}
 <span style="font-size:120%">
-    <b>Please login... Only with a login, you can use all features! Go to <a href="login">Login</a></b>
+    <b>You can use all the features only when logged in! Please <a href="login">Login</a></b>
 </span>
 <p><a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
 {% endif %}
@@ -171,6 +171,7 @@ Coordinators for {{lang.language}}:
 <!-- End Team Messages -->
 
 <!-- Milestones -->
+{% if milestones %}
 <table>
     <col width="60%" /><col width="40%" />
 <tr><td alian="top">
@@ -182,7 +183,7 @@ Coordinators for {{lang.language}}:
 <tbody>
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
-    <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"\> {{milestoneinfo.type}}</td>
+    <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"> {{milestoneinfo.type}}</td>
     <td><a href="{% url ddt_stats_one_milestones_lang milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
     <td align='right'>{{milestoneinfo.pending}}</td>
@@ -244,6 +245,7 @@ y2axis: {show:1 },
 </td></tr>
 </table>
 <!-- End Milestones -->
+{% endif %}
 
 
 <table>
@@ -280,10 +282,10 @@ y2axis: {show:1 },
     <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
-{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Height" title="Hight Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"> {% endif %}
 {% endfor %}
 
 <span name="showage" style="display:none"> ({{trans.age}})</span>
@@ -306,7 +308,7 @@ y2axis: {show:1 },
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
   </form>
-  <a href="{% url ddt_stats_milestones_lang %}">Fetch per Milestones</a>
+  <a href="{% url ddt_stats_milestones_lang %}">Fetch using milestones</a>
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})
@@ -338,10 +340,10 @@ y2axis: {show:1 },
     <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
-{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"> {% endif %}
 {% endfor %}
 
 <span name="showage" style="display:none"> ({{trans.age}})</span>
@@ -367,9 +369,9 @@ y2axis: {show:1 },
 </h2><ul onmouseover="return reset_flot('flot_user')">
 <li>Account: {{user.username}}</li>
 <li>Realname: {{user.realname}}</li>
-<li><a href="{% url ddtss_preferenc %}">Preferenc Page</a></li>
-<li><a href="javascript:toggle_size();">toggle display size</a></li>
-<li><a href="javascript:toggle_age();">toggle display ages</a></li>
+<li><a href="{% url ddtss_preferenc %}">Preference Page</a></li>
+<li><a href="javascript:toggle_size();">Toggle display size</a></li>
+<li><a href="javascript:toggle_age();">Toggle display ages</a></li>
 {% if user.is_coordinator %} 
 <li><a href="{% url ddtss_coordinate %}">{{auth.auth_level_name}}-Page</a></li>
 <li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">

@@ -132,6 +132,16 @@ class Users(Base):
 
         session = Session.object_session(self)
 
+        if not session:
+            # Anonymous user, no stats recorded. Queries below won't work
+            # because the user doesn't exist in database and hence no
+            # session object.
+            output_prozt = "var quote=[];"
+            output_total = "var trans=[];"
+            output_trans = "var revie=[];"
+
+            return output_prozt+output_total+output_trans
+
         values = list();
         Statistic2 = aliased(Statistic)
         values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \

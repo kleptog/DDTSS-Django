@@ -88,6 +88,7 @@ keymap = (
    (r'^(\w+)/done/', r'', ignore),
    (r'^(\w+)/logs/', r'', ignore),
    (r'^(\w+)/packages/([\w.+-]+)$', r'^(.*)$', handle_package_state),
+   (r'^(\w+)/packages/([\w.+-]+)/age$', r'(?sm)^(.*)$', lambda a,b: setattr(packages[(a[0],a[1])], 'agefield', b[0])),
    (r'^(\w+)/packages/([\w.+-]+)/(\w+)$', r'(?sm)^(.*)$', lambda a,b: setattr(packages[(a[0],a[1])], a[2], b[0])),
    (r'^(\w+)/messages$', r'', ignore),
    (r'^descrmatch/', r'^(.*)$', ignore),
@@ -190,8 +191,8 @@ class Command(NoArgsCommand):
             else:
                 package.lastupdate = now
 
-            if hasattr(package,'age'):
-                package.firstupdate = package.age
+            if hasattr(package,'agefield'):
+                package.firstupdate = package.agefield
             else:
                 package.firstupdate = now
             package.language = languages[package_key[0]]
