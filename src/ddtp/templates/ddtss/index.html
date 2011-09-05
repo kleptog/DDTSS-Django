@@ -24,7 +24,8 @@ More information about the DDTP and the DDTSS can be found  <a href="http://www.
 <tr><th>Language</th> <th>Pending translation</th> <th>Pending review</th> <th>Translated</th></tr>
 {% for lang in languages %}{% if lang.enabled %}
 <tr class="{% cycle 'odd' 'even' %}">
-   <td><a href="{% url ddtss_index_lang lang.language %}">{{ lang.language }}</a></td> 
+   <td><a href="{% url ddtss_index_lang lang.language %}">{{ lang.language }}</a>
+   {% if lang.fullname %}({{lang.fullname}}){% endif %}</td>
    <td align="right">{{lang.pending_translation}}</td> 
    <td align="right">{{lang.pending_review}}</td> 
    <td align="right">{{lang.translated}}</td>
