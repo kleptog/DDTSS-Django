@@ -156,3 +156,15 @@ table#coordinator_scores td {
 table#coordinator_scores input.error {
     background: red;
 }
+
+button.button_as_link {
+    display: inline-block;
+    color: #0000EE;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0px;
+    border: none;
+    font-size: 100%;
+    background-color: transparent;
+    font-family: serif;
+}
