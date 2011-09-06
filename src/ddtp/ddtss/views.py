@@ -64,14 +64,38 @@ def view_index(session, request, lang=None):
     return render_to_response("ddtss/index.html", {'languages': params}, context_instance=RequestContext(request))
 
 def get_user(request, session):
+    user = None
+
     if 'username' in request.session:
+        # If logged in, use that user
         user = session.query(Users).filter_by(username = request.session['username']).one()
-    else:
+    elif 'ddtssuser' in request.COOKIES:
+        # If persistant cookie is present, get the username from there
+        cookie_user = Users.from_cookie(request.COOKIES['ddtssuser'])
+        if cookie_user:
+            # If we found a persistant cookie, check if it's a real user from the database
+            user = session.query(Users).filter_by(username = cookie_user.username).first()
+        if user:
+            # If found, store in session
+            request.session['username'] = cookie_user.username
+        else:
+            # If not in database, use whatever is in cookie
+            user = cookie_user
+
+    if not user:
+        # Not found anywhere, make a new user
         user = Users(username=request.META.get('REMOTE_ADDR'))
         user.logged_in = False
         user.countreviews = user.counttranslations = 0
 
     return user
+
+def save_user(response, user):
+    """ Wrapper which save user to response and returns the response """
+    cookie = user.to_cookie()
+
+    response.set_cookie('ddtssuser', cookie, max_age=6*30*86400)
+    return response
 
 class FetchForm(forms.Form):
     """ This form is used to encapsulate the results of Fetch request """
@@ -260,7 +284,7 @@ def view_index_lang(session, request, language):
     if 'lang_milestone_low' in newmilestones:
         milestones.append(newmilestones['lang_milestone_low'])
 
-    return render_to_response("ddtss/index_lang.html", dict(
+    response = render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
         user=user,
         auth=user.get_authority(language),
@@ -271,6 +295,8 @@ def view_index_lang(session, request, language):
         global_messages=global_messages,
         team_messages=team_messages,
         user_messages=user_messages), context_instance=RequestContext(request))
+
+    return save_user(response, user)
 
 def show_message_screen(request, msg, redirect, *args):
     """ Display a message to user, and redirect to a new page after 5 seconds """

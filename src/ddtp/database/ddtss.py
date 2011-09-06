@@ -3,6 +3,7 @@
 # See LICENCE file for details.
 
 import re
+import hmac
 import time
 import difflib
 
@@ -124,6 +125,31 @@ class Users(Base):
     # ensure that this field is reset in instances where the user is not a
     # real user (just IP address).
     logged_in = True
+
+    # These are methods to handle the information transfer between cookies and user objects
+    def to_cookie(self):
+        """ Creates the cookie contents for this user """
+        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, self.lastlanguage_ref)
+        digest = hmac.new(settings.SECRET_KEY, s).hexdigest()
+
+        return digest + "|" + s
+
+    @classmethod
+    def from_cookie(self, cookie):
+        """ Given the cookie content, verifies it and returns a user object """
+        digest, _, s = cookie.partition("|")
+        if not digest or not s:
+            return None
+        if hmac.new(settings.SECRET_KEY, s).hexdigest() != digest:
+            return None
+
+        # Received signed cookie, parse it into new user object
+        v = s.split(":")
+        return Users(username=v[0],
+                    countreviews=int(v[1]),
+                    counttranslations=int(v[2]),
+                    logged_in=False,
+                    lastlanguage_ref=v[3])
 
     def Get_flot_data(self):
         """ Returns all versions in a nice format """

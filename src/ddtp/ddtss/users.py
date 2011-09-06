@@ -148,7 +148,10 @@ def view_logout(request):
         messages.success(request, "Logout successful.")
         del request.session['username']
 
-    return redirect('ddtss_index')
+    response = redirect('ddtss_index')
+
+    response.delete_cookie('ddtssuser')
+    return response
 
 class UserPreferenc(forms.Form):
     """
