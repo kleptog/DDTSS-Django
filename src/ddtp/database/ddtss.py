@@ -286,7 +286,7 @@ class PendingTranslation(Base):
     @classmethod
     def make_suggestion(self, description, language):
         """ From a description object and a language, make a suggestion for
-        the description using existing parts """
+        the description using existing parts, potentially using fuzzy matching """
 
         if description and language in description.translation:
             return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
@@ -304,6 +304,22 @@ class PendingTranslation(Base):
                     suggest.append(u" <fuzzy>\n" + fuzzy_parts[match[0]].part)
                 else:
                     suggest.append(u" <trans>\n")
+        return suggest[0], " .\n".join(suggest[1:])
+
+    @classmethod
+    def make_quick_suggestion(self, description, language):
+        """ From a description object and a language, make a quick suggestion for
+        the description using existing parts, no fuzzy matching """
+
+        if description and language in description.translation:
+            return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
+        parts = description.get_description_part_objects()
+        suggest = []
+        for text, hash, part in parts:
+            if part and language in part.translation:
+                suggest.append(part.translation[language].part)
+            else:
+                suggest.append(u" <trans>\n")
         return suggest[0], " .\n".join(suggest[1:])
 
     # Methods for handling the optimistic locking
