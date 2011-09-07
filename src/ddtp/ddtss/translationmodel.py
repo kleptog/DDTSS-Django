@@ -69,7 +69,7 @@ class DefaultTranslationModel(ddtss.TranslationModel):
         self.points[self.USER_TYPE_ANONYMOUS][self.ACTION_REVIEW] = form['ar']
         self.stability_bonus = form['stable']
         self.threshold = form['accept']
-        
+
     def map_authority(self, auth_level):
         if auth_level >= ddtss.UserAuthority.AUTH_LEVEL_TRUSTED:
             return self.USER_TYPE_TRUSTED

@@ -333,8 +333,8 @@ class DescriptionMilestone(Base):
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
-        output_total = "var total=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
+        output_total = "var total=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
         output_trans = "var trans=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans

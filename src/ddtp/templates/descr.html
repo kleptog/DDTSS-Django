@@ -9,7 +9,7 @@
 <h3>Description: {{descr.description_id}}
         <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"\></a>
-{% if user.is_coordinator %} 
+{% if user.is_coordinator %}
         <span name="onlycoordinator" style="display:inline"> <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
             <img src="/media/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"\></a></span>
 {% endif %}
@@ -30,7 +30,7 @@ Description: {{descr.description}}
 <br>
 {% for lang in langs %}
 {% if lang in descr.translation %}
-This Description is translated to <a href="{%url ddt_transdescr descr.description_id lang%}">{{lang}}</a> 
+This Description is translated to <a href="{%url ddt_transdescr descr.description_id lang%}">{{lang}}</a>
 {% else %}
 This Description is not yet translated to {{lang}}
 {% endif %}
