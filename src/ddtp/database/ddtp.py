@@ -58,8 +58,8 @@ class Description(Base):
     description_md5 = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     prioritize = Column(Integer, nullable=False)
-    package = Column(String, nullable=False)
-    source = Column(String, nullable=False)
+    package = Column(String, nullable=False) # disappear, use package_version
+    source = Column(String, nullable=False) # disappear, use package_version
 
     owners = relationship('Owner', backref='description')
     package_versions = relationship('PackageVersion', backref='description')
@@ -122,6 +122,7 @@ class Description(Base):
         # Finally, find all parts of all descriptions which have been
         # translated and and part of a package which share a source or
         # package
+        # FIXME: don't use Description.package -> use package_version-tb
         Descr2 = aliased(Description)
         related_parts = session.query(Part, Descr2).join(PartDescription, PartDescription.part_md5 == Part.part_md5). \
                                                     join(Descr2, Descr2.description_id == PartDescription.description_id). \
@@ -203,7 +204,12 @@ class PackageVersion(Base):
 
 class Packages(Base):
     """ List of packages. Not quite sure what the purpose of this is that
-    isn't covered by PackageVersions.  """
+    isn't covered by PackageVersions. 
+    
+    This table is disappear and only used as tmp table for the daily
+    import! Don't use it!
+    
+    """
     __tablename__ = 'packages_tb'
 
     packages_id = Column(Integer, primary_key=True)
