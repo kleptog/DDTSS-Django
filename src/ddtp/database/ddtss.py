@@ -129,7 +129,7 @@ class Users(Base):
     # These are methods to handle the information transfer between cookies and user objects
     def to_cookie(self):
         """ Creates the cookie contents for this user """
-        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, self.lastlanguage_ref)
+        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, self.lastlanguage_ref or '')
         digest = hmac.new(settings.SECRET_KEY, s).hexdigest()
 
         return digest + "|" + s
@@ -149,7 +149,7 @@ class Users(Base):
                     countreviews=int(v[1]),
                     counttranslations=int(v[2]),
                     logged_in=False,
-                    lastlanguage_ref=v[3])
+                    lastlanguage_ref=v[3] or None)
 
     def Get_flot_data(self):
         """ Returns all versions in a nice format """
