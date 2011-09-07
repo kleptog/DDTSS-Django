@@ -107,19 +107,18 @@ go</font>
 {% for olddiff in olddiffs %}
 <span name="shortboxes" id="show-short-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
     <li><div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-    <pre>
-{% for type, text in olddiff.diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 ---
-{% for type, text in olddiff.diff_transshort %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_transshort %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 <span name="ShowShortDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
 English:
-<span class='old' >{{olddiff.oldshort}}</span>
-<span class='new' >{{olddiff.short}}</span>
+<pre><span class='old' >{{olddiff.oldshort}}</span>
+<span class='new' >{{olddiff.short}}</span></pre>
 Translated:
-<span class='old' >{{olddiff.oldtransshort}}</span>
-<span class='new' >{{olddiff.transshort}}</span>
+<pre><span class='old' >{{olddiff.oldtransshort}}</span>
+<span class='new' >{{olddiff.transshort}}</span></pre>
 </span>
-    </pre></li>
+    </li>
 </span>
 {% endfor %}
   <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" /></div></li>
@@ -148,19 +147,18 @@ Translated:
 {% for olddiff in olddiffs %}
 <span name="longboxes" id="show-long-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
     <li> <div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-    <pre>
-{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 ---
-{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 <span name="ShowLongDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
 English:
-<span class='old' >{{olddiff.oldlong}}</span>
-<span class='new' >{{olddiff.long}}</span>
+<pre><span class='old' >{{olddiff.oldlong}}</span>
+<span class='new' >{{olddiff.long}}</span></pre>
 Translated:
-<span class='old' >{{olddiff.oldtranslong}}</span>
-<span class='new' >{{olddiff.translong}}</span>
+<pre><span class='old' >{{olddiff.oldtranslong}}</span>
+<span class='new' >{{olddiff.translong}}</span></pre>
 </span>
-    </pre></li>
+    </li>
 </span>
 {% endfor %}
   <li>Translated ({{lang.language}}):
