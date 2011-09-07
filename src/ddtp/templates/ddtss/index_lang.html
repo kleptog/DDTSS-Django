@@ -370,9 +370,9 @@ y2axis: {show:1 },
 <li>Account: {{user.username}}</li>
 <li>Realname: {{user.realname}}</li>
 <li><a href="{% url ddtss_preferenc %}">Preference Page</a></li>
-{% if user.is_coordinator %} 
 <li><button onclick="toggle_size(); return false;" class="button_as_link">Toggle display size</button></li>
 <li><button onclick="toggle_age(); return false;" class="button_as_link">Toggle display ages</button></li>
+{% if user.is_coordinator %}
 <li><a href="{% url ddtss_coordinate %}">{{auth.auth_level_name}}-Page</a></li>
 <li> <form method="post" id="teammsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
         <input type="submit" value="Write a new team messages" />
