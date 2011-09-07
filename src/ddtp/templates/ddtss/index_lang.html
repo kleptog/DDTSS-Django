@@ -59,8 +59,8 @@ function toggle_size() {
 }
 
 //]]></script>
-<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script> 
-<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script> 
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="return reset_flot('flot_lang_milestone_high')" >
@@ -103,7 +103,7 @@ function toggle_size() {
         </li>
 {% if forloop.last %}
     </ul>
-</div> 
+</div>
 {% endif %}
 {% empty %}
 {% endfor %}
@@ -164,7 +164,7 @@ Coordinators for {{lang.language}}:
         </li>
 {% if forloop.last %}
     </ul>
-</div> 
+</div>
 {% endif %}
 {% empty %}
 {% endfor %}
@@ -200,47 +200,47 @@ Coordinators for {{lang.language}}:
 </td><td>
 
 {% for milestoneinfo in milestones %}
-<div id="flot_{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div> 
+<div id="flot_{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 $(function () {
     {{milestoneinfo.flot}}
     $.plot($("#flot_{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
                                                       {label: "Total"     , yaxis: 2, data: total},
                                                       {label: "Translated", yaxis: 2, data: trans} ],
-                                { 
+                                {
 yaxis: { },
 y2axis: {show:1 },
 //yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
                                   xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" } 
+                                  legend: { show: 1, position: "nw" }
                                 });
 
 
 });
-</script> 
+</script>
 {% endfor %}
-<div id="flot_user" style="width:500px;height:150px;display:none"></div> 
+<div id="flot_user" style="width:500px;height:150px;display:none"></div>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 $(function () {
     {{user.Get_flot_data}}
     $.plot($("#flot_user"), [ {label: "Quote"   , yaxis: 1, data: quote},
                                                       {label: "Translated"     , yaxis: 2, data: trans},
                                                       {label: "Reviewed", yaxis: 2, data: revie} ],
-                                { 
+                                {
 yaxis: { },
 y2axis: {show:1 },
 //yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
                                   xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" } 
+                                  legend: { show: 1, position: "nw" }
                                 });
 
 
 });
-</script> 
-<div id="flot_lang_trans" style="width:500px;height:150px;display:none"></div> 
-<div id="flot_lang_review" style="width:500px;height:150px;display:none"></div> 
+</script>
+<div id="flot_lang_trans" style="width:500px;height:150px;display:none"></div>
+<div id="flot_lang_review" style="width:500px;height:150px;display:none"></div>
 
 </td></tr>
 </table>
@@ -259,23 +259,23 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_trans')">
-<script type="text/javascript"> 
+<script type="text/javascript">
 $(function () {
     {{trans.Get_flot_data}}
     $.plot($("#flot_lang_trans"), [ {label: "Quote"   , yaxis: 1, data: quote},
                                                       {label: "Pending Translated"     , yaxis: 2, data: trans},
                                                       {label: "Pending Reviewed", yaxis: 2, data: revie} ],
-                                { 
+                                {
 yaxis: { },
 y2axis: {show:1 },
 //yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
                                   xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" } 
+                                  legend: { show: 1, position: "nw" }
                                 });
 
 
 });
-</script> 
+</script>
     {% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
@@ -317,23 +317,23 @@ y2axis: {show:1 },
   <ol>
 {% for trans in pending_review %}
 {% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_review')">
-<script type="text/javascript"> 
+<script type="text/javascript">
 $(function () {
     {{trans.Get_flot_data}}
     $.plot($("#flot_lang_review"), [ {label: "Quote"   , yaxis: 1, data: quote},
                                                       {label: "Pending Translated"     , yaxis: 2, data: trans},
                                                       {label: "Pending Reviewed", yaxis: 2, data: revie} ],
-                                { 
+                                {
 yaxis: { },
 y2axis: {show:1 },
 //yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
                                   xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" } 
+                                  legend: { show: 1, position: "nw" }
                                 });
 
 
 });
-</script> 
+</script>
     {% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
@@ -381,7 +381,7 @@ y2axis: {show:1 },
     </form>
 </li>
 {% endif %}
-{% if user.superuser %} 
+{% if user.superuser %}
 <li><a href="{% url ddtss_admin %}">Admin-Page</a></li>
 <li> <form method="post" id="globmsg" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8">
     <input type="submit" value="Write a new project messages" />
@@ -418,7 +418,7 @@ y2axis: {show:1 },
 {% empty %}
     None
 {% endfor %}
-</div> 
+</div>
   <div class=reviewed>
   <h2>Reviewed by you ({{ reviewed|length }})
     <div class="help" title="List of translations you have already reviewed. You can still make changes though.">?</div>
@@ -453,15 +453,15 @@ y2axis: {show:1 },
 -->
 </td></tr>
 </table>
-<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> | 
-<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> | 
-<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> | 
-<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> | 
-<a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> | 
+<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> |
+<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> |
+<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> |
+<a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> |
+<a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> |
 {% if user.logged_in %}
 <a href="{% url ddtss_logout %}">Logout</a>
 {% else %}
-<a href="{% url ddtss_login %}">Login</a> | 
+<a href="{% url ddtss_login %}">Login</a> |
 <a href="{% url ddtss_create_user %}">Create Login</a>
 {% endif %}
 </body>

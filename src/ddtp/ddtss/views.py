@@ -795,7 +795,7 @@ def view_delmessage(session, request, message_id ):
 
         return redirect(redirect_to)
 
-    # 
+    #
 
     return HttpResponseForbidden('<h1>Forbidden</h1>')
 

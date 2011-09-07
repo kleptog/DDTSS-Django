@@ -4,8 +4,8 @@
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
 <!-- see http://tablesorter.com/docs/ -->
 <!-- FIXME if we will use it, you should use own local links -->
-<script type="text/javascript" src="http://tablesorter.com/jquery-latest.js"></script> 
-<script type="text/javascript" src="http://autobahn.tablesorter.com/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="http://tablesorter.com/jquery-latest.js"></script>
+<script type="text/javascript" src="http://autobahn.tablesorter.com/jquery.tablesorter.js"></script>
 <script type="text/javascript" id="js">$(document).ready(function() {
         // call the tablesorter plugin
         $("#table").tablesorter();
@@ -21,7 +21,7 @@ function show_coordinator() {
 
 //]]></script>
 </HEAD>
-{% if user.is_coordinator %} 
+{% if user.is_coordinator %}
 <BODY onload="return show_coordinator()" >
 {% else %}
 <BODY>
@@ -36,7 +36,7 @@ function show_coordinator() {
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url ddt_stats_one_milestones_lang milestone %}">{{milestone}}</a> 
+    <td><a href="{% url ddt_stats_one_milestones_lang milestone %}">{{milestone}}</a>
         <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"\></a>
         <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">

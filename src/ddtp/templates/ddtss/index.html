@@ -12,7 +12,7 @@
 <h1>DDTSS</h1>
 <p>
 The DDTSS is a web frontend to the DDTS.  It provides facilities to request
-translations, enter a translation and review other peoples translations. 
+translations, enter a translation and review other peoples translations.
 Afterwards the updated translation is submitted to the DDTS server.
 <p>
 This is the experimental DDTSS-Django version. It is currently under developement.
@@ -26,8 +26,8 @@ More information about the DDTP and the DDTSS can be found  <a href="http://www.
 <tr class="{% cycle 'odd' 'even' %}">
    <td><a href="{% url ddtss_index_lang lang.language %}">{{ lang.language }}</a>
    {% if lang.fullname %}({{lang.fullname}}){% endif %}</td>
-   <td align="right">{{lang.pending_translation}}</td> 
-   <td align="right">{{lang.pending_review}}</td> 
+   <td align="right">{{lang.pending_translation}}</td>
+   <td align="right">{{lang.pending_review}}</td>
    <td align="right">{{lang.translated}}</td>
 </tr>
 {% endif %}{% endfor %}

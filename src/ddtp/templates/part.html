@@ -11,10 +11,10 @@
 <pre>
 {{part.part}}
 </pre>
-{% endfor %} 
+{% endfor %}
 <h3>Descriptions with this part:</h3>
 <pre>
-{% for descr in descrs %} <a href="{% url ddt_descr descr.description_id %}">{{descr.description_id}}</a>{% if not forloop.last %}, {% endif %}{% endfor %} 
+{% for descr in descrs %} <a href="{% url ddt_descr descr.description_id %}">{{descr.description_id}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
 </pre>
 </BODY>
 </HTML>

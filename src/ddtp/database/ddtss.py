@@ -177,8 +177,8 @@ class Users(Base):
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
-        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
         output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans
@@ -476,8 +476,8 @@ class PendingTranslation(Base):
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
-        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
         output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans
@@ -508,7 +508,7 @@ class Messages(Base):
     # all NULL: global
     # Language: for that language only
     # for_description and language: for the description and lang
-    # User: for that user 
+    # User: for that user
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
     for_description = Column(Integer, ForeignKey('description_tb.description_id'))
