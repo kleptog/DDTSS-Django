@@ -148,7 +148,10 @@ def view_logout(request):
         messages.success(request, "Logout successful.")
         del request.session['username']
 
-    return redirect('ddtss_index')
+    response = redirect('ddtss_index')
+
+    response.delete_cookie('ddtssuser')
+    return response
 
 class UserPreferenc(forms.Form):
     """
@@ -180,7 +183,7 @@ def view_preferenc(session, request):
     """ Handle user login """
 
     user = get_user(request, session)
-    
+
     if not user.logged_in:
         return show_message_screen(request, 'Only for login user', 'ddtss_login')
 

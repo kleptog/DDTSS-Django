@@ -3,6 +3,7 @@
 # See LICENCE file for details.
 
 import re
+import hmac
 import time
 import difflib
 
@@ -125,6 +126,31 @@ class Users(Base):
     # real user (just IP address).
     logged_in = True
 
+    # These are methods to handle the information transfer between cookies and user objects
+    def to_cookie(self):
+        """ Creates the cookie contents for this user """
+        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, self.lastlanguage_ref or '')
+        digest = hmac.new(settings.SECRET_KEY, s).hexdigest()
+
+        return digest + "|" + s
+
+    @classmethod
+    def from_cookie(self, cookie):
+        """ Given the cookie content, verifies it and returns a user object """
+        digest, _, s = cookie.partition("|")
+        if not digest or not s:
+            return None
+        if hmac.new(settings.SECRET_KEY, s).hexdigest() != digest:
+            return None
+
+        # Received signed cookie, parse it into new user object
+        v = s.split(":")
+        return Users(username=v[0],
+                    countreviews=int(v[1]),
+                    counttranslations=int(v[2]),
+                    logged_in=False,
+                    lastlanguage_ref=v[3] or None)
+
     def Get_flot_data(self):
         """ Returns all versions in a nice format """
 
@@ -151,8 +177,8 @@ class Users(Base):
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
-        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
         output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans
@@ -260,7 +286,7 @@ class PendingTranslation(Base):
     @classmethod
     def make_suggestion(self, description, language):
         """ From a description object and a language, make a suggestion for
-        the description using existing parts """
+        the description using existing parts, potentially using fuzzy matching """
 
         if description and language in description.translation:
             return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
@@ -278,6 +304,22 @@ class PendingTranslation(Base):
                     suggest.append(u" <fuzzy>\n" + fuzzy_parts[match[0]].part)
                 else:
                     suggest.append(u" <trans>\n")
+        return suggest[0], " .\n".join(suggest[1:])
+
+    @classmethod
+    def make_quick_suggestion(self, description, language):
+        """ From a description object and a language, make a quick suggestion for
+        the description using existing parts, no fuzzy matching """
+
+        if description and language in description.translation:
+            return description.translation[language].translation.partition("\n")[0], description.translation[language].translation.partition("\n")[2]
+        parts = description.get_description_part_objects()
+        suggest = []
+        for text, hash, part in parts:
+            if part and language in part.translation:
+                suggest.append(part.translation[language].part)
+            else:
+                suggest.append(u" <trans>\n")
         return suggest[0], " .\n".join(suggest[1:])
 
     # Methods for handling the optimistic locking
@@ -434,8 +476,8 @@ class PendingTranslation(Base):
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)]) 
-        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])    
+        output_prozt = "var quote=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
+        output_total = "var trans=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
         output_trans = "var revie=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
         return output_prozt+output_total+output_trans
@@ -466,7 +508,7 @@ class Messages(Base):
     # all NULL: global
     # Language: for that language only
     # for_description and language: for the description and lang
-    # User: for that user 
+    # User: for that user
     # Both: Not allowed
     language = Column(String, ForeignKey('languages_tb.language'))
     for_description = Column(Integer, ForeignKey('description_tb.description_id'))

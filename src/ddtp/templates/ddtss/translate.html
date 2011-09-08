@@ -17,8 +17,10 @@ function showshortdiff (url) {
     for(i=0, l=boxes.length; i<l; i++) {
         boxes[i].style.display = "none";
     }
- document.getElementById(url).style.display='block'
- return true;
+ /* Coded like this to avoid errors on 'None' */
+ box = document.getElementById(url)
+ if(box) box.style.display='block'
+ return false;
 }
 
 function showlongdiff (url) {
@@ -26,8 +28,9 @@ function showlongdiff (url) {
     for(i=0, l=boxes.length; i<l; i++) {
         boxes[i].style.display = "none";
     }
- document.getElementById(url).style.display='block'
- return true;
+ box = document.getElementById(url)
+ if(box) box.style.display='block'
+ return false;
 }
 
 function toggle_ShowShortDescr() {
@@ -40,6 +43,7 @@ function toggle_ShowShortDescr() {
             ShowDescr_fields[i].style.display = "block";
         }
     }
+    return false;
 }
 
 function toggle_ShowLongDescr() {
@@ -52,6 +56,7 @@ function toggle_ShowLongDescr() {
             ShowDescr_fields[i].style.display = "block";
         }
     }
+    return false;
 }
 
 //]]></script>
@@ -80,14 +85,14 @@ go</font>
 <form method="post" action="{% url ddtss_translate lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% endif %}
 <h5>Short description</h5>
-<a href="javascript:showshortdiff('None')" >None</a> | 
+<button onclick="return showshortdiff('None')" class="button_as_link">None</button> |
 {% if diff_short %}
-<a href="javascript:showshortdiff('show-short-change-diff')" >Show Diff Changes</a> | 
+<button onclick="return showshortdiff('show-short-change-diff')" class="button_as_link">Show Diff Changes</button> |
 {% endif %}
 {% for olddiff in olddiffs %}
-<a href="javascript:showshortdiff('show-short-diff-{{olddiff.oldid}}')" >Show Diff to {{olddiff.oldid}}</a> | 
+<button onclick="return showshortdiff('show-short-diff-{{olddiff.oldid}}')" class="button_as_link">Show diff to {{olddiff.oldid}}</button> |
 {% if forloop.last %}
-<a href="javascript:toggle_ShowShortDescr();">(toggle full show)</a>
+<button onclick="return toggle_ShowShortDescr();" class="button_as_link">(toggle full show)</button>
 {% endif %}
 {% endfor %}
 <p>
@@ -102,32 +107,31 @@ go</font>
 {% for olddiff in olddiffs %}
 <span name="shortboxes" id="show-short-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
     <li><div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-    <pre>
-{% for type, text in olddiff.diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_short %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 ---
-{% for type, text in olddiff.diff_transshort %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_transshort %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 <span name="ShowShortDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
 English:
-<span class='old' >{{olddiff.oldshort}}</span>
-<span class='new' >{{olddiff.short}}</span>
+<pre><span class='old' >{{olddiff.oldshort}}</span>
+<span class='new' >{{olddiff.short}}</span></pre>
 Translated:
-<span class='old' >{{olddiff.oldtransshort}}</span>
-<span class='new' >{{olddiff.transshort}}</span>
+<pre><span class='old' >{{olddiff.oldtransshort}}</span>
+<span class='new' >{{olddiff.transshort}}</span></pre>
 </span>
-    </pre></li>
+    </li>
 </span>
 {% endfor %}
-  <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" /></div></li>
+  <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" spellcheck="true" /></div></li>
 </ul>
 <h5>Long description</h5>
-<a href="javascript:showlongdiff('None')" >None</a> | 
+<button onclick="return showlongdiff('None')" class="button_as_link">None</button> |
 {% if diff_long %}
-<a href="javascript:showlongdiff('show-long-change-diff')" >Show Diff Changes</a> | 
+<button onclick="return showlongdiff('show-long-change-diff')" class="button_as_link">Show Diff Changes</button> |
 {% endif %}
 {% for olddiff in olddiffs %}
-<a href="javascript:showlongdiff('show-long-diff-{{olddiff.oldid}}')" >Show Diff to {{olddiff.oldid}}</a> | 
+<button onclick="return showlongdiff('show-long-diff-{{olddiff.oldid}}')" class="button_as_link">Show Diff to {{olddiff.oldid}}</button> |
 {% if forloop.last %}
-<a href="javascript:toggle_ShowLongDescr();">(toggle full show)</a>
+<button onclick="return toggle_ShowLongDescr();" class="button_as_link">(toggle full show)</button>
 {% endif %}
 {% endfor %}
 <p>
@@ -143,19 +147,18 @@ Translated:
 {% for olddiff in olddiffs %}
 <span name="longboxes" id="show-long-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
     <li> <div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-    <pre>
-{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 ---
-{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}
+<pre>{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
 <span name="ShowLongDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
 English:
-<span class='old' >{{olddiff.oldlong}}</span>
-<span class='new' >{{olddiff.long}}</span>
+<pre><span class='old' >{{olddiff.oldlong}}</span>
+<span class='new' >{{olddiff.long}}</span></pre>
 Translated:
-<span class='old' >{{olddiff.oldtranslong}}</span>
-<span class='new' >{{olddiff.translong}}</span>
+<pre><span class='old' >{{olddiff.oldtranslong}}</span>
+<span class='new' >{{olddiff.translong}}</span></pre>
 </span>
-    </pre></li>
+    </li>
 </span>
 {% endfor %}
   <li>Translated ({{lang.language}}):
@@ -221,7 +224,7 @@ actually returning UTF-8 as promised -->
         <input type="hidden" name="language" value="{{lang.language}}"  />
     </form>
     {% endfor %}
-</div> 
+</div>
 <!-- end new description comments per Messages -->
 
 </body>
