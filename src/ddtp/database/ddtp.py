@@ -354,16 +354,3 @@ class CollectionMilestone(Base):
     def __repr__(self):
         return 'CollectionMilestone(%d, collection=%s, name=%s, nametype=%d)' % (self.collection_milestone_id, self.collection, self.name, self.nametype)
 
-# This table is old, back from the time when it was assumed that
-# descriptions only belonged to one package.  It has been superseded by the
-# packages_versions table.
-#
-#class Version(Base):
-#    __tablename__ = 'version_tb'
-#
-#    version_id = Column(Integer, primary_key=True)
-#    version = Column(String, nullable=False)
-#    description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
-#
-#    def __repr__(self):
-#        return 'Version(%d, desc=%d, version=%s)' % (self.version_id, self.description_id, self.version)

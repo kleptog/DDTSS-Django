@@ -381,35 +381,6 @@ ALTER SEQUENCE translation_tb_translation_id_seq OWNED BY translation_tb.transla
 
 
 --
--- Name: version_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE TABLE version_tb (
-    version_id integer NOT NULL,
-    version text NOT NULL,
-    description_id integer NOT NULL
-);
-
-
---
--- Name: version_tb_version_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
---
-
-CREATE SEQUENCE version_tb_version_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: version_tb_version_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
---
-
-ALTER SEQUENCE version_tb_version_id_seq OWNED BY version_tb.version_id;
-
-
---
 -- Name: description_tag_id; Type: DEFAULT; Schema: public; Owner: ddtp
 --
 
@@ -477,13 +448,6 @@ ALTER TABLE suggestion_tb ALTER COLUMN suggestion_id SET DEFAULT nextval('sugges
 --
 
 ALTER TABLE translation_tb ALTER COLUMN translation_id SET DEFAULT nextval('translation_tb_translation_id_seq'::regclass);
-
-
---
--- Name: version_id; Type: DEFAULT; Schema: public; Owner: ddtp
---
-
-ALTER TABLE version_tb ALTER COLUMN version_id SET DEFAULT nextval('version_tb_version_id_seq'::regclass);
 
 
 --
@@ -572,14 +536,6 @@ ALTER TABLE ONLY suggestion_tb
 
 ALTER TABLE ONLY translation_tb
     ADD CONSTRAINT translation_tb_pkey PRIMARY KEY (translation_id);
-
-
---
--- Name: version_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: ddtp; Tablespace: 
---
-
-ALTER TABLE ONLY version_tb
-    ADD CONSTRAINT version_tb_pkey PRIMARY KEY (version_id);
 
 
 --
@@ -758,20 +714,6 @@ CREATE UNIQUE INDEX translation_tb_2_idx ON translation_tb USING btree (descript
 
 
 --
--- Name: version_tb_1_idx; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE INDEX version_tb_1_idx ON version_tb USING btree (description_id);
-
-
---
--- Name: version_tb_3_idx; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
---
-
-CREATE UNIQUE INDEX version_tb_3_idx ON version_tb USING btree (description_id, version);
-
-
---
 -- Name: $1; Type: FK CONSTRAINT; Schema: public; Owner: ddtp
 --
 
@@ -817,14 +759,6 @@ ALTER TABLE ONLY package_version_tb
 
 ALTER TABLE ONLY part_description_tb
     ADD CONSTRAINT part_description_tb_description_id_fkey FOREIGN KEY (description_id) REFERENCES description_tb(description_id);
-
-
---
--- Name: version_tb_description_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ddtp
---
-
-ALTER TABLE ONLY version_tb
-    ADD CONSTRAINT version_tb_description_id_fkey FOREIGN KEY (description_id) REFERENCES description_tb(description_id);
 
 
 --
