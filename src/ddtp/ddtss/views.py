@@ -532,6 +532,10 @@ def view_review(session, request, language, description_id):
     if not trans:
         raise Http404()
 
+    if trans.state == PendingTranslation.STATE_PENDING_TRANSLATION:
+        session.commit()
+        return show_message_screen(request, 'Still need to translated, redirecting to translation screen', 'ddtss_translate', language, description_id)
+
     if trans.state != PendingTranslation.STATE_PENDING_REVIEW:
         session.commit()
         return show_message_screen(request, 'Translation not ready for review', 'ddtss_index_lang', language)
