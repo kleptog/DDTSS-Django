@@ -156,6 +156,7 @@ class Command(NoArgsCommand):
         print "%d packages total" % len(packages)
 
         save_package = []
+        messages = []
         for package_key, package in packages.iteritems():
           try:
             if not hasattr(package,'data'):  # Incomplete record
@@ -197,6 +198,20 @@ class Command(NoArgsCommand):
                 package.firstupdate = now
             package.language = languages[package_key[0]]
 
+            if package.comment:
+                if package.language:
+                    message = ddtss.Messages(
+                        message=package.comment,
+                        actionstring="old comments",
+                        to_user=None,
+                        language=package_key[0],
+                        for_description=package.description_id,
+                        from_user=None,
+                        in_reply_to=None,
+                        timestamp=int(time.time()))
+                    messages.append(message)
+            package.comment="";
+
             save_package.append(package_key)
           except Exception, e:
             print "Package %r: %s" % (package_key, e)
@@ -206,12 +221,18 @@ class Command(NoArgsCommand):
         # Update languages
         for lang in languages:
             languages[lang].language = lang
+            languages[lang].milestone_high = "rtrn:" + lang
+            languages[lang].milestone_medium = "part:1-" + lang
+            languages[lang].milestone_low = "popc:sid-500"
             if languages[lang].fullname is None:
                 languages[lang].fullname = lang_names.get(languages[lang].language,'')
         session.add_all(languages.values())
 
         # Update users
         session.add_all(save_users)
+
+        # Update messages
+        session.add_all(messages)
 
         # Update packages
         session.add_all( (packages[p] for p in save_package) )

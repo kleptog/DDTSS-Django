@@ -43,7 +43,8 @@ CREATE TABLE messages_tb (
     from_user character varying,
     in_reply_to integer,
     "timestamp" integer NOT NULL,
-    message character varying NOT NULL
+    message character varying NOT NULL,
+    actionstring character varying DEFAULT ''
 );
 
 
