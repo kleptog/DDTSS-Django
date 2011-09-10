@@ -79,6 +79,10 @@ go</font>
   <li><tt># Versions: {{descr.nice_package_versions}}</tt>
 </li>
 </ul>
+
+<table>
+<tr><td valign="top">
+
 {% if forreview %}
 <form method="post" action="{% url ddtss_forreview lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% else %}
@@ -189,9 +193,11 @@ actually returning UTF-8 as promised -->
 <input type="hidden" name="_charset_" value=""  />
 </form>
 
+</td><td valign="top">
+
 <!-- new description comments per Messages -->
 <div class=messages>
-    <h2>Comments for this description <div class="help" title="Messages from other users for this description">?</div>  </h2>
+    <h2>Comments for this description</h2>
     {% for message in descr_messages %}
     {% if forloop.first %}
     <ul>
@@ -226,6 +232,9 @@ actually returning UTF-8 as promised -->
     {% endfor %}
 </div>
 <!-- end new description comments per Messages -->
+
+</td>
+</table>
 
 </body>
 </html>
