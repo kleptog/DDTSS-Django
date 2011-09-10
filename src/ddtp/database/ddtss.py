@@ -444,13 +444,13 @@ class PendingTranslation(Base):
             part_trans.part = translated_parts.pop(0)
 
         # Add a message indicating acceptance
-        message = "Translation Accepted\n" \
-                  "Translators/Reviewers: %s\n" \
+        message = "Translators/Reviewers: %s\n" \
                   "Description: %s\n" \
                   "%s\n" % (", ".join([self.owner_username] + [r.username for r in self.reviews]),
                   self.short,
                   self.long)
         message = Messages(message=message,
+                           actionstring="Translation Accepted",
                            language=self.language_ref,
                            for_description=self.description_id,
                            timestamp=int(time.time()))
@@ -518,6 +518,7 @@ class Messages(Base):
     in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)
+    actionstring = Column(String, default="")
 
     description = relationship("Description")
     parent = relation('Messages', remote_side=[message_id], backref="children")

@@ -203,10 +203,15 @@ actually returning UTF-8 as promised -->
     <ul>
     {% endif %}
         <li><form method="post" id="msg{{message.message_id}}" action="{% url ddtss_message %}" enctype="multipart/form-data" accept-charset="utf-8" >
-            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            {% if message.message %}
+            <b title="{{message.parent.message}}">{{message.message|linebreaksbr}}</b><br>
+            {% endif %}
             <span style="font-size:80%">
+                {{message.actionstring}}
+                {% if message.from_user %}
                 from {{message.from_user}} <input type="submit" value="(Write a reply)">
-                at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">DEL</a>
+                {% endif %}
+                at {{message.datetime|date:"Y-m-d H:i:s"}} {% if message.message %}<a href="{% url ddtss_delmessage message.message_id %}">DEL</a>{% endif %}
                 <input type="hidden" name="to_user" value="{{message.from_user}}"  />
                 <input type="hidden" name="in_reply_to" value="{{message.message_id}}"  />
                 <input type="hidden" name="for_description" value="{{descr.description_id}}"  />

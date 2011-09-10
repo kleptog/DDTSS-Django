@@ -147,6 +147,17 @@ def view_index_lang(session, request, language):
             if language not in description.translation or force:
                 trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
                 if not trans:
+                    message = Messages(
+                            message="",
+                            actionstring="fetched",
+                            to_user=None,
+                            language=language,
+                            for_description=description_id,
+                            from_user=user.username,
+                            in_reply_to=None,
+                            timestamp=int(time.time()))
+                    session.add(message)
+
                     trans = PendingTranslation(
                             description_id=description_id,
                             language=lang,
@@ -346,6 +357,17 @@ def view_translate(session, request, language, description_id):
     # Select FOR UPDATE, to avoid concurrency issues.
     trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
     if not trans:
+        message = Messages(
+                message="",
+                actionstring="fetched",
+                to_user=None,
+                language=language,
+                for_description=description_id,
+                from_user=user.username,
+                in_reply_to=None,
+                timestamp=int(time.time()))
+        session.add(message)
+
         trans = PendingTranslation(
                 description_id=description_id,
                 language=lang,
@@ -391,6 +413,22 @@ def view_translate(session, request, language, description_id):
             # If no longer pending translation, add one to counter
             if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
                 user.counttranslations += 1
+
+            message = ""
+            if trans.comment:
+                message = trans.comment
+                trans.comment = None
+
+            message = Messages(
+                    message=message,
+                    actionstring="text updated",
+                    to_user=None,
+                    language=language,
+                    for_description=description_id,
+                    from_user=user.username,
+                    in_reply_to=None,
+                    timestamp=int(time.time()))
+            session.add(message)
 
             session.commit()
             return show_message_screen(request, 'Translation submitted', 'ddtss_index_lang', language)
@@ -557,6 +595,20 @@ def view_review(session, request, language, description_id):
 
         if form.cleaned_data['nothing']:
             trans.comment = form.cleaned_data['comment']
+
+            if trans.comment:
+                message = Messages(
+                        message=trans.comment,
+                        to_user=None,
+                        language=language,
+                        for_description=description_id,
+                        from_user=user.username,
+                        in_reply_to=None,
+                        timestamp=int(time.time()))
+                session.add(message)
+
+                trans.comment = None
+
             trans.lastupdate=int(time.time())
             session.commit()
             return show_message_screen(request, 'Changed comment only', 'ddtss_index_lang', language)
@@ -579,6 +631,22 @@ def view_review(session, request, language, description_id):
             user.countreviews += 1
             trans.lastupdate=int(time.time())
 
+            message = ""
+            if trans.comment:
+                message = trans.comment
+                trans.comment = None
+
+            message = Messages(
+                    message=message,
+                    actionstring="reviewed",
+                    to_user=None,
+                    language=language,
+                    for_description=description_id,
+                    from_user=user.username,
+                    in_reply_to=None,
+                    timestamp=int(time.time()))
+            session.add(message)
+
             if lang.translation_model.translation_accepted(trans):
                 # Translation has been accepted, yay!
                 trans.accept_translation()
@@ -596,6 +664,23 @@ def view_review(session, request, language, description_id):
             # Clear reviews
             for review in trans.reviews:
                 session.delete(review)
+
+            message = ""
+            if trans.comment:
+                message = trans.comment
+                trans.comment = None
+
+            message = Messages(
+                    message=message,
+                    actionstring="text updated",
+                    to_user=None,
+                    language=language,
+                    for_description=description_id,
+                    from_user=user.username,
+                    in_reply_to=None,
+                    timestamp=int(time.time()))
+            session.add(message)
+
             session.commit()
             return show_message_screen(request, 'Translation updated, review process restarted', 'ddtss_index_lang', language)
 
@@ -785,7 +870,10 @@ def view_delmessage(session, request, message_id ):
     if user.superuser \
             or user.username == message.to_user \
             or user.username == message.from_user:
-        session.delete(message)
+        if message.actionstring:
+            message.message=""
+        else:
+            session.delete(message)
         session.commit()
 
         return redirect(redirect_to)
