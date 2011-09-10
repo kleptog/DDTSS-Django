@@ -206,6 +206,9 @@ class Command(NoArgsCommand):
         # Update languages
         for lang in languages:
             languages[lang].language = lang
+            languages[lang].milestone_high = "rtrn:" + lang
+            languages[lang].milestone_medium = "part:1-" + lang
+            languages[lang].milestone_low = "popc:sid-500"
             if languages[lang].fullname is None:
                 languages[lang].fullname = lang_names.get(languages[lang].language,'')
         session.add_all(languages.values())
