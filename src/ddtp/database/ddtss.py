@@ -550,3 +550,11 @@ class Messages(Base):
         return session.query(cls) \
                           .filter(cls.to_user==username) \
                           .filter(cls.from_user!=None)
+
+    @classmethod
+    def involveddescriptions(cls, session, username):
+        return session.query(cls.for_description) \
+                          .filter(cls.from_user==username) \
+                          .filter(cls.for_description!=None) \
+                          .distinct()
+

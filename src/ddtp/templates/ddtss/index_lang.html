@@ -287,6 +287,7 @@ y2axis: {show:1 },
 {% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"> {% endif %}
 {% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"> {% endif %}
 {% endfor %}
+    {% if trans.description.description_id in involveddescriptions %}<img src="/media/red-star.svg" alt="Involved" title="Involved" height="15"> {% endif %}
 
 <span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.is_locked %} (locked){% endif %}</li>
@@ -348,6 +349,7 @@ y2axis: {show:1 },
 
 <span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.reviews|length %}(had {{trans.reviews|length}} review){% else %}(needs initial review){% endif %}
+    {% if trans.description.description_id in involveddescriptions %}<img src="/media/red-star.svg" alt="Involved" title="Involved" height="15"> {% endif %}
 
     </li>
 {% if forloop.last %}</ol>{% endif %}
@@ -435,6 +437,7 @@ y2axis: {show:1 },
 {% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
 {% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
 {% endfor %}
+    {% if trans.description.description_id in involveddescriptions %}<img src="/media/red-star.svg" alt="Involved" title="Involved" height="15"> {% endif %}
 
 <span name="showage" style="display:none"> ({{trans.age}})</span>
     {% if trans.owner_username == user.username %}(owner){% endif %}</li>

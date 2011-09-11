@@ -295,6 +295,8 @@ def view_index_lang(session, request, language):
     if 'lang_milestone_low' in newmilestones:
         milestones.append(newmilestones['lang_milestone_low'])
 
+    involveddescriptions = [x for x, in Messages.involveddescriptions(session, user.username).all()]
+
     response = render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
         user=user,
@@ -302,6 +304,7 @@ def view_index_lang(session, request, language):
         pending_translations=pending_translations,
         pending_review=pending_review,
         reviewed=reviewed,
+        involveddescriptions=involveddescriptions,
         milestones=milestones,
         global_messages=global_messages,
         team_messages=team_messages,
