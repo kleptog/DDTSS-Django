@@ -204,11 +204,11 @@ class PackageVersion(Base):
 
 class Packages(Base):
     """ List of packages. Not quite sure what the purpose of this is that
-    isn't covered by PackageVersions. 
-    
+    isn't covered by PackageVersions.
+
     This table is disappear and only used as tmp table for the daily
     import! Don't use it!
-    
+
     """
     __tablename__ = 'packages_tb'
 
