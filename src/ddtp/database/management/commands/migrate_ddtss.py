@@ -104,7 +104,7 @@ keymap = (
 )
 
 class Command(NoArgsCommand):
-    help = "Generates a new SECRET_KEY."
+    help = "Migrates the DDTSS table to the new DDTSS database structure."
 
     requires_model_validation = False
     can_import_settings = False
