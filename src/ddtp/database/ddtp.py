@@ -4,7 +4,7 @@
 
 import hashlib
 from .db import Base, with_db_session
-from sqlalchemy.orm import relationship, collections, aliased
+from sqlalchemy.orm import relationship, collections, aliased, backref
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 
@@ -310,7 +310,7 @@ class DescriptionMilestone(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
     milestone = Column(String, nullable=False)
 
-    description = relationship(Description, backref='milestones')
+    description = relationship(Description, backref=backref('milestones', cascade='all, delete-orphan'))
 
     def Get_flot_data(self,language):
         """ Returns all versions in a nice format """
