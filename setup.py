@@ -11,4 +11,5 @@ setup(name="ddtp", version="0.1",
       install_requires=['setuptools', 
                         'psycopg2', 
                         'SQLalchemy',
+                        'python-debian',
                         'django-debug-toolbar'])
