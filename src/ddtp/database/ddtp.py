@@ -35,7 +35,7 @@ class DescriptionTag(Base):
     date_end = Column(Date)
 
     def __repr__(self):
-        return 'DescriptionTag(%d, descr=%d, tag=%r, %s-%s)' % (self.description_tag_id, self.description_id, self.tag, self.date_begin.strftime("%Y-%m-%d"), self.date_end.strftime("%Y-%m-%d"))
+        return 'DescriptionTag(%s, descr=%s, tag=%r, %s-%s)' % (self.description_tag_id, self.description_id, self.tag, self.date_begin.strftime("%Y-%m-%d"), self.date_end.strftime("%Y-%m-%d"))
 
 class ActiveDescription(Base):
     """ Record is present of description is active """
@@ -44,7 +44,7 @@ class ActiveDescription(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
 
     def __repr__(self):
-        return 'ActiveDescription(%d)' % self.description_id
+        return 'ActiveDescription(%s)' % self.description_id
 
 class Description(Base):
     """ Main description table. Note that a majority of the fields in this
@@ -171,7 +171,7 @@ class Description(Base):
         return result
 
     def __repr__(self):
-        return 'Description(%d, package=%r, source=%r)' % (self.description_id, self.package, self.source)
+        return 'Description(%s, package=%r, source=%r)' % (self.description_id, self.package, self.source)
 
 class Owner(Base):
     """ This table is for tracking owner's, that is, who the description was
@@ -187,7 +187,7 @@ class Owner(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
 
     def __repr__(self):
-        return 'Owner(%d, owner=%r, lang=%r, descr=%d)' % (self.owner_id, self.owner, self.language, self.description_id)
+        return 'Owner(%s, owner=%r, lang=%r, descr=%s)' % (self.owner_id, self.owner, self.language, self.description_id)
 
 class PackageVersion(Base):
     """ Tracks which versions of each package use which description """
@@ -200,7 +200,7 @@ class PackageVersion(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
 
     def __repr__(self):
-        return 'PackageVersion(%d, package=%s (%s), descr=%d)' % (self.package_version_id, self.package, self.version, self.description_id)
+        return 'PackageVersion(%s, package=%s (%s), descr=%s)' % (self.package_version_id, self.package, self.version, self.description_id)
 
 class Packages(Base):
     """ List of packages. Not quite sure what the purpose of this is that
@@ -226,7 +226,7 @@ class Packages(Base):
     description_md5 = Column(String, nullable=False)
 
     def __repr__(self):
-        return 'Packages(%d, package=%r, source=%r, version=%r)' % (self.packages_id, self.package, self.source, self.version)
+        return 'Packages(%s, package=%r, source=%r, version=%r)' % (self.packages_id, self.package, self.source, self.version)
 
 class PartDescription(Base):
     """ Untranslated parts. The actual string comes from the Description table """
@@ -250,7 +250,7 @@ class PartDescription(Base):
         return Session.object_session(self).query(PartDescription).filter_by(part_md5=self.part_md5).all()
 
     def __repr__(self):
-        return 'PartDescription(%d, descr=%d, %s)' % (self.part_description_id, self.description_id, self.part_md5)
+        return 'PartDescription(%s, descr=%s, %s)' % (self.part_description_id, self.description_id, self.part_md5)
 
 class Part(Base):
     """ Translated parts """
@@ -262,7 +262,7 @@ class Part(Base):
     language = Column(String, nullable=False)
 
     def __repr__(self):
-        return 'Part(%d, %s, lang=%s)' % (self.part_id, self.part_md5, self.language)
+        return 'Part(%s, %s, lang=%s)' % (self.part_id, self.part_md5, self.language)
 
 # There is a ppart table but it has never been used.
 
@@ -288,7 +288,7 @@ class Translation(Base):
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
 
     def __repr__(self):
-        return 'Translation(%d, descr=%d, lang=%s)' % (self.translation_id, self.description_id, self.language)
+        return 'Translation(%s, descr=%s, lang=%s)' % (self.translation_id, self.description_id, self.language)
 
 class Statistic(Base):
     """ Records for statistic data """
@@ -300,7 +300,7 @@ class Statistic(Base):
     stat = Column(String, nullable=False)
 
     def __repr__(self):
-        return 'Statistic(value=%d, date=%d, stat=%s)' % (self.value, self.date, self.stat)
+        return 'Statistic(value=%s, date=%s, stat=%s)' % (self.value, self.date, self.stat)
 
 class DescriptionMilestone(Base):
     """ Records for referenc description and milestone """
@@ -340,7 +340,7 @@ class DescriptionMilestone(Base):
         return output_prozt+output_total+output_trans
 
     def __repr__(self):
-        return 'DescriptionMilestone(%d, milestone=%s, description_id=%d)' % (self.description_milestone_id, self.milestone, self.description_id)
+        return 'DescriptionMilestone(%s, milestone=%s, description_id=%s)' % (self.description_milestone_id, self.milestone, self.description_id)
 
 class CollectionMilestone(Base):
     """ Records for referenc milestone collection"""
@@ -352,5 +352,5 @@ class CollectionMilestone(Base):
     nametype = Column(Integer, nullable=False)
 
     def __repr__(self):
-        return 'CollectionMilestone(%d, collection=%s, name=%s, nametype=%d)' % (self.collection_milestone_id, self.collection, self.name, self.nametype)
+        return 'CollectionMilestone(%s, collection=%s, name=%s, nametype=%s)' % (self.collection_milestone_id, self.collection, self.name, self.nametype)
 
