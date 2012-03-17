@@ -317,6 +317,35 @@ ALTER SEQUENCE ppart_tb_ppart_id_seq OWNED BY ppart_tb.ppart_id;
 
 
 --
+-- Name: statistic_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+CREATE TABLE statistic_tb (
+    statistic_id integer NOT NULL,
+    value integer NOT NULL,
+    date date NOT NULL,
+    stat character varying NOT NULL
+);
+
+--
+-- Name: statistic_tb_statistic_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
+--
+
+CREATE SEQUENCE statistic_tb_statistic_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+--
+-- Name: statistic_tb_statistic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
+--
+
+ALTER SEQUENCE statistic_tb_statistic_id_seq OWNED BY statistic_tb.statistic_id;
+
+
+--
 -- Name: suggestion_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
 --
 
@@ -437,6 +466,13 @@ ALTER TABLE ppart_tb ALTER COLUMN ppart_id SET DEFAULT nextval('ppart_tb_ppart_i
 
 
 --
+-- Name: statistic_id; Type: DEFAULT; Schema: public; Owner: ddtp
+--
+
+ALTER TABLE ONLY statistic_tb ALTER COLUMN statistic_id SET DEFAULT nextval('statistic_tb_statistic_id_seq'::regclass);
+
+
+--
 -- Name: suggestion_id; Type: DEFAULT; Schema: public; Owner: ddtp
 --
 
@@ -520,6 +556,14 @@ ALTER TABLE ONLY ppart_tb
 
 ALTER TABLE ONLY ppart_tb
     ADD CONSTRAINT ppart_tb_ppart_md5_key UNIQUE (ppart_md5);
+
+
+--
+-- Name: statistic_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+ALTER TABLE ONLY statistic_tb
+    ADD CONSTRAINT statistic_tb_pkey PRIMARY KEY (statistic_id);
 
 
 --
