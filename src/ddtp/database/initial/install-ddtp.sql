@@ -71,13 +71,6 @@ ALTER SEQUENCE description_milestone_tb_description_milestone_id_seq OWNED BY de
 
 
 --
--- Name: description_milestone_tb_description_milestone_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ddtp
---
-
-SELECT pg_catalog.setval('description_milestone_tb_description_milestone_id_seq', 2978269, true);
-
-
---
 -- Name: description_milestone_id; Type: DEFAULT; Schema: public; Owner: ddtp
 --
 
