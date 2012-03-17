@@ -83,6 +83,22 @@ $ bin/django runserver
 
 There is now a test server running on http://localhost:8000/
 
+This should let you browse more of the functionality, but if you want to see
+everything you will need to make yourself superuser. To do that create an
+account using the interface (don't worry about the email check, that's not
+implemented yet).
+
+After you've done that, log in to the database to make yourself superuser.
+
+$ psql ddtp
+psql (8.4.11)
+ddtp=# update users_tb set superuser=true;
+UPDATE 1
+
+Once you have done this you will be able to access the admin screen. From
+there you can make yourself language coordinator and so see the coordinator
+screens.
+
 Development Tips
 ================
 
