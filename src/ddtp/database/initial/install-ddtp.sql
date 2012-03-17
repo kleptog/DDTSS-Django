@@ -15,6 +15,35 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: collection_milestone_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+CREATE TABLE collection_milestone_tb (
+    collection_milestone_id integer NOT NULL,
+    collection character varying NOT NULL,
+    name character varying NOT NULL,
+    nametype integer NOT NULL
+);
+
+--
+-- Name: collection_milestone_tb_collection_milestone_id_seq; Type: SEQUENCE; Schema: public; Owner: ddtp
+--
+
+CREATE SEQUENCE collection_milestone_tb_collection_milestone_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+--
+-- Name: collection_milestone_tb_collection_milestone_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ddtp
+--
+
+ALTER SEQUENCE collection_milestone_tb_collection_milestone_id_seq OWNED BY collection_milestone_tb.collection_milestone_id;
+
+
+--
 -- Name: description_milestone_tb; Type: TABLE; Schema: public; Owner: ddtp; Tablespace:
 --
 
@@ -410,6 +439,13 @@ ALTER SEQUENCE translation_tb_translation_id_seq OWNED BY translation_tb.transla
 
 
 --
+-- Name: collection_milestone_id; Type: DEFAULT; Schema: public; Owner: ddtp
+--
+
+ALTER TABLE ONLY collection_milestone_tb ALTER COLUMN collection_milestone_id SET DEFAULT nextval('collection_milestone_tb_collection_milestone_id_seq'::regclass);
+
+
+--
 -- Name: description_tag_id; Type: DEFAULT; Schema: public; Owner: ddtp
 --
 
@@ -484,6 +520,14 @@ ALTER TABLE suggestion_tb ALTER COLUMN suggestion_id SET DEFAULT nextval('sugges
 --
 
 ALTER TABLE translation_tb ALTER COLUMN translation_id SET DEFAULT nextval('translation_tb_translation_id_seq'::regclass);
+
+
+--
+-- Name: collection_milestone_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+ALTER TABLE ONLY collection_milestone_tb
+    ADD CONSTRAINT collection_milestone_tb_pkey PRIMARY KEY (collection_milestone_id);
 
 
 --
