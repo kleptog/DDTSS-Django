@@ -189,7 +189,8 @@ CREATE TABLE package_version_tb (
     package_version_id integer NOT NULL,
     package text NOT NULL,
     version text NOT NULL,
-    description_id integer NOT NULL
+    description_id integer NOT NULL,
+    source text
 );
 
 
@@ -708,6 +709,13 @@ CREATE UNIQUE INDEX package_version_tb_3_idx ON package_version_tb USING btree (
 --
 
 CREATE INDEX package_version_tb_4_idx ON package_version_tb USING btree (package, version);
+
+
+--
+-- Name: package_version_tb_5_idx; Type: INDEX; Schema: public; Owner: ddtp; Tablespace: 
+--
+
+CREATE INDEX package_version_tb_5_idx ON package_version_tb USING btree (source);
 
 
 --

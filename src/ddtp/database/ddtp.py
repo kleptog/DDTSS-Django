@@ -198,6 +198,7 @@ class PackageVersion(Base):
     package = Column(String, nullable=False)
     version = Column(String, nullable=False)
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
+    source = Column(String)
 
     def __repr__(self):
         return 'PackageVersion(%s, package=%s (%s), descr=%s)' % (self.package_version_id, self.package, self.version, self.description_id)
