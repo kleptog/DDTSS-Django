@@ -27,7 +27,7 @@ ADMIN_MEDIA_PREFIX = '/admin_media/'
 
 # Use the generate_secret_key command to make the key
 try:
-    SECRET_FILE = open(os.path.join(os.path.dirname(__file__), "secret.key")).read()
+    SECRET_KEY = open(os.path.join(os.path.dirname(__file__), "secret.key")).read()
 except IOError:
     pass
 
