@@ -103,7 +103,11 @@ class Description(Base):
         get the parts in the database """
         parts = self.get_description_parts()
 
-        return [(p[0], p[1], Session.object_session(self).query(PartDescription).filter_by(part_md5=p[1]).first()) for p in parts]
+        return [(p[0], p[1],
+                 Session.object_session(self).
+                         query(PartDescription).
+                         filter_by(part_md5=p[1],description_id=self.description_id).
+                         first()) for p in parts]
 
     def get_potential_fuzzy_matches(self, lang):
         """ Returns a list of pairs (text,Parts) which may be fuzzy matches
