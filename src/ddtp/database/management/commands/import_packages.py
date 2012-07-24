@@ -90,10 +90,12 @@ class Command(BaseCommand):
             description=self.session.query(ddtp.Description).filter(ddtp.Description.description_md5==md5).first()
             self.stats['fetch-descr'] += 1
 
+        package = para['Package']
+        source = para.get('Source', package)  # Source defaults to Package
+        version = para['Version']
+
         if not description:
             # New description, everything new
-            package = para['Package']
-            source = para.get('Source', package)  # Source defaults to Package
             description = ddtp.Description(description_md5=md5,
                                            description=text,
                                            package=package,   # These fields will go
@@ -124,12 +126,14 @@ class Command(BaseCommand):
 
         # add PackageVersions
         for package_version in description.package_versions:
-            if package_version.package == para['Package'] and \
-               package_version.version == para['Version']:
+            if package_version.package == package and \
+               package_version.version == version:
+                package_version.source = source
                 break
         else:
-            package_version = ddtp.PackageVersion(package=para['Package'],
-                                                  version=para['Version'])
+            package_version = ddtp.PackageVersion(package=package,
+                                                  version=version,
+                                                  source=source)
             description.package_versions.append(package_version)
             self.session.add(package_version)
             self.stats['new-package_version'] += 1
