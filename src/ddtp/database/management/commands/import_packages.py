@@ -79,7 +79,7 @@ class Command(BaseCommand):
             md5 = para['Description-md5']
             text = self.descr_text_map.get(md5)
             if not text:
-                raise CommandError("Couldn't find description for md5 %s, did you provide the correct Translations-en file?")
+                raise CommandError("Couldn't find description for md5 %s, did you provide the correct Translations-en file?" % md5)
         else:
             text = para['Description'] + "\n"
             md5 = hashlib.md5(text.encode('utf-8')).hexdigest()
