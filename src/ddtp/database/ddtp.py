@@ -7,6 +7,7 @@ from .db import Base, with_db_session
 from sqlalchemy.orm import relationship, collections, aliased, backref
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
+from sqlalchemy.schema import FetchedValue
 
 def description_to_parts(descr):
     """ Function to convert a textual description into the various
@@ -106,8 +107,7 @@ class Description(Base):
         return [(p[0], p[1],
                  Session.object_session(self).
                          query(PartDescription).
-                         filter_by(part_md5=p[1],description_id=self.description_id).
-                         first()) for p in parts]
+                         get((self.description_id, p[1]))) for p in parts]
 
     def get_potential_fuzzy_matches(self, lang):
         """ Returns a list of pairs (text,Parts) which may be fuzzy matches
@@ -238,9 +238,10 @@ class PartDescription(Base):
 
     __tablename__ = 'part_description_tb'
 
-    part_description_id = Column(Integer, primary_key=True)
-    description_id = Column(Integer, ForeignKey('description_tb.description_id'), nullable=False)
-    part_md5 = Column(String, nullable=False)
+    # Note this is not the primary key listed by the database, here we use the natural key
+    part_description_id = Column(Integer, unique=True, server_default=FetchedValue())
+    description_id = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
+    part_md5 = Column(String, primary_key=True)
 
     def translations(self):
         """ Returns a dict of translations for with part, indexed by language """
