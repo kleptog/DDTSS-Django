@@ -4,7 +4,7 @@
 
 import hashlib
 from .db import Base, with_db_session
-from sqlalchemy.orm import relationship, collections, aliased, backref
+from sqlalchemy.orm import relationship, collections, aliased, backref, deferred
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
 from sqlalchemy.schema import FetchedValue
@@ -59,8 +59,8 @@ class Description(Base):
     description_md5 = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     prioritize = Column(Integer, nullable=False)
-    package = Column(String, nullable=False) # disappear, use package_version
-    source = Column(String, nullable=False) # disappear, use package_version
+    package = deferred(Column(String, nullable=False)) # to disappear, use package_version
+    source = deferred(Column(String, nullable=False))  # to disappear, use package_version
 
     owners = relationship('Owner', backref='description')
     package_versions = relationship('PackageVersion', backref='description')
