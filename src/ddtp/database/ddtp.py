@@ -71,6 +71,18 @@ class Description(Base):
     # Provides access to translations, as a dict
     translation = relationship('Translation', collection_class=collections.attribute_mapped_collection('language'))
 
+    def has_package_version(self, package, version):
+        """ Returns PackageVersion object if it exists, or None """
+        return Session.object_session(self).query(PackageVersion). \
+                       filter_by(package=package, version=version, description_id=self.description_id). \
+                       first()
+
+    def has_tag(self, tag):
+        """ Returns a DescriptionTag object if it exists, or None """
+        return Session.object_session(self).query(DescriptionTag). \
+                       filter_by(tag=tag, description_id=self.description_id). \
+                       first()
+
     def nice_package_versions(self):
         """ Returns all versions in a nice format """
         output = ""
@@ -103,6 +115,9 @@ class Description(Base):
         Note this calculates the parts, you can use the 'parts' property to
         get the parts in the database """
         parts = self.get_description_parts()
+
+        # Query the parts in one go, but use the identity to actually match them up
+        tmp = self.parts
 
         return [(p[0], p[1],
                  Session.object_session(self).

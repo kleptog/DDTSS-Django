@@ -110,31 +110,28 @@ class Command(BaseCommand):
         self.descr_map[md5] = description
 
         # update Tags
-        for tag_obj in description.tags:
-            if tag_obj.tag == tag:
-                if tag_obj.date_end < date.today():
-                    tag_obj.date_end = date.today()
-                    self.stats['upd-tag'] += 1
-                break
+        tag_obj = description.has_tag(tag)
+        if tag_obj:
+            if tag_obj.date_end < date.today():
+                tag_obj.date_end = date.today()
+                self.stats['upd-tag'] += 1
         else:
             description_tag = ddtp.DescriptionTag(tag=tag,
+                                                  description=description,
                                                   date_begin=date.today(),
                                                   date_end=date.today())
-            description.tags.append(description_tag)
             self.session.add(description_tag)
             self.stats['new-tag'] += 1
 
         # add PackageVersions
-        for package_version in description.package_versions:
-            if package_version.package == package and \
-               package_version.version == version:
-                package_version.source = source
-                break
+        package_version = description.has_package_version(package, version)
+        if package_version:
+            package_version.source = source
         else:
             package_version = ddtp.PackageVersion(package=package,
                                                   version=version,
+                                                  description=description,
                                                   source=source)
-            description.package_versions.append(package_version)
             self.session.add(package_version)
             self.stats['new-package_version'] += 1
 
