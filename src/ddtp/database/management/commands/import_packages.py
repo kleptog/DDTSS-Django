@@ -54,7 +54,10 @@ class Command(BaseCommand):
                 if 'Description-en' in para:
                     self._handle_translation_en(para)
                 if 'Version' in para:
-                    self._handle_packages(tag, para)
+                    try:
+                        self._handle_packages(tag, para)
+                    except Exception, e:
+                        self.stdout.write("Problem processing %r\n%s\n" % (para, e))
             self.session.commit()
 
         self.stdout.write("Processed descriptions %d, unique %d, new %d\n" %
