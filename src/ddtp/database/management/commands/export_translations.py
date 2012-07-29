@@ -6,7 +6,7 @@ import hashlib
 import subprocess
 
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from debian.deb822 import Deb822
 from ddtp.database import db, ddtp, ddtss
 from django.core.management.base import BaseCommand, CommandError
@@ -36,8 +36,9 @@ class Command(BaseCommand):
                                           filter(ddtp.Translation.description_id == ddtp.Description.description_id). \
                                           filter(ddtp.Description.description_id == ddtp.DescriptionTag.description_id). \
                                           filter(ddtp.Translation.language == lang). \
-                                          filter(ddtp.DescriptionTag.date_end == date.today()). \
+                                          filter(ddtp.DescriptionTag.date_end >= date.today()-timedelta(days=7)). \
                                           filter(ddtp.DescriptionTag.tag == tag). \
+                                          order_by(ddtp.Description.package). \
                                           yield_per(100):
             trans_para = Deb822()
             trans_para['Package'] = descr.package
