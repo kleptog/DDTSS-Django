@@ -132,6 +132,7 @@ CREATE TABLE users_tb (
     lastseen integer NOT NULL,
     lastlanguage character varying,
     superuser boolean NOT NULL DEFAULT false,
+    openid text,
     milestone character varying
 );
 

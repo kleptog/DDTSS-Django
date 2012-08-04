@@ -117,6 +117,7 @@ class Users(Base):
     lastseen = Column(Integer, nullable=False)   # timestamp
     lastlanguage_ref = Column('lastlanguage', String, ForeignKey('languages_tb.language'))
     superuser = Column(Boolean, nullable=False, default=False)
+    openid = Column(String, nullable=True)
     milestone = Column(String, ForeignKey('description_milestone_tb.milestone'))
 
     lastlanguage = relationship(Languages)

@@ -12,4 +12,5 @@ setup(name="ddtp", version="0.1",
                         'psycopg2', 
                         'SQLalchemy',
                         'python-debian',
+                        'django_openid-consumer',
                         'django-debug-toolbar'])
