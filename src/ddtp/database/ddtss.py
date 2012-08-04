@@ -143,8 +143,12 @@ class Users(Base):
         if hmac.new(settings.SECRET_KEY, s).hexdigest() != digest:
             return None
 
-        # Received signed cookie, parse it into new user object
-        v = s.split(":")
+        # Received signed cookie, parse it into new user object.
+
+        # Note: while usernames cannot contain colons, we also put IP
+        # addresses in there, and IPv6 addresses can contain colons.  So we
+        # use rsplit to work around that.
+        v = s.rsplit(":", 3)
         return Users(username=v[0],
                     countreviews=int(v[1]),
                     counttranslations=int(v[2]),
