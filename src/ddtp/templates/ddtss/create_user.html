@@ -11,12 +11,11 @@
 {% include "navigation.html" %}
 <h1>DDTSS create login</h1>
 <p>
-A login on the DDTSS is only used so you can keep the status of what you've
-reviewed between machines.  Normally the system tries to guess if you're
-coming from the same machine.  and if that's the case, you do not need a
-login.  If you keep using different machines however, a login may be useful.
+A login on the DDTSS is not in general required. However, certain language
+teams may require a login to be able to contribute.
 <p>
-Note: Some languages require a login to translate and/or review.
+If you don't have a login the system tries to keep stats in a cookie, so if
+you keep using different machines, a login may be useful.
 </p>
 <form method="post" action="{% url ddtss_create_user %}" enctype="multipart/form-data">
 <table id="create_table">
@@ -25,6 +24,13 @@ Note: Some languages require a login to translate and/or review.
 <input type="submit" name="submit" value="Submit" />
 <input type="submit" name="cancel" value="Cancel" />
 </form>
-<p>An email will be sent to the given address to confirm it. Any accounts not used for 14 days will be removed.</p>
+<br>Common OpenID providers:
+<ul>
+<li>https://www.google.com/accounts/o8/id
+<li>http://{username}.livejournal.com/
+<li>http://{username}.wordpress.com/
+<li>http://{username}.blogspot.com/
+<li>http://facebook-openid.appspot.com/
+</ul>
 </body>
 </html>

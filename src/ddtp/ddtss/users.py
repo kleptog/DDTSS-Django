@@ -9,6 +9,7 @@ import time
 
 from django import forms
 from django.shortcuts import render_to_response, redirect
+from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib import messages
 from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, DescriptionMilestone
@@ -16,18 +17,17 @@ from ddtp.database.ddtp import with_db_session, CollectionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
 from urlparse import urlsplit
 
+import django_openid_consumer.views
+
 class UserCreationForm(forms.Form):
     """
     A form that creates a user, with no privileges, from the given username and password.
     """
-    email = forms.EmailField(label='Email address')
     username = forms.RegexField(label="Alias", max_length=30, regex=r'^[\w.@+-]+$',
         help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Retype password", widget=forms.PasswordInput,
-        help_text = "Enter the same password as above, for verification.")
     realname = forms.CharField(label='Real Name')
+    openid_url = forms.CharField(label='OpenID URL')
 
     def __init__(self, session, *args, **kwargs):
         self.session = session
@@ -41,23 +41,6 @@ class UserCreationForm(forms.Form):
 
         return username
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        if self.session.query(Users).filter_by(email=email).first():
-            raise forms.ValidationError("A user with that email address already exists.")
-
-        return email
-
-    def clean_password2(self):
-        password1 = self.cleaned_data["password1"]
-        password2 = self.cleaned_data["password2"]
-
-        if password1 != password2:
-            raise forms.ValidationError("Entered passwords don't match")
-
-        return password1
-
 def generate_random_string(length):
     chars = string.letters + string.digits + "/_"
 
@@ -69,27 +52,20 @@ def view_create_user(session, request):
     if request.method == "POST":
         form = UserCreationForm(session=session, data=request.POST)
         if form.is_valid():
-            # Create user and add to database
-            user = Users(username=form.cleaned_data['username'],
-                         email=form.cleaned_data['email'],
-                         realname=form.cleaned_data['realname'],
-                         active=False,
-                         key=generate_random_string(16),
-                         lastseen=int(time.time()))
+            # What we do here is add the username to the session and then
+            # run the code as if they did a login request.  Then we run the
+            # code as if they did a login.  If the login succeeds we can
+            # create the user account.
+            request.session['new_user_info'] = (form.cleaned_data['username'], form.cleaned_data['realname'])
 
-            user.md5password = hashlib.md5(user.key + form.cleaned_data['password1']).hexdigest()
+            def on_failure(request, message):
+                return render_to_reponse("ddtss/create_user.html", {'message': message},
+                                         context_instance=RequestContext(request))
 
-            session.add(user)
-            session.commit()
+            return django_openid_consumer.views.begin(request,
+                                                      on_failure=on_failure,
+                                                      redirect_to=reverse('ddtss_create_user_complete'))
 
-            # Login user in
-            request.session['username'] = form.cleaned_data['username']
-
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
-
-            messages.success(request, "Account successfully created.")
-            return redirect('ddtss_index')
     else:
         form = UserCreationForm(session)
 
@@ -101,15 +77,64 @@ def view_create_user(session, request):
     return render_to_response("ddtss/create_user.html", context,
                               context_instance=RequestContext(request))
 
+@with_db_session
+def view_create_user_complete(session, request):
+    """ Called after the OpenID authentication completes """
+    def on_failure(request, message):
+        request.session.pop('new_user_info',None)
+        return render_to_reponse("ddtss/create_user.html", {'message': message},
+                                 context_instance=RequestContext(request))
+
+    def on_success(request, identity_url, openid_response):
+        if not request.session.get('new_user_info'):
+            return on_failure(request, "Failure (no new username)")
+
+        # Setup OpenID middleware (do we really need this?)
+        django_openid_consumer.views.default_on_success(request, identity_url, openid_response)
+
+        user = session.query(Users).filter(Users.openid == request.session['openids'][0].openid).first()
+
+        if user:
+            messages.error(request, "OpenID already associated with another user, not creating. Logging in instead.")
+            request.session['username'] = user.username
+            return redirect('ddtss_index')
+
+        # Create user and add to database
+        user = Users(username=request.session['new_user_info'][0],
+                     email='*',
+                     realname=request.session['new_user_info'][1],
+                     active=True,
+                     key=generate_random_string(16),
+                     lastseen=int(time.time()))
+
+        user.md5password = "*"
+        user.openid = request.session['openids'][0].openid
+
+        session.add(user)
+        session.commit()
+
+        # Login user in
+        request.session['username'] = user.username
+
+        if request.session.test_cookie_worked():
+            request.session.delete_test_cookie()
+
+        messages.success(request, "Account successfully created.")
+        return redirect('ddtss_index')
+
+    return django_openid_consumer.views.complete(request, on_failure=on_failure, on_success=on_success)
+
+
 class LoginForm(forms.Form):
     """
     A form for logging in
     """
-    username = forms.RegexField(label="Alias", max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label="Alias", max_length=30, regex=r'^[\w.@+-]+$', required=False,
         help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
-    password = forms.CharField(label="Password", widget=forms.PasswordInput,
+    password = forms.CharField(label="Password", widget=forms.PasswordInput, required=False,
         help_text = "Enter the same password as above, for verification.")
+    openid_url = forms.CharField(label='OpenID URL', required=False)
 
 @with_db_session
 def view_login(session, request):
@@ -124,14 +149,38 @@ def view_login(session, request):
             # Check if user is exists and password match
             user = session.query(Users).get(form.cleaned_data['username'])
 
+            # Kill any previous logins
+            django_openid_consumer.views.signout(request)
+            reqest.session.pop('username', None)
+
             if user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
                 # Login user in
                 request.session['username'] = form.cleaned_data['username']
 
                 messages.success(request, "Login successful.")
-                return redirect('ddtss_index')
+                success = True
             else:
                 messages.error(request, "Login failed.")
+                success = False
+
+            # If the user gave an OpenID URL, try to login with that
+            def on_failure(request, message):
+                messages.error(request, "OpenID login failed: %s" % message)
+
+                # If OpenID and normal login failed, go back to login page
+                if not success:
+                    return render_to_reponse("ddtss/login.html", {'form': form},
+                                             context_instance=RequestContext(request))
+                # Otherwise continue, the user is authenticated, albeit without OpenID
+                return redirect('ddtss_index')
+
+            if form.openid_url:
+                return django_openid_consumer.views.begin(request,
+                                                          on_failure=on_failure,
+                                                          redirect_to=reverse('ddtss_login_complete'))
+
+            if success:
+                return redirect('ddtss_index')
     else:
         form = LoginForm()
 
@@ -141,12 +190,57 @@ def view_login(session, request):
     return render_to_response("ddtss/login.html", context,
                               context_instance=RequestContext(request))
 
+@with_db_session
+def view_login_complete(session, request):
+    """ Called after the OpenID authentication completes """
+    def on_failure(request, message):
+        messages.error(request, "OpenID login failed: %s" % message)
+
+        if request.session['username']:
+            # User is authenticated, without OpenID
+            return redirect('ddtss_index')
+
+        return redirect("ddtss_login")
+
+    def on_success(request, identity_url, openid_response):
+        # Setup OpenID middleware (do we really need this?)
+        django_openid_consumer.views.default_on_success(request, identity_url, openid_response)
+
+        # Try to find user by openid
+        user = session.query(Users).filter(Users.openid == request.session['openids'][0].openid).first()
+
+        if user:
+            # If found, login user using that
+            request.session['username'] = user.username
+            messages.success(request, "OpenID login successful")
+        elif 'username' in request.session:
+            # User logged in with password as well OpenID
+            user = session.query(Users).get(request.session['username'])
+
+            user.openid = request.session['openids'][0].openid
+            messages.success(request, "OpenID succesfully linked with user")
+        else:
+            messages.error(request, "OpenID succesful, but no account")
+
+        session.commit()
+
+        if request.session.test_cookie_worked():
+            request.session.delete_test_cookie()
+
+        messages.success(request, "OpenID login succeeded.")
+        return redirect('ddtss_index')
+
+    return django_openid_consumer.views.complete(request, on_failure=on_failure, on_success=on_success)
+
+
 def view_logout(request):
     """ Handle user logout """
     if 'username' in request.session:
         # Login user in
         messages.success(request, "Logout successful.")
         del request.session['username']
+
+    django_openid_consumer.views.signout(request)
 
     response = redirect('ddtss_index')
 
