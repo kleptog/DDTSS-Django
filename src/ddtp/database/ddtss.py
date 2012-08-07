@@ -527,6 +527,7 @@ class Messages(Base):
 
     description = relationship("Description")
     parent = relation('Messages', remote_side=[message_id], backref="children")
+    language_obj = relationship('Languages')
 
     @property
     def datetime(self):
