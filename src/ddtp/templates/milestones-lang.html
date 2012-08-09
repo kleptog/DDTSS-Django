@@ -4,10 +4,8 @@
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
-<!-- see http://tablesorter.com/docs/ -->
-<!-- FIXME if we will use it, you should use own local links -->
-<script type="text/javascript" src="http://tablesorter.com/jquery-latest.js"></script>
-<script type="text/javascript" src="http://autobahn.tablesorter.com/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://cachedcommons.org/cache/jquery-table-sorter/2.0.3/javascripts/jquery-table-sorter-min.js"></script>
 <script type="text/javascript" id="js">$(document).ready(function() {
         // call the tablesorter plugin
         $("#table").tablesorter();
