@@ -1,14 +1,10 @@
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
-<head>
-<title>DDTSS</title>
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body>
-{% include "navigation.html" %}
+{% extends "ddtss/base_ddtss.html" %}
+
+{% block title %}
+DDTSS
+{% endblock %}
+
+{% block content %}
 <h1>DDTSS</h1>
 <p>
 The DDTSS is a web frontend to the DDTS.  It provides facilities to request
@@ -46,5 +42,4 @@ available via the email system (the DDTS).
 {% endif %}
 {% endfor %}
 </ul>
-</body>
-</html>
+{% endblock %}

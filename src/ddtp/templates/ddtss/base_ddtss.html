@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}ddtss/ddtss.css" />
+{% block ddtss_head %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+<a href="{% url ddtss_index %}">Team Page</a> |
+<a href="{% url ddt_stats_milestones_lang %}">Milestones</a> |
+{% if user.is_coordinator %}
+<a href="{% url ddtss_coordinate %}">Coordinator-Page</a> |
+{% endif %}
+{% if user.superuser %}
+<a href="{% url ddtss_admin %}">Admin-Page</a> |
+{% endif %}
+<br>
+{% block content %}{% endblock %}
+{% endblock %}

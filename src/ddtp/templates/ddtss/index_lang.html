@@ -1,10 +1,12 @@
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
-<head>
-<title>DDTSS ({{lang.language}})</title>
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+{% extends "ddtss/base_ddtss.html" %}
+
+{% block title %}
+DDTSS ({{lang.language}})
+{% endblock %}
+
+{% block ddtss_head %}
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script>
 <script type="text/javascript">//<![CDATA[
 function popup (url) {
  fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
@@ -58,13 +60,13 @@ function toggle_size() {
     }
 }
 
+$(document).ready(function($) {
+    return reset_flot('flot_lang_milestone_high');
+})
 //]]></script>
-<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script>
-<script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body onload="return reset_flot('flot_lang_milestone_high')" >
-{% include "navigation.html" %}
+{% endblock %}
+
+{% block content %}
 <h1>DDTSS for {{lang.language}} {% if lang.fullname %}({{lang.fullname}}){% endif %}</h1>
 <!-- Messages not implemented for now
 <div class=messages>
@@ -467,5 +469,4 @@ y2axis: {show:1 },
 <a href="{% url ddtss_login %}">Login</a> |
 <a href="{% url ddtss_create_user %}">Create Login</a>
 {% endif %}
-</body>
-</html>
+{% endblock %}

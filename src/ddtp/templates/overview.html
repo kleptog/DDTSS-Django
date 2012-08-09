@@ -1,9 +1,8 @@
-<HTML>
-<HEAD>
-<TITLE>Debian Description Tracking  --- {{ prefix }} --- </TITLE>
-</HEAD>
-<BODY>
-{% include "navigation.html" %}
+{% extends "base_ddtp.html" %}
+
+{% block title %}Debian Description Tracking  --- {{ prefix }} ---{% endblock %}
+
+{% block content %}
 <h3>{{ prefix }}</h3>
 {% for package, descriptions in packages %}
 <h4><a href="{% url ddt_package package %}">{{ package }}</a></h4>
@@ -15,5 +14,4 @@
         <br>
     {% endfor %}
 {% endfor %}
-</BODY>
-</HTML>
+{% endblock %}

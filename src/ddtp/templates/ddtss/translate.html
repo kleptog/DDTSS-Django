@@ -1,10 +1,11 @@
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
-<head>
-<title>DDTSS ({{lang.language}}): Translating {{descr.package}}</title>
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/ddtss/ddtss.css" />
+{% extends "ddtss/base_ddtss.html" %}
+
+{% block title %}
+DDTSS ({{lang.language}}): Translating {{descr.package}}
+{% endblock %}
+
+{% block ddtss_head %}
+<script language="javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript">//<![CDATA[
 function popup (url) {
  fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
@@ -59,11 +60,14 @@ function toggle_ShowLongDescr() {
     return false;
 }
 
+$(document).ready(function($) {
+    $("#submit").prop('disabled',true);
+})
 //]]></script>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body onload="document.forms[0].submit.disabled=1">
-{% include "navigation.html" %}
+{% endblock %}
+
+{% block content %}
+
 {% if not forreview %}
 <h1>
   <font color="red">Note: If you decide not to go ahead with translating a
@@ -176,7 +180,7 @@ Translated:
 </ul>
 {% if forreview %}
 <input type="submit" name="accept" value="Accept as is" />
-<input type="submit" name="submit" value="Accept with changes" />
+<input type="submit" name="submit" id="submit" value="Accept with changes" />
 <input type="submit" name="nothing" value="Change comment only" />
 <input name="timestamp" type="hidden" value="{{trans.lastupdate}}" />
 <br />
@@ -185,7 +189,7 @@ Translated:
 In that case the review process will start again.
 {% else %}
 <input type="submit" name="abandon" value="Abandon" />
-<input type="submit" name="submit" value="Submit" />
+<input type="submit" name="submit" id="submit" value="Submit" />
 {% endif %}
 <!-- This is a hidden field which on many browsers is automatically filled
 in with the charset of the submitted form. Useful to check browsers are
@@ -240,6 +244,4 @@ actually returning UTF-8 as promised -->
 
 </td>
 </table>
-
-</body>
-</html>
+{% endblock %}

@@ -1,12 +1,7 @@
-<a href="{% url ddtss_index %}">Team Page</a> |
-<a href="{% url ddt_stats_milestones_lang %}">Milestones</a> |
-{% if user.is_coordinator %}
-<a href="{% url ddtss_coordinate %}">Coordinator-Page</a> |
-{% endif %}
-{% if user.superuser %}
-<a href="{% url ddtss_admin %}">Admin-Page</a> |
-{% endif %}
-| DDT (
+{% extends "base.html" %}
+
+{% block body %}
+DDT (
     <a href="{% url ddt_overview '0' %}"> 0 </a> |
     <a href="{% url ddt_overview '1' %}"> 1 </a> |
     <a href="{% url ddt_overview '2' %}"> 2 </a> |
@@ -44,4 +39,5 @@
     <a href="{% url ddt_overview 'y' %}"> Y </a> |
     <a href="{% url ddt_overview 'z' %}"> Z </a> )
 <br>
-
+{% block content %}{% endblock %}
+{% endblock %}

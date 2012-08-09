@@ -1,11 +1,10 @@
-<HTML>
-<HEAD>
-<meta http-equiv="content-type" content="text/html;charset=UTF-8">
-<TITLE>Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{lang}} --- </TITLE>
-</HEAD>
-<BODY>
-{% include "navigation.html" %}
-<br>
+{% extends "base_ddtp.html" %}
+
+{% block title %}
+Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{lang}} ---
+{% endblock %}
+
+{% block content %}
 <h3>{{descr.package}}</h3>
 <pre>
 Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
@@ -25,5 +24,4 @@ parts-md5sum: <br><pre>
 
 </pre>
 </pre>
-</BODY>
-</HTML>
+{% endblock %}

@@ -1,32 +1,22 @@
-<HTML>
-<HEAD>
-    <TITLE>Debian Description Tracking  --- milestones'{{milestone}}' for {{lang}}</TITLE>
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
-</HEAD>
-<script type="text/javascript">//<![CDATA[
-function show_coordinator() {
-    var onlycoordinators = document.getElementsByName("onlycoordinator");
-    for(i=0, l=onlycoordinators.length; i<l; i++) {
-        onlycoordinators[i].style.display = "inline";
-    }
-}
+{% extends "base_ddtp.html" %}
 
-//]]></script>
+{% block title %}Debian Description Tracking  --- milestones'{{milestone}}' for {{lang}}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.js"></script>
 <script language="javascript" type="text/javascript" src="http://people.iola.dk/olau/flot/jquery.flot.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</HEAD>
-{% if user.is_coordinator %}
-<BODY onload="return show_coordinator()" >
-{% else %}
-<BODY>
-{% endif %}
-{% include "navigation.html" %}
+{% endblock %}
+
+{% block content %}
 <h1>milestones '{{milestone}}' for {{lang}}
         <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"\></a>
-        <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"\></a></span>
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
+{% if user.is_coordinator %}
+        <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
+{% endif %}
 </h1>
 <div id="flot_milestone" style="width:500px;height:150px;position:fixed;top:30px;right:30px;background-color:#cccccc;"></div>
 
@@ -67,13 +57,13 @@ y2axis: {show:1 },
         {% endif %}
         {% endif %}
         <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"\></a>
-        <span name="onlycoordinator" style="display:none"> <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"\></a></span>
+            <img src="/media/user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"></a>
+{% if user.is_coordinator %}
+        <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
+            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"></a>
+{% endif %}
     </td>
     <td> <a style="text-decoration:none;" href="{% url ddt_descr descr.description_id %}">{{ descr.nice_package_versions }}</a></td> </tr>
 {% endfor %}
 </table>
-<br>
-</BODY>
-</HTML>
+{% endblock %}

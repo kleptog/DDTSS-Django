@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{% block title %}ddtp.debian.org{% endblock %}</title>
+
+	<link rel="stylesheet" href="http://ddtp.debian.org/debian.css" type="text/css" />
+{% block head %}
+<!--	<link rel="stylesheet" href="{{ STATIC_URL }}ddtp.css" type="text/css" /> -->
+{% endblock %}
+</head>
+<body>
+
+<div id="header">
+        <div id="upperheader">
+                <div id="logo">
+                        <a href="http://www.debian.org/" title="Debian Home"><img src="http://ddtp.debian.org/openlogo-50.png" alt="Debian" width="50" height="61" /></a>
+                </div>
+                <p class="section"><a href="/">ddtp</a></p>
+		
+        </div>
+
+        <div id="navbar">
+                <p class="hidecss"><a href="#inner">Skip Quicknav</a></p>
+                <ul>
+                   <li><a href="http://www.debian.org/intro/about">About Debian</a></li>
+                   <li><a href="http://www.debian.org/distrib/">Getting Debian</a></li>
+                   <li><a href="http://www.debian.org/support">Support</a></li>
+                   <li><a href="http://www.debian.org/devel/">Developers'&nbsp;Corner</a></li>
+                </ul>
+        </div>
+	<p id="breadcrumbs">{% block breadcrumbs %}ddtp.debian.org{% endblock %}</p>
+</div> 
+<div id="content">
+{% block body %}{% endblock %}
+</div>
+</body>
+</html>

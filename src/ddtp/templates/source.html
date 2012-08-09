@@ -1,10 +1,8 @@
-<HTML>
-<HEAD>
-<meta http-equiv="content-type" content="text/html;charset=UTF-8">
-<TITLE>Debian Description Tracking  --- source: {{source_name}} --- </TITLE>
-</HEAD>
-<BODY>
-{% include "navigation.html" %}
+{% extends "base_ddtp.html" %}
+
+{% block title %}Debian Description Tracking  --- source: {{source_name}} ---{% endblock %}
+
+{% block content %}
 <h3>{{source_name}}
         <a href="{% url ddtss_addusermilestone 'source' source_name %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"\></a>
@@ -17,5 +15,4 @@
 Package: <a href="{% url ddt_package description.package %}">{{description.package}}</a><br>
 {% endfor %}
 <br>
-</BODY>
-</HTML>
+{% endblock %}

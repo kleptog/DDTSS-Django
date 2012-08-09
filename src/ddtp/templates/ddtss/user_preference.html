@@ -1,15 +1,11 @@
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
-<head>
-    <title>DDTSS User Preferenc {{user.realname}} ({{user.username}})</title>
-<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/ddtss/ddtss.css" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body>
-{% include "navigation.html" %}
-<h1>DDTSS User Preferenc {{user.realname}} ({{user.username}})</h1>
+{% extends "ddtss/base_ddtss.html" %}
+
+{% block title %}
+DDTSS User Preferenc {{user.realname}} ({{user.username}})
+{% endblock %}
+
+{% block content %}
+<h1>DDTSS User Preference {{user.realname}} ({{user.username}})</h1>
 <p>
 {% if messages %}
 <ul class="messages">
@@ -34,7 +30,4 @@
         <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"\></a> </li>
     {% endfor %}
         </ul>
-
-
-</body>
-</html>
+{% endblock %}
