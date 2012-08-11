@@ -130,7 +130,8 @@ class Users(Base):
     # These are methods to handle the information transfer between cookies and user objects
     def to_cookie(self):
         """ Creates the cookie contents for this user """
-        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, self.lastlanguage_ref or '')
+        last_language = (self.lastlanguage and self.lastlanguage.language) or self.lastlanguage_ref or ''
+        s = "%s:%d:%d:%s" % (self.username, self.countreviews, self.counttranslations, last_language)
         digest = hmac.new(settings.SECRET_KEY, s).hexdigest()
 
         return digest + "|" + s
