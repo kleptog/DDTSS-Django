@@ -43,6 +43,7 @@ class ActiveDescription(Base):
     __tablename__ = 'active_tb'
 
     description_id = Column(Integer, ForeignKey('description_tb.description_id'), primary_key=True)
+    description = relationship('Description')
 
     def __repr__(self):
         return 'ActiveDescription(%s)' % self.description_id
