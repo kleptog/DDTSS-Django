@@ -42,16 +42,17 @@ def view_browse(session, request, prefix):
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
 def view_index(session, request):
-    """ Main index.html, show summary info """
+    """ Main index.html, main page """
 
-    user = get_user(request, session)
-    lang = user.lastlanguage_ref
-    if lang is None:
-        lang = 'xx'
-    if lang != 'xx':
-        return redirect('ddtss_index_lang', lang)
+    langinfo = session.query(Languages, func.count(Translation.translation_id), func.count(ActiveDescription.description_id)). \
+                             outerjoin(Translation, Translation.language == Languages.language). \
+                             outerjoin(ActiveDescription, ActiveDescription.description_id == Translation.description_id). \
+                             group_by(Languages). \
+                             order_by(Languages.language).all()
 
-    return redirect('ddtss_index')
+    active = session.query(ActiveDescription).count()
+    descriptions = session.query(Description).count()
+    return render_to_response("index.html", {'langinfo': langinfo, 'active_count': active, 'description_count': descriptions}, context_instance=RequestContext(request))
 
 @with_db_session
 def view_package(session, request, package_name):

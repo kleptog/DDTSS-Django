@@ -1,0 +1,32 @@
+{% extends "base_ddtp.html" %}
+
+{% block title %}Debian Description Tracking{% endblock %}
+
+{% block body %}
+<a href="{% url ddtss_index %}">to the ddtss (a web interface for the ddtp)<a/><br>
+Daily description translation stats for
+<a href='stats/stats-etch.html'>Etch</a>,
+<a href='stats/stats-lenny.html'>Lenny</a> ,
+<a href='stats/stats-squeeze.html'>Squeeze</a>,
+<a href='stats/stats-wheezy.html'>Wheezy</a>  and
+<a href='stats/stats-sid.html'>Sid</a>
+
+<hr>
+<a href="http://www.debian.org/international/l10n/ddtp">Documentation about DDTP and DDTSS<a/>
+<hr>
+<img src="http://ddtp.debian.net/gnuplot/ddts-stat.png">
+<hr>
+{{ description_count }} package descriptions;<br>
+<br>
+{{ active_count }} package descriptions are active;<br>
+<br>
+{% for lang, total, active in langinfo %}
+    lang {{lang.language}} has {{active}} active translations from {{total}} total;<br>
+{% endfor %}
+<br>
+<hr>
+{% for lang, total, active in langinfo %}
+<h3>{{lang.language}} in sid</h3>
+<img src="http://ddtp.debian.net/gnuplot/stat-trans-sid-{{lang.language}}.png">
+{% endfor %}
+{% endblock %}
