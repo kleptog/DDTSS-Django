@@ -1,6 +1,6 @@
 {% extends "base_ddtp.html" %}
 
-{% block title %}Debian Description Tracking  --- milestones'{{milestone}}' for {{lang}}{% endblock %}
+{% block title %}Debian Description Tracking  --- milestones'{{milestone}}' for {{lang.language}}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>milestones '{{milestone}}' for {{lang}}
+<h1>milestones '{{milestone}}' for {{lang.language}}
         <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
@@ -37,8 +37,8 @@ y2axis: {show:1 },
 
 });
 </script>
-<a href="{% url ddt_stats_milestones_lang %}">back to the milestones for {{lang}}</a><br>
-<a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
+<a href="{% url ddt_stats_milestones_lang lang.language %}">back to the milestones for {{lang.language}}</a><br>
+<a href="{% url ddtss_index_lang lang.language %}">back to team page {{lang.language}}</a><br>
 <table class="tablesorter">
 <tr><th>status</th> <th width=75%>Package</th></tr>
 {% for descr, transinfo in descriptions %}
@@ -48,12 +48,12 @@ y2axis: {show:1 },
     <tr class="{% cycle 'odd_untrans' 'even_untrans' %}">
 {% endif %}
     <td>{% if transinfo.translate > 0 %}
-            <a href="{% url ddt_transdescr transinfo.translate lang %}">translated</a>
+            <a href="{% url ddt_transdescr transinfo.translate lang.language %}">translated</a>
         {% else %}
         {% if transinfo.pending > 0 %}
-            <a href="{% url ddtss_forreview lang descr.description_id %}">pending</a>
+            <a href="{% url ddtss_forreview lang.language descr.description_id %}">pending</a>
         {% else %}
-            <a href="{% url ddtss_translate lang descr.description_id %}">Fetched for translation</a>
+            <a href="{% url ddtss_translate lang.language descr.description_id %}">Fetched for translation</a>
         {% endif %}
         {% endif %}
         <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">

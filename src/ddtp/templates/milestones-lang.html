@@ -1,6 +1,6 @@
 {% extends "base_ddtp.html" %}
 
-{% block title %}Debian Description Tracking  --- milestones for {{lang}}{% endblock %}
+{% block title %}Debian Description Tracking  --- milestones for {{lang.language}}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
@@ -12,8 +12,8 @@
 }); </script>
 {% endblock %}
 {% block content %}
-<h1>milestones for {{lang}}</h1>
-<a href="{% url ddtss_index %}">back to team page {{lang}}</a><br>
+<h1>milestones for {{lang.language}}</h1>
+<a href="{% url ddtss_index_lang lang.language %}">back to team page {{lang.language}}</a><br>
 <table id="milestonetable" cellspacing="1" class="tablesorter">
 <thead>
 <tr><th>milestone</th> <th>translated</th> <th>pending</th>  <th>total</th> <th>progress</th></tr>
@@ -21,7 +21,7 @@
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url ddt_stats_one_milestones_lang milestone %}">{{milestone}}</a>
+    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestone %}">{{milestone}}</a>
         <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}

@@ -207,16 +207,13 @@ def view_source(session, request, source_name):
     return render_to_response("source.html", params, context_instance=RequestContext(request))
 
 @with_db_session
-def stats_milestones_lang(session, request):
+def stats_milestones_lang(session, request, language):
     """ Does milestones stats page per language """
 
     user = get_user(request, session)
-    language = user.lastlanguage_ref
-
-    if language is None:
-        language = 'xx'
-    if language == 'xx':
-        return redirect('ddtss_index')
+    lang = session.query(Languages).get(language)
+    if not lang:
+        raise Http404()
 
     resultset = session.query(DescriptionMilestone.milestone,func.count(Translation.description_id)). \
                         join(Translation, DescriptionMilestone.description_id == Translation.description_id).\
@@ -234,7 +231,7 @@ def stats_milestones_lang(session, request):
     params = dict()
     resultdict = dict(resultset)
     resultdict1 = dict(resultset1)
-    params['lang'] = language
+    params['lang'] = lang
     params['user'] = user
     params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'pending': resultdict1.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
 
@@ -242,16 +239,13 @@ def stats_milestones_lang(session, request):
 
 @cache_page(60*60)   # Cache for an hour
 @with_db_session
-def stats_one_milestones_lang(session, request, mile):
+def stats_one_milestones_lang(session, request, language, mile):
     """ Does milestones stats page per language """
 
     user = get_user(request, session)
-    language = user.lastlanguage_ref
-
-    if language is None:
-        language = 'xx'
-    if language == 'xx':
-        return redirect('ddtss_index')
+    lang = session.query(Languages).get(language)
+    if not lang:
+        raise Http404()
 
     flot = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==mile).all()[0].Get_flot_data(language);
 
@@ -279,7 +273,7 @@ def stats_one_milestones_lang(session, request, mile):
     params = dict()
     resultdict = dict(resultset2)
     resultdict1 = dict(resultset1)
-    params['lang'] = language
+    params['lang'] = lang
     params['user'] = user
     params['milestone'] = mile
     params['flot'] = flot
