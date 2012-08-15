@@ -60,8 +60,8 @@ class Description(Base):
     description_md5 = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
     prioritize = Column(Integer, nullable=False)
-    package = deferred(Column(String, nullable=False)) # to disappear, use package_version
-    source = deferred(Column(String, nullable=False))  # to disappear, use package_version
+    package = Column(String, nullable=False)
+    source = Column(String, nullable=False)
 
     owners = relationship('Owner', backref='description')
     package_versions = relationship('PackageVersion', backref='description')
