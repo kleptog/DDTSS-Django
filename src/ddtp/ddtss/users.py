@@ -247,9 +247,9 @@ def view_logout(request):
     response.delete_cookie('ddtssuser')
     return response
 
-class UserPreferenc(forms.Form):
+class UserPreference(forms.Form):
     """
-    A form change the user preferenc
+    A form change the user preference
     """
     milestone = forms.ChoiceField(label="Milestone", required=False, help_text="personal Milestone")
     realname  = forms.CharField(label="Realname", help_text="your real name")
@@ -259,7 +259,7 @@ class UserPreferenc(forms.Form):
         help_text = "Enter the same password as above, for verification.")
 
     def __init__(self, session, *args, **kwargs):
-        super(UserPreferenc, self).__init__(*args, **kwargs)
+        super(UserPreference, self).__init__(*args, **kwargs)
 
         self.fields['milestone'].choices = [(x, x) for (x,) in ( session.query(DescriptionMilestone.milestone).distinct()) ]
 
@@ -273,7 +273,7 @@ class UserPreferenc(forms.Form):
         return password1
 
 @with_db_session
-def view_preferenc(session, request):
+def view_preference(session, request):
     """ Handle user login """
 
     user = get_user(request, session)
@@ -285,7 +285,7 @@ def view_preferenc(session, request):
         if request.POST.get('cancel'):
             return redirect('ddtss_index')
 
-        form = UserPreferenc(session,data=request.POST)
+        form = UserPreference(session,data=request.POST)
         if form.is_valid():
             user.milestone=form.cleaned_data['milestone']
             user.realname=form.cleaned_data['realname']
@@ -300,7 +300,7 @@ def view_preferenc(session, request):
         form_fields = dict(milestone=user.milestone,
                 realname=user.realname,
                 )
-        form = UserPreferenc(session,form_fields)
+        form = UserPreference(session,form_fields)
 
     collectionmilestones = session.query(CollectionMilestone).\
             filter(CollectionMilestone.nametype==1). \

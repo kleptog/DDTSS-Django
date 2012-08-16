@@ -373,7 +373,7 @@ y2axis: {show:1 },
 </h2><ul onmouseover="return reset_flot('flot_user')">
 <li>Account: {{user.username}}</li>
 <li>Realname: {{user.realname}}</li>
-<li><a href="{% url ddtss_preferenc %}">Preference Page</a></li>
+<li><a href="{% url ddtss_preference %}">Preference Page</a></li>
 <li><button onclick="toggle_size(); return false;" class="button_as_link">Toggle display size</button></li>
 <li><button onclick="toggle_age(); return false;" class="button_as_link">Toggle display ages</button></li>
 {% if user.is_coordinator %}
