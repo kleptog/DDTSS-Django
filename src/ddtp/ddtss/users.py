@@ -151,7 +151,7 @@ def view_login(session, request):
 
             # Kill any previous logins
             django_openid_consumer.views.signout(request)
-            reqest.session.pop('username', None)
+            request.session.pop('username', None)
 
             if user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
                 # Login user in
@@ -160,7 +160,6 @@ def view_login(session, request):
                 messages.success(request, "Login successful.")
                 success = True
             else:
-                messages.error(request, "Login failed.")
                 success = False
 
             # If the user gave an OpenID URL, try to login with that
@@ -174,13 +173,15 @@ def view_login(session, request):
                 # Otherwise continue, the user is authenticated, albeit without OpenID
                 return redirect('ddtss_index')
 
-            if form.openid_url:
+            if form.cleaned_data['openid_url']:
                 return django_openid_consumer.views.begin(request,
                                                           on_failure=on_failure,
                                                           redirect_to=reverse('ddtss_login_complete'))
 
             if success:
                 return redirect('ddtss_index')
+
+            messages.error(request, "Login failed.")
     else:
         form = LoginForm()
 
@@ -227,7 +228,6 @@ def view_login_complete(session, request):
         if request.session.test_cookie_worked():
             request.session.delete_test_cookie()
 
-        messages.success(request, "OpenID login succeeded.")
         return redirect('ddtss_index')
 
     return django_openid_consumer.views.complete(request, on_failure=on_failure, on_success=on_success)
