@@ -467,6 +467,7 @@ def view_translate(session, request, language, description_id):
     session.commit()
 
     return render_to_response("ddtss/translate.html", dict(
+        user=user,
         forreview=False,
         lang=lang,
         descr=descr,
@@ -724,6 +725,7 @@ def view_review(session, request, language, description_id):
         olddiffs.append(oneolddiff)
 
     return render_to_response("ddtss/translate.html", dict(
+        user=user,
         forreview=True,
         diff_short=diff_short,
         diff_long=diff_long,

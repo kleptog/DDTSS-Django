@@ -101,13 +101,13 @@ def view_admin_lang(session, request, language):
                 messages.info(request, 'User %s now only trusted' % new_user.username)
                 session.commit()
 
-    form = LanguageAdminForm(session,dict( \
-        language=language, \
-        name=lang.fullname, \
-        enabled=lang.enabled_ddtss \
+    form = LanguageAdminForm(session,dict(
+        language=language,
+        name=lang.fullname,
+        enabled=lang.enabled_ddtss
         ))
 
-    return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form },
+    return render_to_response("ddtss/admin_lang.html", { 'lang': lang, 'form': form, 'user': user },
                               context_instance=RequestContext(request))
 
 class CoordinatorAdminForm(forms.Form):
@@ -241,10 +241,11 @@ def view_coordinator(session, request):
         form_fields.update(lang.translation_model.to_form_fields())
         form = CoordinatorAdminForm(session, form_fields)
 
-    return render_to_response("ddtss/coordinator.html", {\
-            'lang': lang,\
-            'form': form,\
-            'collectionmilestones': collectionmilestones},\
+    return render_to_response("ddtss/coordinator.html", {
+            'user': user,
+            'lang': lang,
+            'form': form,
+            'collectionmilestones': collectionmilestones},
                               context_instance=RequestContext(request))
 
 
