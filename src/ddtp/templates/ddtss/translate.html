@@ -7,12 +7,6 @@ DDTSS ({{lang.language}}): Translating {{descr.package}}
 {% block ddtss_head %}
 <script language="javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript">//<![CDATA[
-function popup (url) {
- fenster = window.open("/", "msgwindow", "width=400,height=300,resizable=yes");
- fenster.focus();
- return true;
-}
-
 function showshortdiff (url) {
     var boxes = document.getElementsByName("shortboxes");
     for(i=0, l=boxes.length; i<l; i++) {
