@@ -736,109 +736,84 @@ def view_review(session, request, language, description_id):
         descr_messages=descr_messages), context_instance=RequestContext(request))
 
 
-class writeMessage(forms.Form):
+class MessageForm(forms.Form):
     """ This form is used to encapsulate the results of form submission """
-    message = forms.CharField(required=False)
-    to_user = forms.CharField(required=False)
-    for_description = forms.CharField(required=False)
-    language = forms.CharField(required=False)
-    in_reply_to = forms.CharField(required=False)
-    cancel = forms.CharField(required=False)
-    submit = forms.CharField(required=False)
+    message = forms.CharField(widget=forms.Textarea, required=True)
+    in_reply_to = forms.IntegerField(widget=forms.HiddenInput, required=False)
 
-    _charset_ = forms.CharField(required=False)
-    timestamp = forms.IntegerField(required=False)
 
 @with_db_session
-def view_write_message(session, request):
+def view_write_message(session, request, type, language=None, description=None, to_user=None):
     """ write a message to a user """
 
     user = get_user(request, session)
 
+    # type=global, lang, descr, descrlang, user
+    if language is not None:
+        lang = session.query(Languages).get(language)
+    else:
+        lang = None
+    if to_user is not None:
+        to_user_obj = session.query(Users).get(to_user)
+    else:
+        to_user_obj = None
+    if description is not None:
+        descr = session.query(Description).get(description)
+    else:
+        descr = None
+
+    # Now check references
+    if type in ('lang', 'descrlang'):
+        if not lang:
+            raise Http404()
+    if type in ('descr', 'descrlang'):
+        if not descr:
+            raise Http404()
+
+    # Only global & lang have restrictions on who can post them
+    if type == 'global':
+        if not user.superuser:
+            return HttpResponseForbidden("Only superusers can send global messages")
+    if type == 'lang':
+        if not lang:
+            raise Http500()
+        auth = user.get_authority(language)
+        if not auth.is_coordinator:
+            return HttpResponseForbidden("Only language coordinators can send team messages")
+
     if request.method == 'GET':
-        form = writeMessage(request.GET)
-
-        if not form.is_valid():
-            # Maybe return HTTP 400 - Bad request?
-            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index')
-
-        # check to_user
-        to_user=form.cleaned_data['to_user']
-
-        if not to_user:
-            return show_message_screen(request, 'Bad request' , 'ddtss_index')
-
-        title='Send to user %s' % to_user
-
-        return render_to_response("ddtss/post_message.html", dict(
-            title=title,
-            to_user=to_user
-            ), context_instance=RequestContext(request))
+        form = MessageForm(request.GET)
 
     if request.method == 'POST':
-        form = writeMessage(request.POST)
+        form = MessageForm(request.POST)
 
-        if not form.is_valid():
-            # Maybe return HTTP 400 - Bad request?
-            return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index')
-
-        if form.cleaned_data['cancel']:
+        if request.POST.has_key('cancel'):
             return show_message_screen(request, 'message canceled' , 'close')
 
-        # check to_user
-        to_user=form.cleaned_data['to_user']
+        if form.is_valid() and request.POST.has_key('submit'):
+            message = Messages(
+                    message=form.cleaned_data['message'],
+                    to_user=to_user,
+                    language=language,
+                    for_description=description,
+                    from_user=user.username,
+                    in_reply_to=form.cleaned_data['in_reply_to'],
+                    timestamp=int(time.time()))
 
-        # check language
-        language=form.cleaned_data['language']
+            session.add(message)
 
-        # check for_description
-        for_description=form.cleaned_data['for_description']
+            session.commit()
+            return show_message_screen(request, 'message sent: %s %s %s %s ' % ( to_user, str(description), language, form.cleaned_data['in_reply_to']) , 'close')
 
-        # check in_reply_to
-        in_reply_to=form.cleaned_data['in_reply_to']
-
-        # check message
-        message = form.cleaned_data['message']
-        if not message:
-            if for_description:
-                title='Send to description'
-                if to_user:
-                    title='Send to description and user %s' % to_user
-                else:
-                    title='Send to description'
-            elif to_user:
-                title='Send to user %s' % to_user
-            elif language:
-                title='Send %s team message' % language
-            else:
-                title='Send project message'
-
-            return render_to_response("ddtss/post_message.html", dict(
-                title=title,
-                language=language,
-                for_description=for_description,
-                to_user=to_user,
-                in_reply_to=in_reply_to
-                ), context_instance=RequestContext(request))
-
-        if form.cleaned_data['submit']:
-
-            if message:
-                message = Messages(
-                        message=message,
-                        to_user=to_user or None,
-                        language=language or None,
-                        for_description=for_description or None,
-                        from_user=user.username,
-                        in_reply_to=in_reply_to or None,
-                        timestamp=int(time.time()))
-
-                session.add(message)
-
-                session.commit()
-                return show_message_screen(request, 'message send: %s %s %s %s ' % ( to_user, str(for_description), language, in_reply_to) , 'close')
-
-    return show_message_screen(request, 'Bad request' , 'ddtss_index')
+    return render_to_response("ddtss/post_message.html", dict(
+        action=request.get_full_path(),
+        type=type,
+        language=lang,
+        description=descr,
+        to_user=to_user,
+        user=user,
+        form=form,
+        ), context_instance=RequestContext(request))
 
 @with_db_session
 def view_delmessage(session, request, message_id ):

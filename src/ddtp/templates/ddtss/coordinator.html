@@ -26,6 +26,8 @@ Coordinators:
 {% endfor %}
 </table>
 <p>
+<a href="{% url ddtss_message_lang lang.language %}">New Team message</a> |
+<p>
 <form method="post" action="{% url ddtss_coordinate %}" enctype="multipart/form-data">
 {% for errors in form.errors.itervalues %}
 {{errors}}
