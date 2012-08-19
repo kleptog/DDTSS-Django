@@ -62,12 +62,6 @@ $(document).ready(function($) {
 
 {% block content %}
 <h1>DDTSS for {{lang.language}} {% if lang.fullname %}({{lang.fullname}}){% endif %}</h1>
-<!-- Messages not implemented for now
-<div class=messages>
-<h3>Project-Messages (2): <div class="help" title="Messages for the DDTP">?</div>
-
-</h3><ul><li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Sun Nov 30 00:05:40 2008   <br> <b>Ok, now we have a new part: 'suggestions'; from parts outsite the projekt</b></li> <li>(<a href="/ddtss/index.cgi/messageto/grisu42" onclick="return popup(this.href)">grisu42</a>): Fri Nov 28 17:26:40 2008   <br> <b>Now we have a message-system... use it for your coordination</b></li></ul>
--->
 
 <!-- Project Messages -->
 {% for message in global_messages %}
