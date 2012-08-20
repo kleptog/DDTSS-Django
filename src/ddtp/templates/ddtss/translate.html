@@ -56,6 +56,7 @@ function toggle_ShowLongDescr() {
 
 $(document).ready(function($) {
     $("#submit").prop('disabled',true);
+    setup_messagelinks();
 })
 //]]></script>
 {% endblock %}
@@ -210,14 +211,14 @@ actually returning UTF-8 as promised -->
                 from {{message.from_user}}
                 {% endif %}
                 at {{message.datetime|date:"Y-m-d H:i:s"}} {% if message.message %}<a href="{% url ddtss_delmessage message.message_id %}">Delete</a>{% endif %}
-                <a href="{% url ddtss_message_descr descr.description_id %}?in_reply_to={{message.message_id}}">Reply</a>
+                <a class="messagelink" target="_blank" href="{% url ddtss_message_descr descr.description_id %}?in_reply_to={{message.message_id}}">Reply</a>
             </span>
         </li>
     {% if forloop.last %}
     </ul>
     {% endif %}
     {% endfor %}
-    <a href="{% url ddtss_message_descr descr.description_id %}">New comment</a>
+    <a class="messagelink" target="_blank" href="{% url ddtss_message_descr descr.description_id %}">New comment</a>
 </div>
 <!-- end new description comments per Messages -->
 

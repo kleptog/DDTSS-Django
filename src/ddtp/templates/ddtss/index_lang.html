@@ -55,7 +55,8 @@ function toggle_size() {
 }
 
 $(document).ready(function($) {
-    return reset_flot('flot_lang_milestone_high');
+    reset_flot('flot_lang_milestone_high');
+    setup_messagelinks();
 })
 //]]></script>
 {% endblock %}
@@ -69,7 +70,7 @@ $(document).ready(function($) {
 <div class=messages>
     <h2>Project-Messages<div class="help" title="Project Messages for the DDTP">?</div>  </h2>
 {% if user.superuser %}
-    <a href="{% url ddtss_message %}">New global message</a>
+    <a class="messagelink" target="_blank" href="{% url ddtss_message %}">New global message</a>
 {% endif %}
     <ul>
 {% endif %}
@@ -79,7 +80,7 @@ $(document).ready(function($) {
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
                 {% if user.superuser %}<a href="{% url ddtss_delmessage message.message_id %}">Delete</a>{% endif %}
-                <a href="{% url ddtss_message_user message.from_user %}?in_reply_to=message.message_id">Reply</a>
+                <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to=message.message_id">Reply</a>
             </span>
         </li>
 {% if forloop.last %}
@@ -100,7 +101,7 @@ $(document).ready(function($) {
 
 
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %} <a href="{% url ddtss_message_user user.username %}">{{user.username}}</a>
+{% for user in lang.coordinators %} <a class="messagelink" target="_blank" href="{% url ddtss_message_user user.username %}">{{user.username}}</a>
 {%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
@@ -120,7 +121,7 @@ Coordinators for {{lang.language}}:
 <div class=messages>
     <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
     {% if user.is_coordinator %}
-    <a href="{% url ddtss_message_lang lang.language %}">New team message</a>
+    <a class="messagelink" target="_blank" href="{% url ddtss_message_lang lang.language %}">New team message</a>
     {% endif %}
     <ul>
 {% endif %}
@@ -130,7 +131,7 @@ Coordinators for {{lang.language}}:
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
                 <a href="{% url ddtss_delmessage message.message_id %}">Delete</a>
-                <a href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
+                <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
             </span>
         </li>
 {% if forloop.last %}
@@ -360,7 +361,7 @@ y2axis: {show:1 },
             to the description <a href="{% url ddtss_forreview message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
             {% endif %}
             at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">Delete</a>
-            <a href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
+            <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
         </span>
     </li>
 {% if forloop.last %}</ul>{% endif %}

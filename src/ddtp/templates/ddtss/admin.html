@@ -4,6 +4,14 @@
 DDTSS Administration
 {% endblock %}
 
+{% block ddtss_head %}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function($) {
+    setup_messagelinks();
+})
+//]]></script>
+{% endblock %}
+
 {% block content %}
 <h1>DDTSS Administration</h1>
 <p>
@@ -31,5 +39,5 @@ to individual languages.
 {% endfor %}
 </table>
 <p>
-<a href="{% url ddtss_message %}">New project message</a> |
+<a class="messagelink" target="_blank" href="{% url ddtss_message %}">New project message</a> |
 {% endblock %}

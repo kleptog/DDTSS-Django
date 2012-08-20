@@ -4,6 +4,14 @@
 DDTSS Language Coordination {{lang.language}}
 {% endblock %}
 
+{% block ddtss_head %}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function($) {
+    setup_messagelinks();
+})
+//]]></script>
+{% endblock %}
+
 {% block content %}
 <h1>DDTSS Language Coordination {{lang.language}}</h1>
 <p>
@@ -26,7 +34,7 @@ Coordinators:
 {% endfor %}
 </table>
 <p>
-<a href="{% url ddtss_message_lang lang.language %}">New Team message</a> |
+<a class="messagelink" target="_blank" href="{% url ddtss_message_lang lang.language %}">New Team message</a> |
 <p>
 <form method="post" action="{% url ddtss_coordinate %}" enctype="multipart/form-data">
 {% for errors in form.errors.itervalues %}

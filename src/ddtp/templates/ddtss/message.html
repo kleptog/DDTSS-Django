@@ -9,7 +9,7 @@ DDTSS
 <ul>
 </ul>
 {% if close %}
-<form action=""> <input type="button" value="close window" onclick="history.go(-2)"> </form>
+<form action=""> <input type="button" value="close window" onclick="window.close()"> </form>
 {% else %}
 <a href="{{url}}">Continue</a>
 {% endif %}

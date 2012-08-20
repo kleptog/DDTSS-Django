@@ -4,3 +4,10 @@ function popup (url) {
  fenster.focus();
  return true;
 }
+
+function setup_messagelinks() {
+  $("a.messagelink").click(function () {
+    popup(this.href)
+    return false; // suppress normal click event
+  })
+}
