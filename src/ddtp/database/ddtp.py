@@ -6,7 +6,7 @@ import hashlib
 from .db import Base, with_db_session
 from sqlalchemy.orm import relationship, collections, aliased, backref, deferred
 from sqlalchemy.orm.session import Session
-from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey, func
 from sqlalchemy.schema import FetchedValue
 
 def description_to_parts(descr):
@@ -334,32 +334,45 @@ class DescriptionMilestone(Base):
 
     description = relationship(Description, backref=backref('milestones', cascade='all, delete-orphan'))
 
-    def Get_flot_data(self,language):
+    def info_language(self, lang):
+        session = Session.object_session(self)
+
+        packages, = session.query(func.count(DescriptionMilestone.description_id)). \
+                            filter(DescriptionMilestone.milestone==self.milestone).\
+                            one()
+
+        translated, = session.query(func.count(Translation.description_id)). \
+                            join(DescriptionMilestone, DescriptionMilestone.description_id == Translation.description_id).\
+                            filter(Translation.language==lang.language).\
+                            filter(DescriptionMilestone.milestone==self.milestone).\
+                            one()
+
+        return {
+            'name': self.milestone,
+            'total': packages,
+            'translated': translated,
+            'percent': float(translated)*100.0/packages,
+        }
+
+
+    def raw_flot_data_language(self, language):
         """ Returns all versions in a nice format """
         # SELECT B.value*1000/A.value AS Promil,A.value,A.stat,B.value,B.stat,B.date from statistic_tb AS A,statistic_tb AS B where A.stat='mile:part:1-de' and B.stat like 'mile:part:1-de:trans-de' and B.date=A.date order by A.stat;
-
         max_counter=100
-
-        output_prozt = 'var prozt = ['
-        output_total = 'var total = ['
-        output_trans = 'var trans = ['
 
         session = Session.object_session(self)
 
         values = list();
         Statistic2 = aliased(Statistic)
-        values = session.query(Statistic2.value*1000/Statistic.value, Statistic.value, Statistic2.value). \
+        values = session.query(Statistic.date, Statistic2.value, Statistic.value). \
                 filter(Statistic.stat == 'mile:'+self.milestone). \
                 filter(Statistic2.stat == 'mile:'+self.milestone+':trans-'+language). \
                 filter(Statistic.date == Statistic2.date). \
                 order_by(Statistic.date.asc()). \
                 limit(max_counter). \
                 all()
-        output_prozt = "var prozt=%s;" % ([[i, stat[0]/10] for i, stat in enumerate(values)])
-        output_total = "var total=%s;" % ([[i, stat[1]] for i, stat in enumerate(values)])
-        output_trans = "var trans=%s;" % ([[i, stat[2]] for i, stat in enumerate(values)])
 
-        return output_prozt+output_total+output_trans
+        return values
 
     def __repr__(self):
         return 'DescriptionMilestone(%s, milestone=%s, description_id=%s)' % (self.description_milestone_id, self.milestone, self.description_id)

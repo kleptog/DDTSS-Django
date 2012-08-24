@@ -8,6 +8,7 @@ from django.conf import settings
 from ddtp.ddtss import views as ddtss_views
 from ddtp.ddtss import users as ddtss_users
 from ddtp.ddtss import admin as ddtss_admin
+from ddtp.ddtss import flot as ddtss_flot
 
 handler500 # Pyflakes
 
@@ -37,5 +38,7 @@ urlpatterns = patterns(
     url(r'^delusermilestone/(.+)$',ddtss_users.view_delusermilestone, name='ddtss_delusermilestone'),
     url(r'^addlangmilestone/(\w+)/(.+)$',ddtss_admin.view_addlangmilestone, name='ddtss_addlangmilestone'),
     url(r'^dellangmilestone/(.+)$',ddtss_admin.view_dellangmilestone, name='ddtss_dellangmilestone'),
+    url(r'^flot/milestone/(?P<language>\w\w(?:_\w\w)?)/(?P<milestone>.+)$',ddtss_flot.milestone_data, name='ddtss_flot_milestone_data'),
+    url(r'^flot/thisuser$',ddtss_flot.thisuser_data, name='ddtss_flot_thisuser_data'),
 )
 

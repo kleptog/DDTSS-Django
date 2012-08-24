@@ -247,8 +247,6 @@ def stats_one_milestones_lang(session, request, language, mile):
     if not lang:
         raise Http404()
 
-    flot = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==mile).all()[0].Get_flot_data(language);
-
     resultset = session.query(Description). \
                         join(DescriptionMilestone, DescriptionMilestone.description_id == Description.description_id).\
                         filter(DescriptionMilestone.milestone==mile).\
@@ -276,7 +274,6 @@ def stats_one_milestones_lang(session, request, language, mile):
     params['lang'] = lang
     params['user'] = user
     params['milestone'] = mile
-    params['flot'] = flot
     params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0), 'pending': resultdict1.get(r.description_id,0)}) for r in resultset]
 
     return render_to_response("one_milestones-lang.html", params, context_instance=RequestContext(request))

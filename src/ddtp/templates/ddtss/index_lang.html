@@ -7,28 +7,6 @@ DDTSS ({{lang.language}})
 {% block ddtss_head %}
 <script language="javascript" type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.7/jquery.flot.min.js"></script>
 <script type="text/javascript">//<![CDATA[
-function reset_flot (url) {
-{% if user.milestone == None %}
- document.getElementById('flot_user').style.display='none'
- document.getElementById('flot_lang_trans').style.display='none'
- document.getElementById('flot_lang_review').style.display='none'
- document.getElementById('flot_lang_milestone_medium').style.display='none'
- document.getElementById('flot_lang_milestone_low').style.display='none'
- document.getElementById('flot_lang_milestone_high').style.display='none'
- document.getElementById(url).style.display='block'
-{% else %}
- document.getElementById('flot_user').style.display='none'
- document.getElementById('flot_lang_trans').style.display='none'
- document.getElementById('flot_lang_review').style.display='none'
- document.getElementById('flot_user_milestone').style.display='none'
- document.getElementById('flot_lang_milestone_high').style.display='none'
- document.getElementById('flot_lang_milestone_medium').style.display='none'
- document.getElementById('flot_lang_milestone_low').style.display='none'
- document.getElementById(url).style.display='block'
-{% endif %}
- return true;
-}
-
 function toggle_age() {
     var age_fields = document.getElementsByName("showage");
     for(i=0, l=age_fields.length; i<l; i++) {
@@ -54,7 +32,6 @@ function toggle_size() {
 }
 
 $(document).ready(function($) {
-    reset_flot('flot_lang_milestone_high');
     setup_messagelinks();
 })
 //]]></script>
@@ -143,78 +120,33 @@ Coordinators for {{lang.language}}:
 
 <!-- Milestones -->
 {% if milestones %}
-<table>
-    <col width="60%" /><col width="40%" />
-<tr><td alian="top">
-
-<table id="milestonetable" cellspacing="1" class="tablesorter" style="height:150px;">
+<table id="milestonetable" cellspacing="1" class="tablesorter" width='100%'>
 <thead>
-<tr><th>Type</th><th>milestone</th> <th>translated</th> <th>pending</th> <th>total</th> <th>progress</th></tr>
+<tr><th>Type</th><th>Milestone</th> <th>Translated</th> <!--<th>Pending</th>--> <th>Total</th> <th>Progress</th></tr>
 </thead>
 <tbody>
 {% for milestoneinfo in milestones %}
-<tr class="{% cycle 'odd' 'even' %}" onmouseover="return reset_flot('flot_{{milestoneinfo.type}}')">
-    <td><img src="/media/{{milestoneinfo.type}}.png" alt="User" title="User Milestone" height="15"> {{milestoneinfo.type}}</td>
+<tr class="{% cycle 'odd' 'even' %}">
+    <td><img src="/media/{{milestoneinfo.type}}.png" height="15">{{milestoneinfo.typename}}</td>
     <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
-    <td align='right'>{{milestoneinfo.pending}}</td>
+<!--    <td align='right'>{{milestoneinfo.pending}}</td> -->
     <td align='right'> {{milestoneinfo.total}}</td>
     <td> <div class="progress_bar">
-            <strong>{{milestoneinfo.percent}}%</strong>
+            <strong>{{milestoneinfo.percent|floatformat}}%</strong>
             <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
         </div>
-    </td></tr>
+    </td>
+    <td><div onclick="set_milestone_chart('{{milestoneinfo.typename}} milestone', '{% url ddtss_flot_milestone_data lang.language milestoneinfo.name %}')">Chart</div></td>
+    </tr>
 {% endfor %}
 </tbody>
 </table>
 
-</td><td>
-
-{% for milestoneinfo in milestones %}
-<div id="flot_{{milestoneinfo.type}}" style="width:500px;height:150px;display:none"></div>
-
-<script type="text/javascript">
-$(function () {
-    {{milestoneinfo.flot}}
-    $.plot($("#flot_{{milestoneinfo.type}}"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
-                                                      {label: "Total"     , yaxis: 2, data: total},
-                                                      {label: "Translated", yaxis: 2, data: trans} ],
-                                {
-yaxis: { },
-y2axis: {show:1 },
-//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
-                                  xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" }
-                                });
-
-
-});
-</script>
-{% endfor %}
-<div id="flot_user" style="width:500px;height:150px;display:none"></div>
-
-<script type="text/javascript">
-$(function () {
-    {{user.Get_flot_data}}
-    $.plot($("#flot_user"), [ {label: "Quote"   , yaxis: 1, data: quote},
-                                                      {label: "Translated"     , yaxis: 2, data: trans},
-                                                      {label: "Reviewed", yaxis: 2, data: revie} ],
-                                {
-yaxis: { },
-y2axis: {show:1 },
-//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
-                                  xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" }
-                                });
-
-
-});
-</script>
-<div id="flot_lang_trans" style="width:500px;height:150px;display:none"></div>
-<div id="flot_lang_review" style="width:500px;height:150px;display:none"></div>
-
-</td></tr>
-</table>
+<div id="flot_chart" style="display:none">
+   <h3 id="flot_title" style="width:100%; text-align:center"></h3>
+   <div id="flot_graph" style="width:100%;height:150px"></div>
+</div>
 <!-- End Milestones -->
 {% endif %}
 
@@ -229,25 +161,7 @@ y2axis: {show:1 },
   </h2>
   <ol>
 {% for trans in pending_translations %}
-{% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_trans')">
-<script type="text/javascript">
-$(function () {
-    {{trans.Get_flot_data}}
-    $.plot($("#flot_lang_trans"), [ {label: "Quote"   , yaxis: 1, data: quote},
-                                                      {label: "Pending Translated"     , yaxis: 2, data: trans},
-                                                      {label: "Pending Reviewed", yaxis: 2, data: revie} ],
-                                {
-yaxis: { },
-y2axis: {show:1 },
-//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
-                                  xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" }
-                                });
-
-
-});
-</script>
-    {% endif %}
+{% if forloop.first %}<ol>{% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
     <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
@@ -288,25 +202,7 @@ y2axis: {show:1 },
   </h2>
   <ol>
 {% for trans in pending_review %}
-{% if forloop.first %}<ol onmouseover="return reset_flot('flot_lang_review')">
-<script type="text/javascript">
-$(function () {
-    {{trans.Get_flot_data}}
-    $.plot($("#flot_lang_review"), [ {label: "Quote"   , yaxis: 1, data: quote},
-                                                      {label: "Pending Translated"     , yaxis: 2, data: trans},
-                                                      {label: "Pending Reviewed", yaxis: 2, data: revie} ],
-                                {
-yaxis: { },
-y2axis: {show:1 },
-//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
-                                  xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" }
-                                });
-
-
-});
-</script>
-    {% endif %}
+{% if forloop.first %}<ol>{% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
     <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
@@ -339,12 +235,13 @@ y2axis: {show:1 },
 <td valign='top' >
 <div class=infobox>
 <h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
-</h2><ul onmouseover="return reset_flot('flot_user')">
+</h2><ul>
 <li><button onclick="toggle_size(); return false;" class="button_as_link">Toggle display size</button></li>
 <li><button onclick="toggle_age(); return false;" class="button_as_link">Toggle display ages</button></li>
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
+<li><div onclick="set_user_chart('{% url ddtss_flot_thisuser_data %}')">Chart</div></td></li>
 {% endif %}
 </ul>
 </div>

@@ -1,12 +1,15 @@
-{% extends "base_ddtp.html" %}
+{% extends "ddtss/base_ddtss.html" %}
 
-{% block title %}Debian Description Tracking  --- milestones'{{milestone}}' for {{lang.language}}{% endblock %}
+{% block title %}Debian Description Tracking  --- milestones '{{milestone}}' for {{lang.language}}{% endblock %}
 
-{% block head %}
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
-<script language="javascript" type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% block ddtss_head %}
 <script language="javascript" type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.7/jquery.flot.min.js"></script>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<script type="text/javascript">
+$(document).ready(function($) {
+    set_milestone_chart("Milestone progress", '{% url ddtss_flot_milestone_data lang.language milestone %}');
+})
+</script>
 {% endblock %}
 
 {% block content %}
@@ -18,25 +21,10 @@
             <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
 {% endif %}
 </h1>
-<div id="flot_milestone" style="width:500px;height:150px;position:fixed;top:30px;right:30px;background-color:#cccccc;"></div>
-
-<script type="text/javascript">
-$(function () {
-    {{flot}}
-    $.plot($("#flot_milestone"), [ {label: "Prozent"   , yaxis: 1, data: prozt},
-                                                      {label: "Total"     , yaxis: 2, data: total},
-                                                      {label: "Translated", yaxis: 2, data: trans} ],
-                                {
-yaxis: { },
-y2axis: {show:1 },
-//yaxis: [{show:0 , min: 0, max: 100 }, {show:0 ,position: "left"}],
-                                  xaxis: {show:0 },
-                                  legend: { show: 1, position: "nw" }
-                                });
-
-
-});
-</script>
+<div id="flot_chart" style="display:none;">
+    <h3 id="flot_title" style="text-align: center"></h3>
+    <div id="flot_graph" style="width:100%;height:150px;"></div>
+</div>
 <a href="{% url ddt_stats_milestones_lang lang.language %}">back to the milestones for {{lang.language}}</a><br>
 <a href="{% url ddtss_index_lang lang.language %}">back to team page {{lang.language}}</a><br>
 <table class="tablesorter">
