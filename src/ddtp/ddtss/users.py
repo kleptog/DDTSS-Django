@@ -8,12 +8,14 @@ import random
 import time
 
 from django import forms
+from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, DescriptionMilestone
-from ddtp.database.ddtp import with_db_session, CollectionMilestone
+from ddtp.database.db import with_db_session
+from ddtp.database.ddtss import Users
+from ddtp.database.ddtp import CollectionMilestone, DescriptionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
 from urlparse import urlsplit
 
@@ -59,7 +61,7 @@ def view_create_user(session, request):
             request.session['new_user_info'] = (form.cleaned_data['username'], form.cleaned_data['realname'])
 
             def on_failure(request, message):
-                return render_to_reponse("ddtss/create_user.html", {'message': message},
+                return render_to_response("ddtss/create_user.html", {'message': message},
                                          context_instance=RequestContext(request))
 
             return django_openid_consumer.views.begin(request,
@@ -82,7 +84,7 @@ def view_create_user_complete(session, request):
     """ Called after the OpenID authentication completes """
     def on_failure(request, message):
         request.session.pop('new_user_info',None)
-        return render_to_reponse("ddtss/create_user.html", {'message': message},
+        return render_to_response("ddtss/create_user.html", {'message': message},
                                  context_instance=RequestContext(request))
 
     def on_success(request, identity_url, openid_response):
@@ -168,7 +170,7 @@ def view_login(session, request):
 
                 # If OpenID and normal login failed, go back to login page
                 if not success:
-                    return render_to_reponse("ddtss/login.html", {'form': form},
+                    return render_to_response("ddtss/login.html", {'form': form},
                                              context_instance=RequestContext(request))
                 # Otherwise continue, the user is authenticated, albeit without OpenID
                 return redirect('ddtss_index')

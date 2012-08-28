@@ -3,10 +3,10 @@
 # See LICENCE file for details.
 
 import hashlib
-from .db import Base, with_db_session
-from sqlalchemy.orm import relationship, collections, aliased, backref, deferred
+from .db import Base
+from sqlalchemy.orm import relationship, collections, aliased, backref
 from sqlalchemy.orm.session import Session
-from sqlalchemy import Table, Column, Integer, String, Date, MetaData, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, func
 from sqlalchemy.schema import FetchedValue
 
 def description_to_parts(descr):
@@ -118,7 +118,7 @@ class Description(Base):
         parts = self.get_description_parts()
 
         # Query the parts in one go, but use the identity to actually match them up
-        tmp = self.parts
+        self.parts
 
         return [(p[0], p[1],
                  Session.object_session(self).

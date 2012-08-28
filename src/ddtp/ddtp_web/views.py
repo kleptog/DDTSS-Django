@@ -2,13 +2,14 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
+from ddtp.database.db import with_db_session
+from ddtp.database.ddtp import Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
 from ddtp.database.ddtss import PendingTranslation, Languages
-from sqlalchemy import func, distinct
+from sqlalchemy import func
 from ddtp.ddtss.views import get_user
 
 @cache_page(60*60)   # Cache for an hour

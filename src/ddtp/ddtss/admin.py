@@ -2,20 +2,16 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-import hashlib
-import string
-import random
-import time
-
 from django import forms
 from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404
 from django.template import RequestContext
 from django.contrib import messages
-from ddtp.database.ddtss import with_db_session, Languages, PendingTranslation, PendingTranslationReview, Users, UserAuthority, DescriptionMilestone
-from ddtp.database.ddtp import with_db_session, CollectionMilestone
-from ddtp.ddtss.views import show_message_screen, get_user
+from ddtp.database.db import with_db_session
+from ddtp.database.ddtss import Languages, Users, UserAuthority
+from ddtp.database.ddtp import CollectionMilestone, DescriptionMilestone
+from ddtp.ddtss.views import get_user
 from urlparse import urlsplit
 
 @with_db_session

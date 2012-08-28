@@ -9,7 +9,7 @@ import subprocess
 from collections import defaultdict
 from datetime import date
 from debian.deb822 import Deb822
-from ddtp.database import db, ddtp, ddtss
+from ddtp.database import db, ddtp
 from django.core.management.base import BaseCommand, CommandError
 
 

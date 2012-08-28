@@ -5,7 +5,6 @@
 import os
 
 from random import choice
-from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
 class Command(NoArgsCommand):

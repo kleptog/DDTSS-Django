@@ -2,18 +2,15 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-import os
 import re
 import time
 import hashlib
 from collections import defaultdict
 
-from random import choice
-from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
 from ddtp.database import db, ddtp, ddtss
-from sqlalchemy import Table, Column, Integer, String, Date, LargeBinary, MetaData, ForeignKey
+from sqlalchemy import Column, String, LargeBinary
 from ddtp.ddtss.translationmodel import DefaultTranslationModel
 
 class DDTSS(db.Base):

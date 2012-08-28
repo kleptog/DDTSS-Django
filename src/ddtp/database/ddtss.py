@@ -7,14 +7,14 @@ import hmac
 import time
 import difflib
 
-from .db import Base, with_db_session
-from .ddtp import Description, DescriptionMilestone, Translation, PartDescription, Part, description_to_parts, Statistic
+from .db import Base
+from .ddtp import Description, Translation, PartDescription, Part, description_to_parts, Statistic
 from django.conf import settings
 from django.utils.timesince import timesince
 from sqlalchemy import types
-from sqlalchemy.orm import relationship, collections, backref, relation, aliased
+from sqlalchemy.orm import relationship, relation, aliased
 from sqlalchemy.orm.session import Session
-from sqlalchemy import Table, Column, Integer, String, Date, Boolean, MetaData, ForeignKey, FetchedValue, Sequence, text
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text
 from datetime import datetime
 
 class TranslationModel(object):

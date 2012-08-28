@@ -2,8 +2,7 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-from django.conf.urls.defaults import patterns, include, handler500, url
-from django.conf import settings
+from django.conf.urls.defaults import patterns, handler500, url
 
 from ddtp.ddtss import views as ddtss_views
 from ddtp.ddtss import users as ddtss_users

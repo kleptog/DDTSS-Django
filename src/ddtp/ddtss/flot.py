@@ -2,17 +2,13 @@
 # Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
 # See LICENCE file for details.
 
-import datetime
 import time
 import json
 
 from django.http import Http404, HttpResponse
-from django.template import RequestContext
-from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion, DescriptionMilestone
-from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
-
-from sqlalchemy import func
+from ddtp.database.db import with_db_session
+from ddtp.database.ddtp import DescriptionMilestone
+from ddtp.database.ddtss import Languages
 
 from ddtp.ddtss.views import get_user
 

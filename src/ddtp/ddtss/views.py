@@ -11,12 +11,11 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.http import Http404, HttpResponseForbidden
 from django.template import RequestContext
-from django.views.decorators.cache import cache_page
-from ddtp.database.ddtp import with_db_session, Description, DescriptionTag, ActiveDescription, Translation, PackageVersion, DescriptionMilestone
+from ddtp.database.db import with_db_session
+from ddtp.database.ddtp import Description, ActiveDescription, Translation, PackageVersion, DescriptionMilestone
 from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
 from urlparse import urlsplit
 from sqlalchemy import func
-from sqlalchemy import or_
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
@@ -694,10 +693,6 @@ def view_write_message(session, request, type, language=None, description=None, 
         lang = session.query(Languages).get(language)
     else:
         lang = None
-    if to_user is not None:
-        to_user_obj = session.query(Users).get(to_user)
-    else:
-        to_user_obj = None
     if description is not None:
         descr = session.query(Description).get(description)
     else:
@@ -717,7 +712,7 @@ def view_write_message(session, request, type, language=None, description=None, 
             return HttpResponseForbidden("Only superusers can send global messages")
     if type == 'lang':
         if not lang:
-            raise Http500()
+            raise Http404()
         auth = user.get_authority(language)
         if not auth.is_coordinator:
             return HttpResponseForbidden("Only language coordinators can send team messages")
