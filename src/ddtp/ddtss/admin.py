@@ -231,7 +231,7 @@ def view_coordinator(session, request):
                 session.commit()
 
     collectionmilestones = session.query(CollectionMilestone).\
-            filter(CollectionMilestone.nametype==2). \
+            filter(CollectionMilestone.nametype==CollectionMilestone.NAME_TYPE_LANGUAGE). \
             filter(CollectionMilestone.name==language).all()
 
     if not form:
@@ -267,7 +267,7 @@ def view_addlangmilestone(session, request, collectiontype, collection):
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
     collectionmilestone = CollectionMilestone(name=user.lastlanguage_ref,\
-            nametype=2,\
+            nametype=CollectionMilestone.NAME_TYPE_LANGUAGE,\
             collection=collectiontype+':'+collection)
     session.add(collectionmilestone)
     try:
@@ -298,7 +298,7 @@ def view_dellangmilestone(session, request, collection):
     collectionmilestone = session.query(CollectionMilestone) \
             .filter(CollectionMilestone.collection==collection) \
             .filter(CollectionMilestone.name==user.lastlanguage_ref) \
-            .filter(CollectionMilestone.nametype==2) \
+            .filter(CollectionMilestone.nametype==CollectionMilestone.NAME_TYPE_LANGUAGE) \
             .one()
 
     if collectionmilestone:

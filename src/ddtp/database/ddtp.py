@@ -386,6 +386,9 @@ class CollectionMilestone(Base):
     name = Column(String, nullable=False)
     nametype = Column(Integer, nullable=False)
 
+    NAME_TYPE_USER=1
+    NAME_TYPE_LANGUAGE=2
+
     def __repr__(self):
         return 'CollectionMilestone(%s, collection=%s, name=%s, nametype=%s)' % (self.collection_milestone_id, self.collection, self.name, self.nametype)
 

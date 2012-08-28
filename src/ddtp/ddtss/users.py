@@ -303,7 +303,7 @@ def view_preference(session, request):
         form = UserPreference(session,form_fields)
 
     collectionmilestones = session.query(CollectionMilestone).\
-            filter(CollectionMilestone.nametype==1). \
+            filter(CollectionMilestone.nametype==CollectionMilestone.NAME_TYPE_USER). \
             filter(CollectionMilestone.name==user.username).all()
 
     context = {
@@ -333,7 +333,7 @@ def view_addusermilestone(session, request, collectiontype, collection):
         return show_message_screen(request, 'Only for login user', 'ddtss_login')
 
     collectionmilestone = CollectionMilestone(name=user.username,
-        nametype=1,
+        nametype=CollectionMilestone.NAME_TYPE_USER,
         collection=collectiontype+':'+collection)
     session.add(collectionmilestone)
     try:
@@ -364,7 +364,7 @@ def view_delusermilestone(session, request, collection):
     collectionmilestone = session.query(CollectionMilestone) \
             .filter(CollectionMilestone.collection==collection) \
             .filter(CollectionMilestone.name==user.username) \
-            .filter(CollectionMilestone.nametype==1) \
+            .filter(CollectionMilestone.nametype==CollectionMilestone.NAME_TYPE_USER) \
             .one()
 
     if collectionmilestone:
