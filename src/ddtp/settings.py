@@ -85,4 +85,4 @@ DDTP_DATABASE=dict(drivername='postgresql',
 # Optimistic lock timeout in seconds
 DDTSS_LOCK_TIMEOUT=900
 # If true, disables various permission checks
-DEMO_MODE=True
+DEMO_MODE=False
