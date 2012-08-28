@@ -27,7 +27,7 @@ DDTSS User Preferenc {{user.realname}} ({{user.username}})
         <ul>
     {% for collectionmilestone in collectionmilestones %}
     <li>{{ collectionmilestone.collection }} <a href="{% url ddtss_delusermilestone collectionmilestone.collection %}">
-        <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"\></a> </li>
+        <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"></a> </li>
     {% endfor %}
         </ul>
 {% endblock %}

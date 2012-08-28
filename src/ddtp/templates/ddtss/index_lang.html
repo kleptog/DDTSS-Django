@@ -276,10 +276,10 @@ Coordinators for {{lang.language}}:
     <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
-{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"\> {% endif %}
-{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"\> {% endif %}
+{% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_medium %}<img src="/media/lang_milestone_medium.png" alt="Medium" title="Medium Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == lang.milestone_low %}<img src="/media/lang_milestone_low.png" alt="Low" title="Low Team Milestone" height="15"> {% endif %}
+{% if mile.milestone == user.milestone %}<img src="/media/user_milestone.png" alt="User" title="User Milestone" height="15"> {% endif %}
 {% endfor %}
     {% if trans.description.description_id in involveddescriptions %}<img src="/media/red-star.svg" alt="Involved" title="Involved" height="15"> {% endif %}
 
