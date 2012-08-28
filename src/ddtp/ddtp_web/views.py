@@ -3,6 +3,7 @@
 # See LICENCE file for details.
 
 from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from ddtp.database.ddtp import with_db_session, Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
@@ -277,3 +278,10 @@ def stats_one_milestones_lang(session, request, language, mile):
     params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0), 'pending': resultdict1.get(r.description_id,0)}) for r in resultset]
 
     return render_to_response("one_milestones-lang.html", params, context_instance=RequestContext(request))
+
+def block_robots(request):
+    """ A simple robots.txt for when this get made the top-level of a site. Stops a robot requesting every package. """
+    return HttpResponse("""
+User-agent: *
+Disallow: /
+""")

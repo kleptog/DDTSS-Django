@@ -22,6 +22,7 @@ urlpatterns = patterns(
     url(r'^stats/milestones/(\w+)/(.+)$', ddt_views.stats_one_milestones_lang, name='ddt_stats_one_milestones_lang'),
     url(r'^descr/(\d+)/(\w+)$', ddt_views.view_transdescr, name='ddt_transdescr'),
     url(r'^ddtss/', include(ddtss_urls)),
+    url(r'^robots.txt$', ddt_views.block_robots),
 )
 
 if settings.DEBUG:
