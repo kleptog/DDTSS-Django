@@ -1,0 +1,4 @@
+/* Fix absolute positions in debian.css */
+div#header {
+	position: relative;
+}

@@ -191,16 +191,20 @@ class Users(Base):
 
     @property
     def is_trusted(self):
+        if settings.DEMO_MODE:
+            return True
         return self.get_authority(self.lastlanguage_ref).is_trusted
 
     @property
     def is_coordinator(self):
+        if settings.DEMO_MODE:
+            return True
         return self.get_authority(self.lastlanguage_ref).is_coordinator
 
     @property
     def is_superuser(self):
         """ This property abstracts the test from the actual value in the table """
-        return self.superuser
+        return self.superuser or settings.DEMO_MODE
 
     def __repr__(self):
         return '<Users %s (%s)>' % (self.username, self.email)
@@ -233,10 +237,14 @@ class UserAuthority(Base):
 
     @property
     def is_trusted(self):
+        if settings.DEMO_MODE:
+            return True
         return self.auth_level >= UserAuthority.AUTH_LEVEL_TRUSTED
 
     @property
     def is_coordinator(self):
+        if settings.DEMO_MODE:
+            return True
         return self.auth_level >= UserAuthority.AUTH_LEVEL_COORDINATOR
 
     def __repr__(self):
