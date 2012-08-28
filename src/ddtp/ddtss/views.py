@@ -713,7 +713,7 @@ def view_write_message(session, request, type, language=None, description=None, 
 
     # Only global & lang have restrictions on who can post them
     if type == 'global':
-        if not user.superuser:
+        if not user.is_superuser:
             return HttpResponseForbidden("Only superusers can send global messages")
     if type == 'lang':
         if not lang:
@@ -779,7 +779,7 @@ def view_delmessage(session, request, message_id ):
     # special, if to_user and for_description set...
     # remove only the to_user
     if (message.to_user and message.for_description) \
-            and (user.superuser or auth.auth_level == auth.AUTH_LEVEL_COORDINATOR or user.username == message.to_user or user.username == message.from_user):
+            and (user.is_superuser or auth.auth_level == auth.AUTH_LEVEL_COORDINATOR or user.username == message.to_user or user.username == message.from_user):
         message.to_user=None;
         session.commit()
 
@@ -788,7 +788,7 @@ def view_delmessage(session, request, message_id ):
 
     # superuser can remove all messages
     # user can remove own message
-    if user.superuser \
+    if user.is_superuser \
             or user.username == message.to_user \
             or user.username == message.from_user:
         if message.actionstring:

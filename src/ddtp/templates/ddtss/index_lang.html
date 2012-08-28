@@ -45,7 +45,7 @@ $(document).ready(function($) {
 {% if forloop.first %}
 <div class=messages>
     <h2>Project-Messages<div class="help" title="Project Messages for the DDTP">?</div>  </h2>
-{% if user.superuser %}
+{% if user.is_superuser %}
     <a class="messagelink" target="_blank" href="{% url ddtss_message %}">New global message</a>
 {% endif %}
     <ul>
@@ -55,7 +55,7 @@ $(document).ready(function($) {
             <span style="font-size:80%">
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
-                {% if user.superuser %}<a href="{% url ddtss_delmessage message.message_id %}">Delete</a>{% endif %}
+                {% if user.is_superuser %}<a href="{% url ddtss_delmessage message.message_id %}">Delete</a>{% endif %}
                 <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to=message.message_id">Reply</a>
             </span>
         </li>

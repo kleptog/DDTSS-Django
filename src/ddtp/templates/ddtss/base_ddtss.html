@@ -15,7 +15,7 @@
 <a href="{% url ddtss_coordinate %}">Coordinator-Page</a> |
 {% endif %}
 {% endif %}
-{% if user.superuser %}
+{% if user.is_superuser %}
 <a href="{% url ddtss_admin %}">Admin-Page</a> |
 {% endif %}
 {% if user.logged_in %}

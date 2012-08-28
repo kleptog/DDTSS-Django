@@ -197,6 +197,11 @@ class Users(Base):
     def is_coordinator(self):
         return self.get_authority(self.lastlanguage_ref).is_coordinator
 
+    @property
+    def is_superuser(self):
+        """ This property abstracts the test from the actual value in the table """
+        return self.superuser
+
     def __repr__(self):
         return '<Users %s (%s)>' % (self.username, self.email)
 

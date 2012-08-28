@@ -24,7 +24,7 @@ def view_admin(session, request):
 
     user = get_user(request, session)
 
-    if not user.superuser:
+    if not user.is_superuser:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
     langs = session.query(Languages).all()
@@ -56,7 +56,7 @@ def view_admin_lang(session, request, language):
 
     user = get_user(request, session)
 
-    if not user.superuser:
+    if not user.is_superuser:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
     # Note: this is one of the few places where you're allowed to look at a disable language
