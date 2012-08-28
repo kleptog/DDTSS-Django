@@ -487,11 +487,15 @@ class Messages(Base):
     # for_description and language: for the description and lang
     # User: for that user
     # Both: Not allowed
+
+    # Note: to_user and from_user are not foreign keys, because you can send
+    # messages to not-logged in users, which are represented by IP address
+    # only.
     language = Column(String, ForeignKey('languages_tb.language'))
     for_description = Column(Integer, ForeignKey('description_tb.description_id'))
-    to_user = Column(String, ForeignKey('users_tb.username'))
+    to_user = Column(String)
 
-    from_user =  Column(String, ForeignKey('users_tb.username'))
+    from_user = Column(String)
     in_reply_to =  Column(Integer, ForeignKey('messages_tb.message_id'))
     timestamp = Column(Integer, nullable=False)
     message = Column(String, nullable=False)

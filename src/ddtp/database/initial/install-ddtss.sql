@@ -202,27 +202,11 @@ ALTER TABLE ONLY users_tb
 
 
 --
--- Name: messages_tb_from_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
---
-
-ALTER TABLE ONLY messages_tb
-    ADD CONSTRAINT messages_tb_from_user_fkey FOREIGN KEY (from_user) REFERENCES users_tb(username);
-
-
---
 -- Name: messages_tb_language_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
 --
 
 ALTER TABLE ONLY messages_tb
     ADD CONSTRAINT messages_tb_language_fkey FOREIGN KEY (language) REFERENCES languages_tb(language);
-
-
---
--- Name: messages_tb_to_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
---
-
-ALTER TABLE ONLY messages_tb
-    ADD CONSTRAINT messages_tb_to_user_fkey FOREIGN KEY (to_user) REFERENCES users_tb(username);
 
 
 --
