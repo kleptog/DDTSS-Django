@@ -10,6 +10,7 @@ from ddtp.database.db import with_db_session
 from ddtp.database.ddtp import Description, PackageVersion, DescriptionTag, ActiveDescription, Translation, DescriptionMilestone, Part, PartDescription
 from ddtp.database.ddtss import PendingTranslation, Languages
 from sqlalchemy import func
+from sqlalchemy.orm import subqueryload
 from ddtp.ddtss.views import get_user
 
 @cache_page(60*60)   # Cache for an hour
@@ -252,7 +253,9 @@ def stats_one_milestones_lang(session, request, language, mile):
     resultset = session.query(Description). \
                         join(DescriptionMilestone, DescriptionMilestone.description_id == Description.description_id).\
                         filter(DescriptionMilestone.milestone==mile).\
-                        order_by(Description.prioritize).all()
+                        order_by(Description.prioritize).\
+                        options(subqueryload('package_versions')).\
+                        all()
 
     resultset1 = session.query(DescriptionMilestone.description_id,PendingTranslation.description_id). \
                         join(PendingTranslation, DescriptionMilestone.description_id == PendingTranslation.description_id).\
