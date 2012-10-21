@@ -176,7 +176,7 @@ def view_coordinator(session, request):
 
     auth = user.get_authority(language)
 
-    if auth.auth_level != auth.AUTH_LEVEL_COORDINATOR:
+    if not user.is_coordinator:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 
     lang = session.query(Languages).get(language)
