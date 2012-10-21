@@ -274,7 +274,7 @@ def show_message_screen(request, msg, redirect, *args):
 
 class TranslationForm(forms.Form):
     """ This form is used to encapsulate the results of form submission """
-    short = forms.CharField(max_length=80)
+    short = forms.CharField(max_length=160)
     long = forms.CharField()
     comment = forms.CharField(required=False)
     submit = forms.CharField(required=False)
