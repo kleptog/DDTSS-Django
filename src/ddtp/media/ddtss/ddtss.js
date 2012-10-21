@@ -24,7 +24,7 @@ function set_milestone_chart(title, url) {
         }
         $("#flot_chart").show();
         $("#flot_title").html(title);
-        $.plot( $("#flot_graph"), [ {label: "Procent"   , yaxis: 1, data: percent},
+        $.plot( $("#flot_graph"), [ {label: "Percent"   , yaxis: 1, data: percent},
                                     {label: "Total"     , yaxis: 2, data: total},
                                     {label: "Translated", yaxis: 2, data: packages} ],
                                     {
