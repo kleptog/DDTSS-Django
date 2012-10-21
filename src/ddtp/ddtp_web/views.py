@@ -240,7 +240,6 @@ def stats_milestones_lang(session, request, language):
 
     return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
 
-@cache_page(60*60)   # Cache for an hour
 @with_db_session
 def stats_one_milestones_lang(session, request, language, mile):
     """ Does milestones stats page per language """
