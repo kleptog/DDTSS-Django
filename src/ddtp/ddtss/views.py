@@ -374,7 +374,10 @@ def view_translate(session, request, language, description_id):
             session.add(message)
 
             session.commit()
-            return show_message_screen(request, 'Translation submitted', 'ddtss_index_lang', language)
+            if trans.state != PendingTranslation.STATE_PENDING_TRANSLATION:
+                return show_message_screen(request, 'Translation submitted for review', 'ddtss_index_lang', language)
+            else:
+                return show_message_screen(request, 'Translation saved for further translation', 'ddtss_index_lang', language)
 
     if trans.comment is None:
         trans.comment = ""
