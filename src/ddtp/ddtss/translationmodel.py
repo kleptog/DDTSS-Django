@@ -3,6 +3,7 @@
 # See LICENCE file for details.
 
 import time
+from django.conf import settings
 from ddtp.database import ddtss
 
 class DefaultTranslationModel(ddtss.TranslationModel):
@@ -76,6 +77,9 @@ class DefaultTranslationModel(ddtss.TranslationModel):
         return self.USER_TYPE_LOGGED_IN
 
     def user_allowed(self, user, language, action):
+        if settings.DEMO_MODE:
+            return True
+
         auth = user.get_authority(language)
 
         points = self.points[auth.auth_level][action]
