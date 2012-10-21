@@ -36,12 +36,12 @@ $(document).ready(function($) {
     <tr class="{% cycle 'odd_untrans' 'even_untrans' %}">
 {% endif %}
     <td>{% if transinfo.translate > 0 %}
-            <a href="{% url ddt_transdescr transinfo.translate lang.language %}">translated</a>
+            <a href="{% url ddt_transdescr transinfo.translate lang.language %}">Translated</a>
         {% else %}
         {% if transinfo.pending > 0 %}
-            <a href="{% url ddtss_forreview lang.language descr.description_id %}">pending</a>
+            <a href="{% url ddtss_forreview lang.language descr.description_id %}">Pending translation</a>
         {% else %}
-            <a href="{% url ddtss_translate lang.language descr.description_id %}">Fetched for translation</a>
+            <a href="{% url ddtss_translate lang.language descr.description_id %}">Fetch for translation</a>
         {% endif %}
         {% endif %}
         <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
