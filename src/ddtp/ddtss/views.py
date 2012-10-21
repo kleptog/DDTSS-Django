@@ -169,9 +169,9 @@ def view_index_lang(session, request, language):
                     trans.short, trans.long = PendingTranslation.make_suggestion(description, language)
                     session.add(trans)
                     session.commit()
-                    return show_message_screen(request, 'Fetch Package %s (%s)' % (description.package,str(description_id)), 'ddtss_index_lang', language)
+                    return show_message_screen(request, 'Fetched package %s (%s)' % (description.package,str(description_id)), 'ddtss_translate', language, str(description_id))
 
-            return show_message_screen(request, 'Don\'t fetch Package %s' % (pack), 'ddtss_index_lang', language)
+            return show_message_screen(request, 'Didn\'t fetch package %s' % (pack), 'ddtss_index_lang', language)
 
     session.commit()
 
