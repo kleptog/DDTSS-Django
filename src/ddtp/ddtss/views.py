@@ -384,11 +384,12 @@ def view_translate(session, request, language, description_id):
     if trans.short is None:
         trans.short, trans.long = PendingTranslation.make_suggestion(descr, language)
 
-    descr_messages = session.query(Messages) \
-                          .filter(Messages.language==language) \
-                          .filter(Messages.for_description==description_id) \
-                          .order_by(Messages.timestamp) \
-                          .all()
+    descr_messages = Messages.description_messages(session, description_id) \
+                             .order_by(Messages.timestamp) \
+                             .all()
+    trans_messages = Messages.translation_messages(session, language, description_id) \
+                             .order_by(Messages.timestamp) \
+                             .all()
 
     olddiffs = list()
     for olddescr in descr.get_description_predecessors:
@@ -416,7 +417,8 @@ def view_translate(session, request, language, description_id):
         descr=descr,
         trans=trans,
         olddiffs=olddiffs,
-        descr_messages=descr_messages), context_instance=RequestContext(request))
+        descr_messages=descr_messages,
+        trans_messages=trans_messages), context_instance=RequestContext(request))
 
 def generate_line_diff(old, new):
     """ Given two lines, generate a diff between them. Intends for short
@@ -644,11 +646,12 @@ def view_review(session, request, language, description_id):
         diff_long = generate_long_description_diff(trans.for_display(trans.oldlong), trans.for_display(trans.long))
 
 
-    descr_messages = session.query(Messages) \
-                         .filter(Messages.for_description==description_id) \
-                         .filter(Messages.language==language) \
-                         .order_by(Messages.timestamp) \
-                         .all()
+    descr_messages = Messages.description_messages(session, description_id) \
+                             .order_by(Messages.timestamp) \
+                             .all()
+    trans_messages = Messages.translation_messages(session, language, description_id) \
+                             .order_by(Messages.timestamp) \
+                             .all()
 
     olddiffs = list()
     for olddescr in descr.get_description_predecessors:
@@ -676,7 +679,8 @@ def view_review(session, request, language, description_id):
         descr=descr,
         trans=trans,
         olddiffs=olddiffs,
-        descr_messages=descr_messages), context_instance=RequestContext(request))
+        descr_messages=descr_messages,
+        trans_messages=trans_messages), context_instance=RequestContext(request))
 
 
 class MessageForm(forms.Form):

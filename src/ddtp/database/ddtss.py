@@ -492,7 +492,8 @@ class Messages(Base):
     # Specify who sees it:
     # all NULL: global
     # Language: for that language only
-    # for_description and language: for the description and lang
+    # for_description, no lang: for that description (shared between languages)
+    # for_description and language: for the translation of that description in that lang
     # User: for that user
     # Both: Not allowed
 
@@ -522,6 +523,7 @@ class Messages(Base):
 
     @classmethod
     def global_messages(cls, session):
+        """ Returns a query for messages destined for everyone """
         return session.query(cls) \
                           .filter(cls.to_user==None) \
                           .filter(cls.language==None) \
@@ -530,19 +532,38 @@ class Messages(Base):
 
     @classmethod
     def team_messages(cls, session, language):
+        """ Return a query for messages for a given language team """
         return session.query(cls) \
                           .filter(cls.language==language) \
                           .filter(cls.for_description==None) \
                           .filter(cls.from_user!=None)
 
     @classmethod
+    def description_messages(cls, session, description_id):
+        """ Return a query for messages for the given description """
+        return session.query(cls) \
+                          .filter(cls.language==None) \
+                          .filter(cls.for_description==description_id) \
+                          .filter(cls.to_user==None)
+
+    @classmethod
+    def translation_messages(cls, session, language, description_id):
+        """ Return a query for messages for the given description for the given language """
+        return session.query(cls) \
+                          .filter(cls.language==language) \
+                          .filter(cls.for_description==description_id) \
+                          .filter(cls.to_user==None)
+    @classmethod
     def user_messages(cls, session, username):
+        """ Return a query for messages for the given user """
         return session.query(cls) \
                           .filter(cls.to_user==username) \
                           .filter(cls.from_user!=None)
 
     @classmethod
     def involveddescriptions(cls, session, username):
+        """ Return a query for descriptions that user is involved in,
+        detected by the descriptions they have sent a message for """
         return session.query(cls.for_description) \
                           .filter(cls.from_user==username) \
                           .filter(cls.for_description!=None) \

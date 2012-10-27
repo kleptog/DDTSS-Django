@@ -120,6 +120,7 @@ Translated:
 <pre><span class='old' >{{olddiff.oldtransshort}}</span>
 <span class='new' >{{olddiff.transshort}}</span></pre>
 </span>
+</div>
     </li>
 </span>
 {% endfor %}
@@ -159,7 +160,7 @@ English:
 Translated:
 <pre><span class='old' >{{olddiff.oldtranslong}}</span>
 <span class='new' >{{olddiff.translong}}</span></pre>
-</span>
+</span></div>
     </li>
 </span>
 {% endfor %}
@@ -168,9 +169,30 @@ Translated:
     <span class="tooltip" title="Debian policy states that lines without leading spaces may be wrapped by user-agents. So for lists, make sure you include a leading space to avoid splattered text.">Textwrapping note</span>
     <br />
     <textarea name="long"  rows="10" cols="75" onchange="document.forms[0].submit.disabled=0" wrap="hard">{{trans.display_long}}</textarea></li>
-    Comment field: (free form, for discussion about translation. Saved even if you abandon.)
-    <br>
-    <textarea name="comment"  rows="4" cols="75">{{trans.comment}}</textarea>
+<!-- new translation comments from messages -->
+<div class=trans_messages>
+    <h6>Comments for this translation</h6>
+    {% for message in trans_messages %}
+    {% if forloop.first %}
+    <table>
+      <tr>
+        <th>User
+        <th>Action
+        <th>Message
+    {% endif %}
+      <tr>
+        <td><span style="font-size:80%">{{message.from_user}} at {{message.datetime|date:"Y-m-d H:i:s"}}</span>
+        <td><span style="font-size:80%">{{message.actionstring}}</span>
+        <td>{% if message.message %}
+            <span title="{{message.parent.message}}">{{message.message|linebreaksbr}}</span><br>
+            {% endif %}
+    {% if forloop.last %}
+    </table>
+    {% endif %}
+    {% endfor %}
+</div>
+<!-- end new translation comments from message -->
+    <textarea name="comment"  rows="4" cols="75"></textarea>
 </ul>
 {% if forreview %}
 <input type="submit" name="accept" value="Accept as is" />
@@ -194,15 +216,17 @@ actually returning UTF-8 as promised -->
 </td><td valign="top">
 
 <!-- new description comments per Messages -->
-<div class=messages>
+<div class=descr_messages>
     <h2>Comments for this description</h2>
+    <small>Shared between languages, for talking <i>about</i> this description.</small><br>
     {% for message in descr_messages %}
     {% if forloop.first %}
     <ul>
     {% endif %}
         <li>
             {% if message.message %}
-            <b title="{{message.parent.message}}">{{message.message|linebreaksbr}}</b><br>
+            <span
+            title="{{message.parent.message}}">{{message.message|linebreaksbr}}</span><br>
             {% endif %}
             <span style="font-size:80%">
                 {{message.actionstring}}
