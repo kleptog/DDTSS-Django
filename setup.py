@@ -10,7 +10,7 @@ setup(name="ddtp", version="0.1",
       zip_safe=False,      
       install_requires=['setuptools', 
                         'psycopg2', 
-                        'SQLalchemy',
+                        'SQLalchemy >= 0.7.6',
                         'python-debian',
                         'django_openid-consumer',
                         'django-debug-toolbar'])

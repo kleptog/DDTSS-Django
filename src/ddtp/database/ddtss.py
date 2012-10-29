@@ -8,13 +8,13 @@ import time
 import difflib
 
 from .db import Base
-from .ddtp import Description, Translation, PartDescription, Part, description_to_parts, Statistic
+from .ddtp import Description, Translation, PartDescription, Part, description_to_parts, Statistic, DescriptionMilestone
 from django.conf import settings
 from django.utils.timesince import timesince
-from sqlalchemy import types
+from sqlalchemy import types, func
 from sqlalchemy.orm import relationship, relation, aliased
 from sqlalchemy.orm.session import Session
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text, select, literal, union_all, exists
 from datetime import datetime
 
 class TranslationModel(object):
@@ -100,6 +100,40 @@ class Languages(Base):
 
     def __repr__(self):
         return '<Languages %s (%s)>' % (self.language, self.fullname)
+
+    def get_next_to_translate(self, session):
+        """ Use the milestones and priority to find the next description to translate """
+        # This is the query we want:
+        # select description_id from (
+        #         select description_id, 50 as score from languages_tb join description_milestone_tb on (milestone_high=milestone) where language = 'nl'
+        # union all
+        #         select description_id, 30 from languages_tb join description_milestone_tb on (milestone_medium=milestone) where language = 'nl'
+        # union all
+        #         select description_id, 10 from languages_tb join description_milestone_tb on (milestone_low=milestone) where language = 'nl'
+        # union all
+        #         select description_id, prioritize from description_tb
+        # ) x
+        # where not exists (select 1 from translation_tb where translation_tb.description_id = x.description_id)
+        # group by description_id order by sum(score) desc
+        # limit 1;
+        lang_cte = session.query(Languages).filter_by(language=self.language).cte("language")
+
+        prio = session.query(Description.description_id, Description.prioritize)
+        high = session.query(DescriptionMilestone.description_id, literal(50).label("prioritize")).join(lang_cte, lang_cte.c.milestone_high==DescriptionMilestone.milestone)
+        medium = session.query(DescriptionMilestone.description_id, literal(30).label("prioritize")).join(lang_cte, lang_cte.c.milestone_medium==DescriptionMilestone.milestone)
+        low = session.query(DescriptionMilestone.description_id, literal(10).label("prioritize")).join(lang_cte, lang_cte.c.milestone_low==DescriptionMilestone.milestone)
+
+        prio_cte = union_all(prio, high, medium, low).cte()
+
+        q = session.query(prio_cte.c.description_tb_description_id). \
+                    filter(~exists([1], Translation.description_id == prio_cte.c.description_tb_description_id)). \
+                    filter(~exists([1], PendingTranslation.description_id == prio_cte.c.description_tb_description_id)). \
+                    group_by(prio_cte.c.description_tb_description_id). \
+                    order_by(func.sum(prio_cte.c.description_tb_prioritize).desc())
+
+        row = q.first()
+        if row:
+            return row[0]
 
 # /aliases/*
 class Users(Base):

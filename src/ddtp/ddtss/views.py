@@ -98,7 +98,7 @@ def save_user(response, user):
 
 class FetchForm(forms.Form):
     """ This form is used to encapsulate the results of Fetch request """
-    package = forms.CharField(max_length=80)
+    package = forms.CharField(max_length=80, required=False)
     force = forms.CharField(required=False)
     _charset_ = forms.CharField(required=False)
 
@@ -122,56 +122,56 @@ def view_index_lang(session, request, language):
             # Maybe return HTTP 400 - Bad request?
             return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
 
-        if form.cleaned_data['package']:
-            pack = form.cleaned_data['package']
-            force = form.cleaned_data['force']
+        pack = form.cleaned_data['package'].strip()
+        force = form.cleaned_data['force']
 
-            if re.match('^\d+$', pack) :
-                description_id=pack
-            else :
-                # FIXME error, ist package name is not found!
-                packageversion=session.query(PackageVersion).filter(PackageVersion.package==pack).\
-                        join(ActiveDescription, ActiveDescription.description_id == PackageVersion.description_id).limit(1).first()
+        if pack == '':
+            description_id = lang.get_next_to_translate(session)
+        elif re.match('^\d+$', pack):
+            description_id = int(pack)
+        else:
+            packageversion = session.query(PackageVersion).filter(PackageVersion.package==pack). \
+                                     join(ActiveDescription, ActiveDescription.description_id == PackageVersion.description_id).first()
 
-                if not packageversion :
-                    return show_message_screen(request, 'No Package %s found' % pack, 'ddtss_index_lang', language)
+            if not packageversion:
+                return show_message_screen(request, 'No Package %s found' % pack, 'ddtss_index_lang', language)
 
-                description_id=packageversion.description_id
+            description_id=packageversion.description_id
 
-            description=session.query(Description).filter(Description.description_id==description_id).first()
+        description = session.query(Description).filter(Description.description_id==description_id).first()
 
-            if not description :
-                return show_message_screen(request, 'No description-id %s found' % str(description_id), 'ddtss_index_lang', language)
+        if not description:
+            return show_message_screen(request, 'No description-id %s found' % str(description_id), 'ddtss_index_lang', language)
 
-            if language not in description.translation or force:
-                trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
-                if not trans:
-                    message = Messages(
-                            message="",
-                            actionstring="fetched",
-                            to_user=None,
-                            language=language,
-                            for_description=description_id,
-                            from_user=user.username,
-                            in_reply_to=None,
-                            timestamp=int(time.time()))
-                    session.add(message)
+        if language not in description.translation or force:
+            trans = session.query(PendingTranslation).filter_by(language=lang, description_id=description_id).with_lockmode('update').first()
+            if not trans:
+                message = Messages(
+                        message="",
+                        actionstring="fetched",
+                        to_user=None,
+                        language=language,
+                        for_description=description_id,
+                        from_user=user.username,
+                        in_reply_to=None,
+                        timestamp=int(time.time()))
+                session.add(message)
 
-                    trans = PendingTranslation(
-                            description_id=description_id,
-                            language=lang,
-                            firstupdate=int(time.time()),
-                            lastupdate=int(time.time()),
-                            owner_username=user.username,
-                            owner_locktime=int(time.time()),
-                            iteration=0,
-                            state=0)
-                    trans.short, trans.long = PendingTranslation.make_suggestion(description, language)
-                    session.add(trans)
-                    session.commit()
-                    return show_message_screen(request, 'Fetched package %s (%s)' % (description.package,str(description_id)), 'ddtss_translate', language, str(description_id))
+                trans = PendingTranslation(
+                        description_id=description_id,
+                        language=lang,
+                        firstupdate=int(time.time()),
+                        lastupdate=int(time.time()),
+                        owner_username=user.username,
+                        owner_locktime=int(time.time()),
+                        iteration=0,
+                        state=0)
+                trans.short, trans.long = PendingTranslation.make_suggestion(description, language)
+                session.add(trans)
+                session.commit()
+                return show_message_screen(request, 'Fetched package %s (%s)' % (description.package,str(description_id)), 'ddtss_translate', language, str(description_id))
 
-            return show_message_screen(request, 'Didn\'t fetch package %s' % (pack), 'ddtss_index_lang', language)
+        return show_message_screen(request, 'Package %s already translated (and not forced)' % (pack), 'ddtss_index_lang', language)
 
     session.commit()
 
