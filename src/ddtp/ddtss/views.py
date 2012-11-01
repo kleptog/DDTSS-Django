@@ -122,6 +122,9 @@ def view_index_lang(session, request, language):
             # Maybe return HTTP 400 - Bad request?
             return show_message_screen(request, 'Bad request %r' % form.errors, 'ddtss_index_lang', language)
 
+        if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_TRANSLATE):
+            return show_message_screen(request, 'User is not permitted to translate', 'ddtss_index_lang', language)
+
         pack = form.cleaned_data['package'].strip()
         force = form.cleaned_data['force']
 
@@ -294,7 +297,7 @@ def view_translate(session, request, language, description_id):
 
     user = get_user(request, session)
 
-    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_REVIEW):
+    if not lang.translation_model.user_allowed(user, language, lang.translation_model.ACTION_TRANSLATE):
         return show_message_screen(request, 'User is not permitted to translate', 'ddtss_index_lang', language)
 
     # Select FOR UPDATE, to avoid concurrency issues.
