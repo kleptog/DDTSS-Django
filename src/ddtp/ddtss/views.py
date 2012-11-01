@@ -24,8 +24,8 @@ from ddtp.ddtss.translationmodel import DefaultTranslationModel
 @with_db_session
 def view_index(session, request, lang=None):
     """ Does the main index page for DDTSS, with list of languages and stats """
+    user = get_user(request, session)
     if lang is None:
-        user = get_user(request, session)
         lang = user.lastlanguage_ref
     if lang is None:
         lang = 'xx'
@@ -60,7 +60,7 @@ def view_index(session, request, lang=None):
     # Sort by translated descending
     params.sort(key=lambda x:x['translated'], reverse=True)
 
-    return render_to_response("ddtss/index.html", {'languages': params}, context_instance=RequestContext(request))
+    return render_to_response("ddtss/index.html", {'languages': params, 'user': user}, context_instance=RequestContext(request))
 
 def get_user(request, session):
     user = None
