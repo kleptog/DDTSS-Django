@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^(\w\w(?:_\w\w)?)/forreview/(\d+)$', ddtss_views.view_review, name='ddtss_forreview'),
     url(r'^coordinate$', ddtss_admin.view_coordinator, name='ddtss_coordinate'),
     url(r'^createlogin$', ddtss_users.view_create_user, name='ddtss_create_user'),
+    url(r'^createlogin/verifyemail/(?P<user>[\w.@+-]+)$', ddtss_users.view_create_user_verifyemail, name='ddtss_create_user_verifyemail'),
     url(r'^createlogin/complete$', ddtss_users.view_create_user_complete, name='ddtss_create_user_complete'),
     url(r'^preference$', ddtss_users.view_preference, name='ddtss_preference'),
     url(r'^login$', ddtss_users.view_login, name='ddtss_login'),

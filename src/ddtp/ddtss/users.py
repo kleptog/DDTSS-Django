@@ -11,6 +11,7 @@ from django import forms
 from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
+from django.core.mail import EmailMessage
 from django.template import RequestContext
 from django.contrib import messages
 from ddtp.database.db import with_db_session
@@ -29,7 +30,13 @@ class UserCreationForm(forms.Form):
         help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
     realname = forms.CharField(label='Real Name')
-    openid_url = forms.CharField(label='OpenID URL')
+    openid_url = forms.CharField(label='OpenID URL', required=False)
+
+    email = forms.EmailField(label='Email address', required=False)
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False,
+        min_length=6, help_text = "Enter the password.")
+    password2 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False,
+        min_length=6, help_text = "Enter the same password as above, for verification.")
 
     def __init__(self, session, *args, **kwargs):
         self.session = session
@@ -38,10 +45,26 @@ class UserCreationForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data["username"]
 
-        if self.session.query(Users).get(username):
+        if self.session.query(Users).filter_by(username=username, active=True).first():
             raise forms.ValidationError("A user with that username already exists.")
 
         return username
+
+    def clean(self):
+        cleaned_data = super(UserCreationForm, self).clean()
+
+        if cleaned_data.get('openid_url'):
+            return cleaned_data
+        if not (cleaned_data.get('password1') and cleaned_data.get('password2') and cleaned_data.get('email')):
+            raise forms.ValidationError("Must specify either an OpenID or email and passwords.")
+
+        if cleaned_data.get('password1') != cleaned_data.get('password2'):
+            self._errors["password2"] = self.error_class(["Entered passwords do not match"])
+
+            del cleaned_data['password1']
+            del cleaned_data['password2']
+
+        return cleaned_data
 
 def generate_random_string(length):
     chars = string.letters + string.digits + "/_"
@@ -54,20 +77,60 @@ def view_create_user(session, request):
     if request.method == "POST":
         form = UserCreationForm(session=session, data=request.POST)
         if form.is_valid():
-            # What we do here is add the username to the session and then
-            # run the code as if they did a login request.  Then we run the
-            # code as if they did a login.  If the login succeeds we can
-            # create the user account.
-            request.session['new_user_info'] = (form.cleaned_data['username'], form.cleaned_data['realname'])
+            if form.cleaned_data['openid_url']:
+                # What we do here is add the username to the session and then
+                # run the code as if they did a login request.  Then we run the
+                # code as if they did a login.  If the login succeeds we can
+                # create the user account.
+                request.session['new_user_info'] = (form.cleaned_data['username'], form.cleaned_data['realname'])
 
-            def on_failure(request, message):
-                return render_to_response("ddtss/create_user.html", {'message': message},
-                                         context_instance=RequestContext(request))
+                def on_failure(request, message):
+                    return render_to_response("ddtss/create_user.html", {'message': message},
+                                             context_instance=RequestContext(request))
 
-            return django_openid_consumer.views.begin(request,
-                                                      on_failure=on_failure,
-                                                      redirect_to=reverse('ddtss_create_user_complete'))
+                return django_openid_consumer.views.begin(request,
+                                                          on_failure=on_failure,
+                                                          redirect_to=reverse('ddtss_create_user_complete'))
+            else:
+                user = session.query(Users).filter_by(username=form.cleaned_data['username']).first()
 
+                # User may exist but must not be active (forms checks for
+                # that).  Allow reuse of users not active, in case email
+                # gets lost.
+                if not user:
+                    user = Users()
+
+                # Create user and add to database
+                user.username=form.cleaned_data['username']
+                user.email=form.cleaned_data['email']
+                user.realname=form.cleaned_data['realname']
+                user.active=False
+                user.key=generate_random_string(16)
+                user.lastseen=int(time.time())
+                user.md5password = hashlib.md5(user.key + form.cleaned_data['password1']).hexdigest()
+
+                # User logging in with email address and password
+                email = EmailMessage(subject="Verify new DDTSS account",
+                                     from_email="ddtss@kleptog.org",
+                                     to=[form.cleaned_data['email']],
+                                     bcc=["ddtss@kleptog.org"],
+                                    )
+                confirm_url = request.build_absolute_uri( reverse("ddtss_create_user_verifyemail", args=[form.cleaned_data['username']]) )
+                email.body = """
+    To confirm your account (%s) on the DDTSS, please follow this link
+    %s?key=%s
+
+    If you did not create an account, please ignore this email.
+    Django-DDTSS (Debian Distributed Translation Server Satelite)
+                """ % (form.cleaned_data['username'], confirm_url, hashlib.md5(user.key).hexdigest())
+
+                email.send()
+
+                session.add(user)
+                session.commit()
+
+                messages.success(request, "Verification email sent. Press on contained link to activate account.")
+                return redirect("ddtss_index")
     else:
         form = UserCreationForm(session)
 
@@ -126,6 +189,28 @@ def view_create_user_complete(session, request):
 
     return django_openid_consumer.views.complete(request, on_failure=on_failure, on_success=on_success)
 
+@with_db_session
+def view_create_user_verifyemail(session, request, user):
+    """ Called for email verification """
+    user = session.query(Users).filter_by(username=user).first()
+
+    if not user:
+        messages.error(request, "Verification for non-existant user.")
+    elif user.active:
+        messages.error(request, "User already verified.")
+    elif hashlib.md5(user.key).hexdigest() == request.GET.get('key'):
+        messages.success(request, "User successfully verified.")
+        user.active = True
+
+        # Login user in
+        request.session['username'] = user.username
+
+        session.commit()
+    else:
+        messages.error(request, "Verification failed.")
+
+    return redirect('ddtss_index')
+
 
 class LoginForm(forms.Form):
     """
@@ -135,7 +220,7 @@ class LoginForm(forms.Form):
         help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
     password = forms.CharField(label="Password", widget=forms.PasswordInput, required=False,
-        help_text = "Enter the same password as above, for verification.")
+        help_text = "Enter password if no OpenID.")
     openid_url = forms.CharField(label='OpenID URL', required=False)
 
 @with_db_session

@@ -13,9 +13,32 @@ teams may require a login to be able to contribute.
 If you don't have a login the system tries to keep stats in a cookie, so if
 you keep using different machines, a login may be useful.
 </p>
+{% if form.non_field_errors %}{{ form.non_field_errors.as_ul }}{% endif %}
 <form method="post" action="{% url ddtss_create_user %}" enctype="multipart/form-data">
 <table id="create_table">
-{{form}}
+<tr><th>{{ form.username.label_tag }}</th><td> {{ form.username }}
+       {% if form.username.errors %} <br/> <b>{{ form.username.errors }}</b> {% endif %}
+       {% if form.username.help_text %} <br/> {{ form.username.help_text }} </td> {% endif %}
+<tr><th>{{ form.realname.label_tag }}</th><td> {{ form.realname }}
+       {% if form.realname.errors %} <br/> <b>{{ form.realname.errors }}</b> {% endif %}
+       {% if form.realname.help_text %} <br/> {{ form.realname.help_text }} </td> {% endif %}
+<tr><th>{{ form.openid_url.label_tag }}</th><td> {{ form.openid_url }}
+       {% if form.openid_url.errors %} <br/> <b>{{ form.openid_url.errors }}</b> {% endif %}
+       {% if form.openid_url.help_text %} <br/> {{ form.openid_url.help_text }} </td> {% endif %}
+<tr><td colspan=2>If you don't have an OpenID and don't want one, you must
+       supply an email address (for verification) and a password. An email
+       will be sent with a link to click on to enable your
+       account.</td></tr>
+<tr><th>{{ form.email.label_tag }}</th><td> {{ form.email }}
+       {% if form.email.errors %} <br/> <b>{{ form.email.errors }}</b> {% endif %}
+       {% if form.email.help_text %} <br/> {{ form.email.help_text }} </td> {% endif %}
+<tr><th>{{ form.password1.label_tag }}</th><td> {{ form.password1 }}
+       {% if form.password1.errors %} <br/> <b>{{ form.password1.errors }}</b> {% endif %}
+       {% if form.password1.help_text %} <br/> {{ form.password1.help_text }} </td> {% endif %}
+<tr><th>{{ form.password2.label_tag }}</th><td> {{ form.password2 }}
+       {% if form.password2.errors %} <br/> <b>{{ form.password2.errors }}</b> {% endif %}
+       {% if form.password2.help_text %} <br/> {{ form.password2.help_text }} </td> {% endif %}
+</tr>
 </table>
 <input type="submit" name="submit" value="Submit" />
 <input type="submit" name="cancel" value="Cancel" />
