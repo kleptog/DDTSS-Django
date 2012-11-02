@@ -168,11 +168,10 @@ class CoordinatorAdminForm(forms.Form):
         return data
 
 @with_db_session
-def view_coordinator(session, request):
+def view_coordinator(session, request, language):
     """ Handle coordinator language management """
 
     user = get_user(request, session)
-    language = user.lastlanguage_ref
 
     auth = user.get_authority(language)
 
@@ -182,6 +181,8 @@ def view_coordinator(session, request):
     lang = session.query(Languages).get(language)
     if not lang or not lang.enabled_ddtss:
         raise Http404()
+
+    user.lastlanguage_ref = language
 
     form = None
     if request.method == "POST":

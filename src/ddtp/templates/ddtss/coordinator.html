@@ -36,7 +36,7 @@ Coordinators:
 <p>
 <a class="messagelink" target="_blank" href="{% url ddtss_message_lang lang.language %}">New Team message</a> |
 <p>
-<form method="post" action="{% url ddtss_coordinate %}" enctype="multipart/form-data">
+<form method="post" action="{% url ddtss_coordinate_lang lang.language %}" enctype="multipart/form-data">
 {% for errors in form.errors.itervalues %}
 {{errors}}
 {% endfor %}
@@ -76,7 +76,7 @@ Trusted users:
 <table id="trustedusers">
 <tr><th>Username</th><th>Name</th><th></th></tr>
 {% for user in lang.trusted_users %}
-<form method="post" action="{% url ddtss_coordinate %}">
+<form method="post" action="{% url ddtss_coordinate_lang lang.language %}">
 <tr class="{% cycle 'odd' 'even' %}">
   <td>{{user.username}}</td>
   <td>{{user.realname}} ({{user.email}})</td>
@@ -84,7 +84,7 @@ Trusted users:
 </tr>
 </form>
 {% endfor %}
-<form method="post" action="{% url ddtss_coordinate %}">
+<form method="post" action="{% url ddtss_coordinate_lang lang.language %}">
 <tr>
   <td colspan=2><input name="username" type="text"></td>
   <td><button type="submit" name="add" value="Add">Add</button></td>
