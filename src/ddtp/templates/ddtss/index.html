@@ -14,7 +14,14 @@ Afterwards the updated translation is submitted to the DDTS server.
 This is the experimental DDTSS-Django version. It is currently under developement.
 <p>
 More information about the DDTP and the DDTSS can be found  <a href="http://www.debian.org/international/l10n/ddtp">here</a>.
-{# It's tempting to put messages here, but this page is cached #}
+{# These message are the Django messages #}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 <h1>Select a language:</h1>
 <table class="langlist"><col width="150px" /><col width="150px" /><col width="150px" /><col width="150px"/>
 <tr><th>Language</th> <th>Pending translation</th> <th>Pending review</th> <th>Translated</th></tr>
