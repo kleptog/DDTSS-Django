@@ -1,17 +1,7 @@
 TODO
 ====
 
-- User email verification during user creation.
-
-- User permissions
-
-  Probably needs a table to track superusers and language coordinators.
-
-- Complete translation process
-
-- Messages
-
-  The table need should already exist. Needs add/remove pages.
+- Recently translated
 
 - Rest of DDTP ddt.cgi (just for fun really, but mostly so it's templated so
   people can restyle it.
@@ -29,3 +19,5 @@ TODO
 - Wordlists
 
   Needs a new table
+
+- Mail parsing
