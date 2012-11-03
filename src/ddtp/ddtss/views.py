@@ -239,6 +239,7 @@ def view_index_lang(session, request, language):
         milestones.append(info)
 
     involveddescriptions = [x for x, in Messages.involveddescriptions(session, user.username).all()]
+    recently_translated = Messages.recently_translated(session, language).limit(10).all()
 
     response = render_to_response("ddtss/index_lang.html", dict(
         lang=lang,
@@ -249,6 +250,7 @@ def view_index_lang(session, request, language):
         reviewed=reviewed,
         involveddescriptions=involveddescriptions,
         milestones=milestones,
+        recently_translated=recently_translated,
         global_messages=global_messages,
         team_messages=team_messages,
         user_messages=user_messages), context_instance=RequestContext(request))

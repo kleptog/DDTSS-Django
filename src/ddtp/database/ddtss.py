@@ -11,7 +11,7 @@ from .db import Base
 from .ddtp import Description, Translation, PartDescription, Part, description_to_parts, Statistic, DescriptionMilestone
 from django.conf import settings
 from django.utils.timesince import timesince
-from sqlalchemy import types, func
+from sqlalchemy import types, func, desc
 from sqlalchemy.orm import relationship, relation, aliased
 from sqlalchemy.orm.session import Session
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text, select, literal, union_all, exists
@@ -491,7 +491,7 @@ class PendingTranslation(Base):
                   self.short,
                   self.long)
         message = Messages(message=message,
-                           actionstring="Translation Accepted",
+                           actionstring="translation accepted",
                            language=self.language_ref,
                            for_description=self.description_id,
                            timestamp=int(time.time()))
@@ -603,3 +603,11 @@ class Messages(Base):
                           .filter(cls.for_description!=None) \
                           .distinct()
 
+    @classmethod
+    def recently_translated(cls, session, language):
+        """ Return a query for message relating to the acceptance of translations """
+        return session.query(cls) \
+                          .filter(cls.language==language) \
+                          .filter(cls.for_description!=None) \
+                          .filter(cls.actionstring=='translation accepted') \
+                          .order_by(desc(cls.timestamp))
