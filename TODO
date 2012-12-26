@@ -4,6 +4,8 @@ TODO
 - Rest of DDTP ddt.cgi (just for fun really, but mostly so it's templated so
   people can restyle it.
 
+- Forgotten password procedure/Change password procedure
+
 - Translation logging
 
   People would like to keep the comments and logs of translation
