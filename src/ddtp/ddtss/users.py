@@ -26,7 +26,7 @@ class UserCreationForm(forms.Form):
     """
     A form that creates a user, with no privileges, from the given username and password.
     """
-    username = forms.RegexField(label="Alias", max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label="Username", max_length=30, regex=r'^[\w.@+-]+$',
         help_text = "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         error_messages = {'invalid': "This value may contain only letters, numbers and @/./+/-/_ characters."})
     realname = forms.CharField(label='Real Name')
