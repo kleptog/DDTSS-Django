@@ -21,3 +21,6 @@ TODO
   Needs a new table
 
 - Mail parsing
+
+- Rationalise the whole milestones stuff. It's a bit half baked here and
+  there.
