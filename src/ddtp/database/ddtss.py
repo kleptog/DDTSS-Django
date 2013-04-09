@@ -611,3 +611,13 @@ class Messages(Base):
                           .filter(cls.for_description!=None) \
                           .filter(cls.actionstring=='translation accepted') \
                           .order_by(desc(cls.timestamp))
+
+class WordlistEntry(Base):
+    """ Entry in a wordlist for a language """
+    __tablename__ = 'wordlist_tb'
+
+    language_ref = Column('language', String, ForeignKey('languages_tb.language'), primary_key=True)
+    word = Column(String, primary_key=True)
+    translation = Column(String, nullable=False)
+
+    language = relationship(Languages)

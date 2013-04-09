@@ -139,6 +139,19 @@ CREATE TABLE users_tb (
 
 
 --
+-- Name: wordlist_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
+--
+
+CREATE TABLE wordlist_tb (
+    language text NOT NULL,
+    word text NOT NULL,
+    translation text NOT NULL
+);
+
+
+ALTER TABLE public.wordlist_tb OWNER TO kleptog;
+
+--
 -- Name: message_id; Type: DEFAULT; Schema: public; Owner: kleptog
 --
 
@@ -202,6 +215,14 @@ ALTER TABLE ONLY users_tb
 
 
 --
+-- Name: wordlist_tb_pkey; Type: CONSTRAINT; Schema: public; Owner: kleptog; Tablespace: 
+--
+
+ALTER TABLE ONLY wordlist_tb
+    ADD CONSTRAINT wordlist_tb_pkey PRIMARY KEY (language, word);
+
+
+--
 -- Name: messages_tb_language_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
 --
 
@@ -255,6 +276,14 @@ ALTER TABLE ONLY userauthority_tb
 
 ALTER TABLE ONLY users_tb
     ADD CONSTRAINT users_tb_lastlanguage_fkey FOREIGN KEY (lastlanguage) REFERENCES languages_tb(language);
+
+
+--
+-- Name: wordlist_tb_language_fkey; Type: FK CONSTRAINT; Schema: public; Owner: kleptog
+--
+
+ALTER TABLE ONLY wordlist_tb
+    ADD CONSTRAINT wordlist_tb_language_fkey FOREIGN KEY (language) REFERENCES languages_tb(language);
 
 
 --
