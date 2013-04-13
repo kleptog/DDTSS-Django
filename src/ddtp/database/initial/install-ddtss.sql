@@ -30,6 +30,7 @@ CREATE TABLE languages_tb (
 );
 
 
+ALTER TABLE public.languages_tb OWNER TO kleptog;
 
 --
 -- Name: messages_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -44,10 +45,11 @@ CREATE TABLE messages_tb (
     in_reply_to integer,
     "timestamp" integer NOT NULL,
     message character varying NOT NULL,
-    actionstring character varying DEFAULT ''
+    actionstring character varying DEFAULT ''::character varying
 );
 
 
+ALTER TABLE public.messages_tb OWNER TO kleptog;
 
 --
 -- Name: messages_tb_message_id_seq; Type: SEQUENCE; Schema: public; Owner: kleptog
@@ -61,6 +63,7 @@ CREATE SEQUENCE messages_tb_message_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.messages_tb_message_id_seq OWNER TO kleptog;
 
 --
 -- Name: messages_tb_message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kleptog
@@ -79,13 +82,14 @@ CREATE TABLE pendingtranslationreview_tb (
 );
 
 
+ALTER TABLE public.pendingtranslationreview_tb OWNER TO kleptog;
 
 --
 -- Name: pendingtranslations_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
 --
 
 CREATE TABLE pendingtranslations_tb (
-    pending_translation_id SERIAL NOT NULL,
+    pending_translation_id integer NOT NULL,
     description_id integer NOT NULL,
     language character varying NOT NULL,
     comment character varying,
@@ -103,6 +107,28 @@ CREATE TABLE pendingtranslations_tb (
 );
 
 
+ALTER TABLE public.pendingtranslations_tb OWNER TO kleptog;
+
+--
+-- Name: pendingtranslations_tb_pending_translation_id_seq; Type: SEQUENCE; Schema: public; Owner: kleptog
+--
+
+CREATE SEQUENCE pendingtranslations_tb_pending_translation_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pendingtranslations_tb_pending_translation_id_seq OWNER TO kleptog;
+
+--
+-- Name: pendingtranslations_tb_pending_translation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: kleptog
+--
+
+ALTER SEQUENCE pendingtranslations_tb_pending_translation_id_seq OWNED BY pendingtranslations_tb.pending_translation_id;
+
 
 --
 -- Name: userauthority_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -115,6 +141,7 @@ CREATE TABLE userauthority_tb (
 );
 
 
+ALTER TABLE public.userauthority_tb OWNER TO kleptog;
 
 --
 -- Name: users_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -131,12 +158,13 @@ CREATE TABLE users_tb (
     md5password character varying NOT NULL,
     lastseen integer NOT NULL,
     lastlanguage character varying,
-    superuser boolean NOT NULL DEFAULT false,
+    superuser boolean DEFAULT false NOT NULL,
     openid text,
     milestone character varying
 );
 
 
+ALTER TABLE public.users_tb OWNER TO kleptog;
 
 --
 -- Name: wordlist_tb; Type: TABLE; Schema: public; Owner: kleptog; Tablespace: 
@@ -155,7 +183,14 @@ ALTER TABLE public.wordlist_tb OWNER TO kleptog;
 -- Name: message_id; Type: DEFAULT; Schema: public; Owner: kleptog
 --
 
-ALTER TABLE messages_tb ALTER COLUMN message_id SET DEFAULT nextval('messages_tb_message_id_seq'::regclass);
+ALTER TABLE ONLY messages_tb ALTER COLUMN message_id SET DEFAULT nextval('messages_tb_message_id_seq'::regclass);
+
+
+--
+-- Name: pending_translation_id; Type: DEFAULT; Schema: public; Owner: kleptog
+--
+
+ALTER TABLE ONLY pendingtranslations_tb ALTER COLUMN pending_translation_id SET DEFAULT nextval('pendingtranslations_tb_pending_translation_id_seq'::regclass);
 
 
 --
