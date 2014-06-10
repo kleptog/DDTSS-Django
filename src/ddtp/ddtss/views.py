@@ -19,7 +19,6 @@ from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
-from ddtp.ddtss.translationmodel import DefaultTranslationModel
 
 @with_db_session
 def view_index(session, request, lang=None):

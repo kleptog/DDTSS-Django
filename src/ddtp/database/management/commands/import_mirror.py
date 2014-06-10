@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
             # Split out the distribution and component. If the distribution
             # is a symlink, extract the real name
-            dist, component = tag.split('/')
+            dist = tag.split('/')[0]
 
             if os.path.islink(os.path.join(path,'dists',dist)):
                 dist = os.readlink(os.path.join(path,'dists',dist))

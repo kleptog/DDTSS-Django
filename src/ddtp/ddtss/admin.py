@@ -173,8 +173,6 @@ def view_coordinator(session, request, language):
 
     user = get_user(request, session)
 
-    auth = user.get_authority(language)
-
     if not user.is_coordinator:
         return HttpResponseForbidden('<h1>Forbidden</h1>')
 

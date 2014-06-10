@@ -18,8 +18,8 @@ def get_db_session():
     # create a configured "Session" class
     global Session
     if not Session:
-       db_engine = sqlalchemy.create_engine(URL(**settings.DDTP_DATABASE), echo=settings.DEBUG)
-       Session = sessionmaker(bind=db_engine)
+        db_engine = sqlalchemy.create_engine(URL(**settings.DDTP_DATABASE), echo=settings.DEBUG)
+        Session = sessionmaker(bind=db_engine)
     # create a Session
     return Session()
 

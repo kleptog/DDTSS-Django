@@ -155,63 +155,65 @@ class Command(NoArgsCommand):
         save_package = []
         messages = []
         for package_key, package in packages.iteritems():
-          try:
-            if not hasattr(package,'data'):  # Incomplete record
-                continue
-            if package.state is None:
-                continue
+            try:
+                if not hasattr(package,'data'):
+                    # Incomplete record
+                    continue
+                if package.state is None:
+                    continue
 
-            if not hasattr(package, 'long'):  # Not submitted even once
-                print "%r skipped due to not used" % (package_key,)
-                continue
+                if not hasattr(package, 'long'):
+                    # Not submitted even once
+                    print "%r skipped due to not used" % (package_key,)
+                    continue
 
-            # The old system didn't know the description ID, so we look it
-            # up by the MD5 sum of the description in the data field
-            m = re.search(r'(?m)^Description: (.*)\n((?: .*\n)+)', package.data)
-            if not m:
-                print "Couldn't extract description from %r" % package_key
-                continue
-            short, long = m.groups()
-            md5 = hashlib.md5(short+"\n"+long).hexdigest()
+                # The old system didn't know the description ID, so we look it
+                # up by the MD5 sum of the description in the data field
+                m = re.search(r'(?m)^Description: (.*)\n((?: .*\n)+)', package.data)
+                if not m:
+                    print "Couldn't extract description from %r" % package_key
+                    continue
+                short, long = m.groups()
+                md5 = hashlib.md5(short+"\n"+long).hexdigest()
 
-            descr, = session.query(ddtp.Description.description_id).filter_by(description_md5=md5).one()
-            package.description_id = descr
+                descr, = session.query(ddtp.Description.description_id).filter_by(description_md5=md5).one()
+                package.description_id = descr
 
-            # Handle renamed fields
-            if hasattr(package, 'iter'):
-                package.iteration = package.iter
-            else:
-                package.iteration = 0
-            if hasattr(package, 'owner'):
-                package.owner_username = package.owner
-            if hasattr(package, 'timestamp'):
-                package.lastupdate = package.timestamp
-            else:
-                package.lastupdate = now
+                # Handle renamed fields
+                if hasattr(package, 'iter'):
+                    package.iteration = package.iter
+                else:
+                    package.iteration = 0
+                if hasattr(package, 'owner'):
+                    package.owner_username = package.owner
+                if hasattr(package, 'timestamp'):
+                    package.lastupdate = package.timestamp
+                else:
+                    package.lastupdate = now
 
-            if hasattr(package,'agefield'):
-                package.firstupdate = package.agefield
-            else:
-                package.firstupdate = now
-            package.language = languages[package_key[0]]
+                if hasattr(package,'agefield'):
+                    package.firstupdate = package.agefield
+                else:
+                    package.firstupdate = now
+                package.language = languages[package_key[0]]
 
-            if package.comment:
-                if package.language:
-                    message = ddtss.Messages(
-                        message=package.comment,
-                        actionstring="old comments",
-                        to_user=None,
-                        language=package_key[0],
-                        for_description=package.description_id,
-                        from_user=None,
-                        in_reply_to=None,
-                        timestamp=int(time.time()))
-                    messages.append(message)
-            package.comment="";
+                if package.comment:
+                    if package.language:
+                        message = ddtss.Messages(
+                            message=package.comment,
+                            actionstring="old comments",
+                            to_user=None,
+                            language=package_key[0],
+                            for_description=package.description_id,
+                            from_user=None,
+                            in_reply_to=None,
+                            timestamp=int(time.time()))
+                        messages.append(message)
+                package.comment="";
 
-            save_package.append(package_key)
-          except Exception, e:
-            print "Package %r: %s" % (package_key, e)
+                save_package.append(package_key)
+            except Exception, e:
+                print "Package %r: %s" % (package_key, e)
 
         print "%d packages saved" % len(save_package)
 
@@ -236,17 +238,17 @@ class Command(NoArgsCommand):
 
         # Now we can do the reviews
         for package_key in save_package:
-          try:
-            package = packages[package_key]
-            if not hasattr(package, 'reviewers'):
-                continue
-            for reviewer in package.reviewers.split(','):
-                review = ddtss.PendingTranslationReview()
-                review.translation = package
-                review.username = reviewer
-                session.add(review)
-          except Exception, e:
-            print "Package %r: %s" % (package_key, e)
+            try:
+                package = packages[package_key]
+                if not hasattr(package, 'reviewers'):
+                    continue
+                for reviewer in package.reviewers.split(','):
+                    review = ddtss.PendingTranslationReview()
+                    review.translation = package
+                    review.username = reviewer
+                    session.add(review)
+            except Exception, e:
+                print "Package %r: %s" % (package_key, e)
 
         session.commit()
         print "Done."
