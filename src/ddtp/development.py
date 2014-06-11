@@ -1,4 +1,4 @@
-from ddtp.settings import MIDDLEWARE_CLASSES, INSTALLED_APPS
+from ddtp.settings import *
 
 DEBUG=True
 TEMPLATE_DEBUG=DEBUG
