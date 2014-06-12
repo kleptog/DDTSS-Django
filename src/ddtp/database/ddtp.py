@@ -86,7 +86,6 @@ class Description(Base):
 
     def nice_package_versions(self):
         """ Returns all versions in a nice format """
-        output = ""
         outputdict = dict()
         for package_version in self.package_versions:
             if package_version.package not in outputdict:
@@ -362,7 +361,6 @@ class DescriptionMilestone(Base):
 
         session = Session.object_session(self)
 
-        values = list();
         Statistic2 = aliased(Statistic)
         values = session.query(Statistic.date, Statistic2.value, Statistic.value). \
                 filter(Statistic.stat == 'mile:'+self.milestone). \

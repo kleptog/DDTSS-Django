@@ -14,7 +14,7 @@ from django.utils.timesince import timesince
 from sqlalchemy import types, func, desc
 from sqlalchemy.orm import relationship, relation, aliased
 from sqlalchemy.orm.session import Session
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text, select, literal, union_all, exists
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Sequence, text, literal, union_all, exists
 from datetime import datetime
 
 class TranslationModel(object):

@@ -10,3 +10,6 @@ develop-eggs/
 src/ddtp/secret.key
 src/ddtp.egg-info/
 src/ddtp/sessions.db
+# Eclipse settings/file
+.project
+.pydevproject
