@@ -3,11 +3,11 @@
 {% block title %}Debian Description Tracking  --- milestones '{{milestone}}' for {{lang.language}}{% endblock %}
 
 {% block ddtss_head %}
-<script language="javascript" type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.7/jquery.flot.min.js"></script>
+<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery.flot.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function($) {
-    set_milestone_chart("Milestone progress", '{% url ddtss_flot_milestone_data lang.language milestone %}');
+    setMilestoneChart('Milestone progress', '{% url ddtss_flot_milestone_data lang.language milestone %}');
 })
 </script>
 {% endblock %}

@@ -3,12 +3,13 @@
 {% block title %}Debian Description Tracking  --- milestones for {{lang.language}}{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/ddtss.css" />
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://cachedcommons.org/cache/jquery-table-sorter/2.0.3/javascripts/jquery-table-sorter-min.js"></script>
-<script type="text/javascript" id="js">$(document).ready(function() {
-        // call the tablesorter plugin
-        $("#table").tablesorter();
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/css/ddtss.css" />
+<script type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery.tablesorter.js"></script>
+<script type="text/javascript" id="js">
+$(document).ready(function() {
+    // call the tablesorter plugin
+    $('#table').tablesorter();
 }); </script>
 {% endblock %}
 {% block content %}
