@@ -4,16 +4,16 @@
 
 {% block content %}
 <h3>{{package_name}}
-        <a href="{% url ddtss_addusermilestone 'pkg' package_name %}">
+        <a href="{% url "ddtss_addusermilestone" 'pkg' package_name %}">
             <img src="/media/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <span name="onlycoordinator" style="display:inline"> <a href="{% url ddtss_addlangmilestone 'pkg' package_name %}">
+        <span name="onlycoordinator" style="display:inline"> <a href="{% url "ddtss_addlangmilestone" 'pkg' package_name %}">
             <img src="/media/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
 {% endif %}
 </h3>
 
 {% for description, active in package %}
-    Description: <a href="{% url ddt_descr description.description_id %}">{{description.description_id}}</a><br>
+    Description: <a href="{% url "ddt_descr" description.description_id %}">{{description.description_id}}</a><br>
     {% if active %}
     This Description is active<br>
     {% endif %}

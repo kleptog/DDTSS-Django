@@ -46,7 +46,7 @@ $(document).ready(function($) {
 <div class=messages>
     <h2>Project-Messages<div class="help" title="Project Messages for the DDTP">?</div>  </h2>
 {% if user.is_superuser %}
-    <a class="messagelink" target="_blank" href="{% url ddtss_message %}">New global message</a>
+    <a class="messagelink" target="_blank" href="{% url "ddtss_message" %}">New global message</a>
 {% endif %}
     <ul>
 {% endif %}
@@ -55,8 +55,8 @@ $(document).ready(function($) {
             <span style="font-size:80%">
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
-                {% if user.is_superuser %}<a href="{% url ddtss_delmessage message.message_id %}">Delete</a>{% endif %}
-                <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to=message.message_id">Reply</a>
+                {% if user.is_superuser %}<a href="{% url "ddtss_delmessage" message.message_id %}">Delete</a>{% endif %}
+                <a class="messagelink" target="_blank" href="{% url "ddtss_message_user" message.from_user %}?in_reply_to=message.message_id">Reply</a>
             </span>
         </li>
 {% if forloop.last %}
@@ -77,7 +77,7 @@ $(document).ready(function($) {
 
 
 Coordinators for {{lang.language}}:
-{% for user in lang.coordinators %} <a class="messagelink" target="_blank" href="{% url ddtss_message_user user.username %}">{{user.username}}</a>
+{% for user in lang.coordinators %} <a class="messagelink" target="_blank" href="{% url "ddtss_message_user" user.username %}">{{user.username}}</a>
 {%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
 <p>
@@ -97,7 +97,7 @@ Coordinators for {{lang.language}}:
 <div class=messages>
     <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
     {% if user.is_coordinator %}
-    <a class="messagelink" target="_blank" href="{% url ddtss_message_lang lang.language %}">New team message</a>
+    <a class="messagelink" target="_blank" href="{% url "ddtss_message_lang" lang.language %}">New team message</a>
     {% endif %}
     <ul>
 {% endif %}
@@ -106,8 +106,8 @@ Coordinators for {{lang.language}}:
             <span style="font-size:80%">
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
-                <a href="{% url ddtss_delmessage message.message_id %}">Delete</a>
-                <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
+                <a href="{% url "ddtss_delmessage" message.message_id %}">Delete</a>
+                <a class="messagelink" target="_blank" href="{% url "ddtss_message_user" message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
             </span>
         </li>
 {% if forloop.last %}
@@ -128,7 +128,7 @@ Coordinators for {{lang.language}}:
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
     <td><img src="/media/{{milestoneinfo.type}}.png" height="15">{{milestoneinfo.typename}}</td>
-    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
+    <td><a href="{% url "ddt_stats_one_milestones_lang" lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
     <td align='right'>{{milestoneinfo.translated}}</td>
 <!--    <td align='right'>{{milestoneinfo.pending}}</td> -->
     <td align='right'> {{milestoneinfo.total}}</td>
@@ -137,7 +137,7 @@ Coordinators for {{lang.language}}:
             <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
         </div>
     </td>
-    <td><div onclick="set_milestone_chart('{{milestoneinfo.typename}} milestone', '{% url ddtss_flot_milestone_data lang.language milestoneinfo.name %}')">Chart</div></td>
+    <td><div onclick="set_milestone_chart('{{milestoneinfo.typename}} milestone', '{% url "ddtss_flot_milestone_data" lang.language milestoneinfo.name %}')">Chart</div></td>
     </tr>
 {% endfor %}
 </tbody>
@@ -164,7 +164,7 @@ Coordinators for {{lang.language}}:
 {% if forloop.first %}<ol>{% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
-    <a href="{% url ddtss_translate lang.language trans.description_id %}">{{trans.description.package}}</a>
+    <a href="{% url "ddtss_translate" lang.language trans.description_id %}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Height" title="Hight Team Milestone" height="15"> {% endif %}
@@ -186,7 +186,7 @@ Coordinators for {{lang.language}}:
   <h4>Fetch specific description
     <div class="help" title="Get a specific description to translate. Normally it won't fetch descriptions already translated, use force to override.">?</div>
   </h4>
-  <form method="post" action="{% url ddtss_index_lang lang.language %}" enctype="multipart/form-data" accept-charset="utf-8">
+  <form method="post" action="{% url "ddtss_index_lang" lang.language %}" enctype="multipart/form-data" accept-charset="utf-8">
     <input name="package" type="text" />
     <label><input type="checkbox" name="force" value="yes" id="force" /></label>
     <label for="force">Force fetching even if not untranslated</label>
@@ -194,7 +194,7 @@ Coordinators for {{lang.language}}:
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
   </form>
-  <a href="{% url ddt_stats_milestones_lang lang.language %}">Fetch using milestones</a>
+  <a href="{% url "ddt_stats_milestones_lang" lang.language %}">Fetch using milestones</a>
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})
@@ -205,7 +205,7 @@ Coordinators for {{lang.language}}:
 {% if forloop.first %}<ol>{% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
-    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <a href="{% url "ddtss_forreview" lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"> {% endif %}
@@ -241,7 +241,7 @@ Coordinators for {{lang.language}}:
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
-<li><div onclick="set_user_chart('{% url ddtss_flot_thisuser_data %}')">Chart</div></li>
+<li><div onclick="set_user_chart('{% url "ddtss_flot_thisuser_data" %}')">Chart</div></li>
 {% endif %}
 </ul>
 </div>
@@ -254,10 +254,10 @@ Coordinators for {{lang.language}}:
         <span style="font-size:80%">
             from {{message.from_user}}
             {% if message.for_description %}
-            to the description <a href="{% url ddtss_forreview message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
+            to the description <a href="{% url "ddtss_forreview" message.language message.for_description %}">{{message.description.package}}({{message.language}})</a>
             {% endif %}
-            at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url ddtss_delmessage message.message_id %}">Delete</a>
-            <a class="messagelink" target="_blank" href="{% url ddtss_message_user message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
+            at {{message.datetime|date:"Y-m-d H:i:s"}} <a href="{% url "ddtss_delmessage" message.message_id %}">Delete</a>
+            <a class="messagelink" target="_blank" href="{% url "ddtss_message_user" message.from_user %}?in_reply_to={{message.message_id}}">Reply</a>
         </span>
     </li>
 {% if forloop.last %}</ul>{% endif %}
@@ -273,7 +273,7 @@ Coordinators for {{lang.language}}:
 {% if forloop.first %}<ol>{% endif %}
     <li>
     <span name="showsize" style="display:none"> ({{trans.description.description|wordcount }})</span>
-    <a href="{% url ddtss_forreview lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
+    <a href="{% url "ddtss_forreview" lang.language trans.description_id %}?iter={{trans.iteration}}">{{trans.description.package}}</a>
 
 {% for mile in trans.description.milestones %}
 {% if mile.milestone == lang.milestone_high %}<img src="/media/lang_milestone_high.png" alt="Hight" title="Hight Team Milestone" height="15"> {% endif %}
@@ -306,15 +306,15 @@ Coordinators for {{lang.language}}:
 </div>
 </td></tr>
 </table>
-<a href="{% url ddtss_index_lang lang.language %}">Refresh</a> |
-<a href="{% url ddtss_index_lang 'xx' %}">Another language</a> |
+<a href="{% url "ddtss_index_lang" lang.language %}">Refresh</a> |
+<a href="{% url "ddtss_index_lang" 'xx' %}">Another language</a> |
 <a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> |
 <a href="http://www.debian.org/international/l10n/ddtp">DDTP documentation</a> |
 <a href="http://www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> |
 {% if user.logged_in %}
-<a href="{% url ddtss_logout %}">Logout</a>
+<a href="{% url "ddtss_logout" %}">Logout</a>
 {% else %}
-<a href="{% url ddtss_login %}">Login</a> |
-<a href="{% url ddtss_create_user %}">Create Login</a>
+<a href="{% url "ddtss_login" %}">Login</a> |
+<a href="{% url "ddtss_create_user" %}">Create Login</a>
 {% endif %}
 {% endblock %}

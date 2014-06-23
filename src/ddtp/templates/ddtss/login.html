@@ -20,9 +20,9 @@ teams may require a login to be able to contribute.
 <p>
 {% endif %}
 <p>
-(To create a account go to <a href="{% url ddtss_create_user %}">Create Login</a>)
+(To create a account go to <a href="{% url "ddtss_create_user" %}">Create Login</a>)
 </p>
-<form method="post" action="{% url ddtss_login %}" enctype="multipart/form-data">
+<form method="post" action="{% url "ddtss_login" %}" enctype="multipart/form-data">
 <table id="login">
 {{form}}
 </table>

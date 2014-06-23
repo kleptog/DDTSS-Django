@@ -15,7 +15,7 @@ DDTSS Admin language {{lang.language}}
 </ul>
 <p>
 {% endif %}
-<form method="post" action="{% url ddtss_admin_lang lang.language %}" enctype="multipart/form-data">
+<form method="post" action="{% url "ddtss_admin_lang" lang.language %}" enctype="multipart/form-data">
 <table id="login">
 {{form}}
 </table>
@@ -27,7 +27,7 @@ Coordinators:
 <table id="coordinators">
 <tr><th>Username</th><th>Name</th><th></th></tr>
 {% for user in lang.coordinators %}
-<form method="post" action="{% url ddtss_admin_lang lang.language %}">
+<form method="post" action="{% url "ddtss_admin_lang" lang.language %}">
 <tr class="{% cycle 'odd' 'even' %}">
   <td>{{user.username}}</td>
   <td>{{user.realname}} ({{user.email}})</td>
@@ -35,7 +35,7 @@ Coordinators:
 </tr>
 </form>
 {% endfor %}
-<form method="post" action="{% url ddtss_admin_lang lang.language %}">
+<form method="post" action="{% url "ddtss_admin_lang" lang.language %}">
 <tr>
   <td colspan=2><input name="username" type="text"></td>
   <td><button type="submit" name="add" value="Add">Add</button></td>

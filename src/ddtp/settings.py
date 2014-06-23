@@ -13,13 +13,13 @@ LANGUAGE_CODE = 'en-us'
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'media')
+#MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media2')
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
@@ -48,8 +48,10 @@ ROOT_URLCONF = 'ddtp.urls'
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'ddtp.ddtp_web',
+    'ddtp.ddtss',
     'ddtp.database',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
     'django_openid_consumer',
 )
 
