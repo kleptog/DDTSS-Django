@@ -3,30 +3,30 @@
 {% block title %}Debian Description Tracking  --- milestones '{{milestone}}' for {{lang.language}}{% endblock %}
 
 {% block ddtss_head %}
-<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.flot.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function($) {
-    setMilestoneChart('Milestone progress', '{% url ddtss_flot_milestone_data lang.language milestone %}');
+    DDTSS.setMilestoneChart('Milestone progress', '{% url ddtss_flot_milestone_data lang.language milestone %}');
 })
 </script>
 {% endblock %}
 
 {% block content %}
 <h1>milestones '{{milestone}}' for {{lang.language}}
-        <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
+        <a href="{% url "ddtss_addusermilestone" 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
+        <a href="{% url "ddtss_addlangmilestone" 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
 {% endif %}
 </h1>
 <div id="flot_chart" style="display:none;">
     <h3 id="flot_title" style="text-align: center"></h3>
     <div id="flot_graph" style="width:100%;height:150px;"></div>
 </div>
-<a href="{% url ddt_stats_milestones_lang lang.language %}">back to the milestones for {{lang.language}}</a><br>
-<a href="{% url ddtss_index_lang lang.language %}">back to team page {{lang.language}}</a><br>
+<a href="{% url "ddt_stats_milestones_lang" lang.language %}">back to the milestones for {{lang.language}}</a><br>
+<a href="{% url "ddtss_index_lang" lang.language %}">back to team page {{lang.language}}</a><br>
 <table class="tablesorter">
 <tr><th>status</th> <th width=75%>Package</th></tr>
 {% for descr, transinfo in descriptions %}
@@ -36,22 +36,22 @@ $(document).ready(function($) {
     <tr class="{% cycle 'odd_untrans' 'even_untrans' %}">
 {% endif %}
     <td>{% if transinfo.translate > 0 %}
-            <a href="{% url ddt_transdescr transinfo.translate lang.language %}">Translated</a>
+            <a href="{% url "ddt_transdescr" transinfo.translate lang.language %}">Translated</a>
         {% else %}
         {% if transinfo.pending > 0 %}
-            <a href="{% url ddtss_forreview lang.language descr.description_id %}">Pending translation</a>
+            <a href="{% url "ddtss_forreview" lang.language descr.description_id %}">Pending translation</a>
         {% else %}
-            <a href="{% url ddtss_translate lang.language descr.description_id %}">Fetch for translation</a>
+            <a href="{% url "ddtss_translate" lang.language descr.description_id %}">Fetch for translation</a>
         {% endif %}
         {% endif %}
-        <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"></a>
+        <a href="{% url "ddtss_addusermilestone" 'd_id' descr.description_id %}">
+            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"></a>
+        <a href="{% url "ddtss_addlangmilestone" 'd_id' descr.description_id %}">
+            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"></a>
 {% endif %}
     </td>
-    <td> <a style="text-decoration:none;" href="{% url ddt_descr descr.description_id %}">{{ descr.nice_package_versions }}</a></td> </tr>
+    <td> <a style="text-decoration:none;" href="{% url "ddt_descr" descr.description_id %}">{{ descr.nice_package_versions }}</a></td> </tr>
 {% endfor %}
 </table>
 {% endblock %}

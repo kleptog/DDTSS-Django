@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}ddtss/css/ddtss.css" />
-<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
-<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/ddtss.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/ddtss.css" />
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}ddtss/js/ddtss.js"></script>
 {% block ddtss_head %}{% endblock %}
 {% endblock %}
 
 {% block body %}
-<a href="{% url ddtss_index %}">Team Page</a> |
+<a href="{% url "ddtss_index" %}">Team Page</a> |
 {% if lang %}
-<a href="{% url ddt_stats_milestones_lang lang.language %}">Milestones</a> |
+<a href="{% url "ddt_stats_milestones_lang" lang.language %}">Milestones</a> |
 {% if user.is_coordinator %}
-<a href="{% url ddtss_coordinate_lang lang.language %}">Coordinator-Page</a> |
+<a href="{% url "ddtss_coordinate_lang" lang.language %}">Coordinator-Page</a> |
 {% endif %}
 {% endif %}
 {% if user.is_superuser %}
-<a href="{% url ddtss_admin %}">Admin-Page</a> |
+<a href="{% url "ddtss_admin" %}">Admin-Page</a> |
 {% endif %}
 {% if user.logged_in %}
-Logged in as {{ user.username }} | <a href="{% url ddtss_logout %}">Logout</a>
+Logged in as {{ user.username }} | <a href="{% url "ddtss_logout" %}">Logout</a>
 {% else %}
-<a href="{% url ddtss_login %}">Login</a>
+<a href="{% url "ddtss_login" %}">Login</a>
 {% endif %}
 <br>
 {% block content %}{% endblock %}

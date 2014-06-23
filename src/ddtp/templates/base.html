@@ -5,9 +5,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>{% block title %}ddtp.debian.org{% endblock %}</title>
-
-	<link rel="stylesheet" href="://ddtp.debian.org/debian.css" type="text/css" />
-	<link rel="stylesheet" href="{{ MEDIA_URL }}ddtss/css/ddtss.css" type="text/css" />
+	<link rel="stylesheet" href="{{ STATIC_URL }}debian.css" type="text/css" />
+	<link rel="stylesheet" href="{{ STATIC_URL }}ddtp.css" type="text/css" />
 {% block head %}
 {% endblock %}
 </head>
@@ -26,7 +25,7 @@ Please send any feedback to the debian-i18n@l.d.o mailing list.
 <div id="header">
         <div id="upperheader">
                 <div id="logo">
-                        <a href="://www.debian.org/" title="Debian Home"><img src="://ddtp.debian.org/openlogo-50.png" alt="Debian" width="50" height="61" /></a>
+                        <a href="://www.debian.org/" title="Debian Home"><img src="{{ STATIC_URL }}openlogo-50.png" alt="Debian" width="50" height="61" /></a>
                 </div>
                 <p class="section"><a href="/">ddtp</a></p>
 		

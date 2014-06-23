@@ -4,17 +4,17 @@
 
 {% block content %}
 <h3>Description: {{descr.description_id}}
-        <a href="{% url ddtss_addusermilestone 'd_id' descr.description_id %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
+        <a href="{% url "ddtss_addusermilestone" 'd_id' descr.description_id %}">
+            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <span name="onlycoordinator" style="display:inline"> <a href="{% url ddtss_addlangmilestone 'd_id' descr.description_id %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
+        <span name="onlycoordinator" style="display:inline"> <a href="{% url "ddtss_addlangmilestone" 'd_id' descr.description_id %}">
+            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
 {% endif %}
     </h3>
 </h3>
 <pre>
-Source: <a href="{%url ddt_source descr.source%}">{{descr.source}}</a>
-Package: <a href="{%url ddt_package descr.package%}">{{descr.package}}</a>
+Source: <a href="{% url "ddt_source" descr.source%}">{{descr.source}}</a>
+Package: <a href="{% url "ddt_package" descr.package%}">{{descr.package}}</a>
 Versions: {{ descr.nice_package_versions }}
 Milestones: {% for milestone in descr.milestones %}{{milestone.milestone}}{% if not forloop.last %}, {% endif %}{% endfor %}
 Prioritize: {{descr.prioritize}}
@@ -27,20 +27,20 @@ Description: {{descr.description}}
 <br>
 {% for lang in langs %}
 {% if lang in descr.translation %}
-This Description is translated to <a href="{%url ddt_transdescr descr.description_id lang%}">{{lang}}</a>
+This Description is translated to <a href="{% url "ddt_transdescr" descr.description_id lang%}">{{lang}}</a>
 {% else %}
 This Description is not yet translated to {{lang}}
 {% endif %}
-<a href="{%url ddtss_translate lang descr.description_id%}"><img src="{{MEDIA_URL}}quill.png" border=0 height=13></a> <br>
+<a href="{% url "ddtss_translate" lang descr.description_id%}"><img src="{{ STATIC_URL }}quill.png" border=0 height=13></a> <br>
 {% endfor %}
 <br>
 parts-md5sum: <br><pre>
 {% for part in descr.parts %}
-<a href="{%url ddt_part part.part_md5 %}">{{part.part_md5}}</a> {% for lang, part in part.translations.items %}<a href="{%url ddt_onepart part.part_md5 lang %}">{{lang}}</a> {% endfor %} {% for partdescr in part.other_descriptions %}{% if partdescr.description_id != descr.description_id %}<a href="{%url ddt_descr partdescr.description_id%}">{{partdescr.description_id}}</a>{% endif %} {% endfor %} {% endfor %}
+<a href="{% url "ddt_part" part.part_md5 %}">{{part.part_md5}}</a> {% for lang, part in part.translations.items %}<a href="{% url "ddt_onepart" part.part_md5 lang %}">{{lang}}</a> {% endfor %} {% for partdescr in part.other_descriptions %}{% if partdescr.description_id != descr.description_id %}<a href="{% url "ddt_descr" partdescr.description_id%}">{{partdescr.description_id}}</a>{% endif %} {% endfor %} {% endfor %}
 </pre>
 <h4>other Descriptions of the {{descr.package}} package:</h4>
 {% for description in other_descriptions %}
-    Description: <a href="{% url ddt_descr description.description_id %}">{{description.description_id}}</a>
+    Description: <a href="{% url "ddt_descr" description.description_id %}">{{description.description_id}}</a>
     <a href="ddt.cgi?diff1=70989&diff2=67391">patch</a><br>
     {% if active %}
     This Description is active<br>

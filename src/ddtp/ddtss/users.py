@@ -20,6 +20,10 @@ from ddtp.database.ddtp import CollectionMilestone, DescriptionMilestone
 from ddtp.ddtss.views import show_message_screen, get_user
 from urlparse import urlsplit
 
+# Monkey patch for django_openid_consumer
+import django.http
+django.http.get_host = lambda req: req.get_host()
+
 import django_openid_consumer.views
 
 class UserCreationForm(forms.Form):

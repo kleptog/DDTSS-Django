@@ -14,7 +14,7 @@ If you don't have a login the system tries to keep stats in a cookie, so if
 you keep using different machines, a login may be useful.
 </p>
 {% if form.non_field_errors %}{{ form.non_field_errors.as_ul }}{% endif %}
-<form method="post" action="{% url ddtss_create_user %}" enctype="multipart/form-data">
+<form method="post" action="{% url "ddtss_create_user" %}" enctype="multipart/form-data">
 <table id="create_table">
 <tr><th>{{ form.username.label_tag }}</th><td> {{ form.username }}
        {% if form.username.errors %} <br/> <b>{{ form.username.errors }}</b> {% endif %}

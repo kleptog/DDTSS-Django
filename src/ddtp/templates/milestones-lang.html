@@ -3,9 +3,10 @@
 {% block title %}Debian Description Tracking  --- milestones for {{lang.language}}{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}ddtss/css/ddtss.css" />
-<script type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}ddtss/js/jquery/jquery.tablesorter.js"></script>
+
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}ddtss/css/ddtss.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.tablesorter.js"></script>
 <script type="text/javascript" id="js">
 $(document).ready(function() {
     // call the tablesorter plugin
@@ -14,7 +15,7 @@ $(document).ready(function() {
 {% endblock %}
 {% block content %}
 <h1>milestones for {{lang.language}}</h1>
-<a href="{% url ddtss_index_lang lang.language %}">back to team page {{lang.language}}</a><br>
+<a href="{% url "ddtss_index_lang" lang.language %}">back to team page {{lang.language}}</a><br>
 <table id="milestonetable" cellspacing="1" class="tablesorter">
 <thead>
 <tr><th>milestone</th> <th>translated</th> <th>pending</th>  <th>total</th> <th>progress</th></tr>
@@ -22,12 +23,12 @@ $(document).ready(function() {
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url ddt_stats_one_milestones_lang lang.language milestone %}">{{milestone}}</a>
-        <a href="{% url ddtss_addusermilestone 'mile' milestone %}">
-            <img src="/media/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
+    <td><a href="{% url "ddt_stats_one_milestones_lang" lang.language milestone %}">{{milestone}}</a>
+        <a href="{% url "ddtss_addusermilestone" 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <a href="{% url ddtss_addlangmilestone 'mile' milestone %}">
-            <img src="/media/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
+        <a href="{% url "ddtss_addlangmilestone" 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
 {% endif %}
     </td>
     <td align='right'>{{milestoneinfo.translated}}</td>

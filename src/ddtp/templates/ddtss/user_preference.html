@@ -15,7 +15,7 @@ DDTSS User Preferenc {{user.realname}} ({{user.username}})
 </ul>
 <p>
 {% endif %}
-<form method="post" action="{% url ddtss_preference %}" enctype="multipart/form-data">
+<form method="post" action="{% url "ddtss_preference" %}" enctype="multipart/form-data">
 <table id="login">
 {{form}}
 </table>
@@ -26,8 +26,8 @@ DDTSS User Preferenc {{user.realname}} ({{user.username}})
 <h2>the collection of the user milestone user:{{user.username}}</h2>
         <ul>
     {% for collectionmilestone in collectionmilestones %}
-    <li>{{ collectionmilestone.collection }} <a href="{% url ddtss_delusermilestone collectionmilestone.collection %}">
-        <img src="/media/user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"></a> </li>
+    <li>{{ collectionmilestone.collection }} <a href="{% url "ddtss_delusermilestone" collectionmilestone.collection %}">
+        <img src="{{ STATIC_URL }}user_milestone-minus.png" alt="Hight" title="remove from user milestone" height="15"></a> </li>
     {% endfor %}
         </ul>
 {% endblock %}
