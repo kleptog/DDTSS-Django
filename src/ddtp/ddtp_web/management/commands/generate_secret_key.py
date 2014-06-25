@@ -12,6 +12,7 @@ class Command(NoArgsCommand):
 
     requires_model_validation = False
     can_import_settings = False
+    leave_locale_alone = True
 
     def handle_noargs(self, **options):
         from ddtp.settings import __file__ as settings_file

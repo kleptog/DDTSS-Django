@@ -13,7 +13,6 @@ class Command(BaseCommand):
     args = "lang tag filename"
 
     requires_model_validation = False
-    can_import_settings = False
 
     def handle(self, *args, **options):
         if len(args) != 3:

@@ -17,7 +17,6 @@ class Command(BaseCommand):
     args = "path_to_mirror [dist/component ...]"
 
     requires_model_validation = False
-    can_import_settings = False
 
     dist_comp_RE = re.compile(r'^[a-z-]+/[a-z-]+$')
 
