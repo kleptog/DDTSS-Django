@@ -11,7 +11,7 @@ class Command(NoArgsCommand):
     help = "Generates a new SECRET_KEY."
 
     requires_model_validation = False
-    can_import_settings = False
+    can_import_settings = True
 
     def handle_noargs(self, **options):
         from ddtp.settings import __file__ as settings_file

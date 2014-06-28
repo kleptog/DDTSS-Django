@@ -15,7 +15,7 @@ $(document).ready(function() {
 {% endblock %}
 {% block content %}
 <h1>milestones for {{lang.language}}</h1>
-<a href="{% url "ddtss_index_lang" lang.language %}">back to team page {{lang.language}}</a><br>
+<a href="{% url 'ddtss_index_lang' lang.language %}">back to team page {{ lang.language }}</a><br>
 <table id="milestonetable" cellspacing="1" class="tablesorter">
 <thead>
 <tr><th>milestone</th> <th>translated</th> <th>pending</th>  <th>total</th> <th>progress</th></tr>
@@ -23,20 +23,20 @@ $(document).ready(function() {
 <tbody>
 {% for milestone, milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><a href="{% url "ddt_stats_one_milestones_lang" lang.language milestone %}">{{milestone}}</a>
-        <a href="{% url "ddtss_addusermilestone" 'mile' milestone %}">
+    <td><a href="{% url 'ddt_stats_one_milestones_lang' lang.language milestone %}">{{milestone}}</a>
+        <a href="{% url 'ddtss_addusermilestone' 'mile' milestone %}">
             <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
-        <a href="{% url "ddtss_addlangmilestone" 'mile' milestone %}">
+        <a href="{% url 'ddtss_addlangmilestone' 'mile' milestone %}">
             <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
 {% endif %}
     </td>
-    <td align='right'>{{milestoneinfo.translated}}</td>
-    <td align='right'>{{milestoneinfo.pending}}</td>
-    <td align='right'> {{milestoneinfo.total}}</td>
+    <td align='right'>{{ milestoneinfo.translated }}</td>
+    <td align='right'>{{ milestoneinfo.pending }}</td>
+    <td align='right'> {{ milestoneinfo.total }}</td>
     <td> <div class="progress_bar">
-            <strong>{{milestoneinfo.percent}}%</strong>
-            <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
+            <strong>{{ milestoneinfo.percent }}%</strong>
+            <span style="width: {{ milestoneinfo.percent }}%;">&nbsp;</span>
         </div>
     </td></tr>
 {% endfor %}

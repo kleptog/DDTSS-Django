@@ -20,16 +20,16 @@ teams may require a login to be able to contribute.
 <p>
 {% endif %}
 <p>
-(To create a account go to <a href="{% url "ddtss_create_user" %}">Create Login</a>)
+(To create a account go to <a href="{% url 'ddtss_create_user' %}">Create Login</a>)
 </p>
-<form method="post" action="{% url "ddtss_login" %}" enctype="multipart/form-data">
+<form method="post" action="{% url 'ddtss_login' %}" enctype="multipart/form-data">
 <table id="login">
 {{form}}
 </table>
 <input type="submit" name="submit" value="Submit" />
 <input type="submit" name="cancel" value="Cancel" />
 </form>
-<br>Common <a href="http://openid.net/get-an-openid/">OpenID providers</a>:
+<br>Common <a href="//openid.net/get-an-openid/">OpenID providers</a>:
 <ul>
 <li>https://www.google.com/accounts/o8/id
 <li>https://{username}.livejournal.com/

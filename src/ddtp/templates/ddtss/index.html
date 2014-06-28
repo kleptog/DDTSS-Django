@@ -13,7 +13,7 @@ Afterwards the updated translation is submitted to the DDTS server.
 <p>
 This is the experimental DDTSS-Django version. It is currently under developement.
 <p>
-More information about the DDTP and the DDTSS can be found  <a href="://www.debian.org/international/l10n/ddtp">here</a>.
+More information about the DDTP and the DDTSS can be found  <a href="//www.debian.org/international/l10n/ddtp">here</a>.
 {# These message are the Django messages #}
 {% if messages %}
 <ul class="messages">
@@ -27,7 +27,7 @@ More information about the DDTP and the DDTSS can be found  <a href="://www.debi
 <tr><th>Language</th> <th>Pending translation</th> <th>Pending review</th> <th>Translated</th></tr>
 {% for lang in languages %}{% if lang.enabled %}
 <tr class="{% cycle 'odd' 'even' %}">
-   <td><a href="{% url "ddtss_index_lang" lang.language %}">{{ lang.language }}</a>
+   <td><a href="{% url 'ddtss_index_lang' lang.language %}">{{ lang.language }}</a>
    {% if lang.fullname %}({{lang.fullname}}){% endif %}</td>
    <td align="right">{{lang.pending_translation}}</td>
    <td align="right">{{lang.pending_review}}</td>
