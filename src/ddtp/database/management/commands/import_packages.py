@@ -18,7 +18,6 @@ class Command(BaseCommand):
     args = "tag [Translation-en] <Packages Packages ...>"
 
     requires_model_validation = False
-    can_import_settings = False
 
     comma_sep_RE = re.compile(r'\s*,\s*')
 

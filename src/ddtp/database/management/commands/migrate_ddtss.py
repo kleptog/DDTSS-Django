@@ -104,7 +104,6 @@ class Command(NoArgsCommand):
     help = "Migrates the DDTSS table to the new DDTSS database structure."
 
     requires_model_validation = False
-    can_import_settings = False
 
     def handle_noargs(self, **options):
 
