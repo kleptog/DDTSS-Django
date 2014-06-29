@@ -7,7 +7,7 @@ DDTSS Language Coordination {{lang.language}}
 {% block ddtss_head %}
 <script type="text/javascript">//<![CDATA[
 $(document).ready(function($) {
-    setup_messagelinks();
+    DDTSS.setupMessagelinks();
 })
 //]]></script>
 {% endblock %}
@@ -34,9 +34,9 @@ Coordinators:
 {% endfor %}
 </table>
 <p>
-<a class="messagelink" target="_blank" href="{% url "ddtss_message_lang" lang.language %}">New Team message</a> |
+<a class="messagelink" target="_blank" href="{% url 'ddtss_message_lang' lang.language %}">New Team message</a> |
 <p>
-<form method="post" action="{% url "ddtss_coordinate_lang" lang.language %}" enctype="multipart/form-data">
+<form method="post" action="{% url 'ddtss_coordinate_lang' lang.language %}" enctype="multipart/form-data">
 {% for errors in form.errors.itervalues %}
 {{errors}}
 {% endfor %}
@@ -76,7 +76,7 @@ Trusted users:
 <table id="trustedusers">
 <tr><th>Username</th><th>Name</th><th></th></tr>
 {% for user in lang.trusted_users %}
-<form method="post" action="{% url "ddtss_coordinate_lang" lang.language %}">
+<form method="post" action="{% url 'ddtss_coordinate_lang' lang.language %}">
 <tr class="{% cycle 'odd' 'even' %}">
   <td>{{user.username}}</td>
   <td>{{user.realname}} ({{user.email}})</td>
@@ -84,7 +84,7 @@ Trusted users:
 </tr>
 </form>
 {% endfor %}
-<form method="post" action="{% url "ddtss_coordinate_lang" lang.language %}">
+<form method="post" action="{% url 'ddtss_coordinate_lang' lang.language %}">
 <tr>
   <td colspan=2><input name="username" type="text"></td>
   <td><button type="submit" name="add" value="Add">Add</button></td>
@@ -94,8 +94,8 @@ Trusted users:
 <h2>the collection of the language milestone lang:{{lang.language}}</h2>
         <ul>
     {% for collectionmilestone in collectionmilestones %}
-    <li>{{ collectionmilestone.collection }} <a href="{% url "ddtss_delusermilestone" collectionmilestone.collection %}">
-        <img src="/media/lang_milestone-minus.png" alt="Hight" title="remove from lang milestone" height="15"></a> </li>
+    <li>{{ collectionmilestone.collection }} <a href="{% url 'ddtss_delusermilestone' collectionmilestone.collection %}">
+        <img src="{{ STATIC_URL }}lang_milestone-minus.png" alt="Hight" title="remove from lang milestone" height="15"></a> </li>
     {% endfor %}
         </ul>
 {% endblock %}

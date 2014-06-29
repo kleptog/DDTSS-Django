@@ -1,26 +1,32 @@
 {% extends "base_ddtp.html" %}
 
 {% block title %}
-Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{lang}} ---
+Debian Description Tracking  --- package: {{descr.package}} - desc_id: {{descr.description_id}} - lang: {{ lang }} ---
 {% endblock %}
 
 {% block content %}
 <h3>{{descr.package}}</h3>
 <pre>
-Source: <a href="{% url "ddt_source" descr.source%}">{{descr.source}}</a>
-Package: <a href="{% url "ddt_package" descr.package%}">{{descr.package}}</a>
+Source: <a href="{% url 'ddt_source' descr.source%}">{{ descr.source }}</a>
+Package: <a href="{% url 'ddt_package' descr.package%}">{{ descr.package }}</a>
 Versions: {{ descr.nice_package_versions }}
-Milestones: {% for milestone in descr.milestones %}<a href="{% url "ddt_stats_one_milestones_lang" lang milestone.milestone %}">{{milestone.milestone}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
-Prioritize: {{descr.prioritize}}
-Description: {{descr.description}}
+Milestones: {% for milestone in descr.milestones %}<a href="{% url 'ddt_stats_one_milestones_lang' lang milestone.milestone %}">{{ milestone.milestone }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+Prioritize: {{ descr.prioritize }}
+Description: {{ descr.description }}
 </pre>
-The {{lang}}-translation:
+The {{ lang }}-translation:
 <pre>
-Description-{{lang}}: {{ translation.translation}}
+Description-{{ lang }}: {{ translation.translation}}
 </pre>
 parts-md5sum: <br><pre>
 {% for part in descr.parts %}
-<a href="{% url "ddt_onepart" part.part_md5 lang %}">{{part.part_md5}}</a> {% for partdescr in part.other_descriptions %}{% if partdescr.description_id != descr.description_id %}<a href="{% url "ddt_descr" partdescr.description_id%}">{{partdescr.description_id}}</a>{% endif %} {% endfor %} {% endfor %}
+    <a href="{% url 'ddt_onepart' part.part_md5 lang %}">{{part.part_md5}}</a>
+    {% for partdescr in part.other_descriptions %}
+        {% if partdescr.description_id != descr.description_id %}
+        <a href="{% url "ddt_descr" partdescr.description_id%}">{{ partdescr.description_id }}</a>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
 
 </pre>
 </pre>

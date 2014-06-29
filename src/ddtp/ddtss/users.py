@@ -246,7 +246,7 @@ def view_login(session, request):
 
             if user and not user.active:
                 # User must have been activated.
-                messages.error("Account not yet enabled.")
+                messages.error(request, "Account not yet enabled.")
                 success = False
             elif user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
                 # Login user in

@@ -7,7 +7,7 @@ DDTSS Administration
 {% block ddtss_head %}
 <script type="text/javascript">//<![CDATA[
 $(document).ready(function($) {
-    setup_messagelinks();
+    DDTSS.setupMessagelinks();
 })
 //]]></script>
 {% endblock %}
@@ -19,7 +19,7 @@ $(document).ready(function($) {
 <tr><th>Language</th> <th>Name</th> <th>Enabled</th></tr>
 {% for lang in languages %}
 <tr class="{% cycle 'odd' 'even' %}">
-   <td><a href="{% url "ddtss_admin_lang" lang.language %}">{{ lang.language }}</a></td>
+   <td><a href="{% url 'ddtss_admin_lang' lang.language %}">{{ lang.language }}</a></td>
    <td align="left">{{lang.fullname}}</td>
    <td align="center">{% if lang.enabled_ddtss %}Yes{%else%}No{%endif%}</td>
 </tr>
@@ -39,5 +39,5 @@ to individual languages.
 {% endfor %}
 </table>
 <p>
-<a class="messagelink" target="_blank" href="{% url "ddtss_message" %}">New project message</a> |
+<a class="messagelink" target="_blank" href="{% url 'ddtss_message' %}">New project message</a> |
 {% endblock %}

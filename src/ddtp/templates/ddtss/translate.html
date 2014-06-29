@@ -7,14 +7,15 @@ DDTSS ({{lang.language}}): Translating {{descr.package}}
 {% block ddtss_head %}
 <script type="text/javascript">//<![CDATA[
 function showshortdiff (url) {
-    var boxes = document.getElementsByName("shortboxes");
-    for(i=0, l=boxes.length; i<l; i++) {
-        boxes[i].style.display = "none";
+    var boxes = document.getElementsByName('shortboxes');
+    for(i = boxes.length; i >= 0; i -= 1) {
+        boxes[i].style.display = 'none';
     }
- /* Coded like this to avoid errors on 'None' */
- box = document.getElementById(url)
- if(box) box.style.display='block'
- return false;
+    /* Coded like this to avoid errors on 'None' */
+    box = document.getElementById(url)
+    if(box) {
+        box.style.display='block';
+    }
 }
 
 function showlongdiff (url) {
@@ -55,7 +56,7 @@ function toggle_ShowLongDescr() {
 
 $(document).ready(function($) {
     $("#submit").prop('disabled',true);
-    setup_messagelinks();
+    DDTSS.setupMessagelinks();
 })
 //]]></script>
 {% endblock %}
@@ -82,9 +83,9 @@ go</font>
 <tr><td valign="top">
 
 {% if forreview %}
-<form method="post" action="{% url "ddtss_forreview" lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
+<form method="post" action="{% url 'ddtss_forreview' lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% else %}
-<form method="post" action="{% url "ddtss_translate" lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
+<form method="post" action="{% url 'ddtss_translate' lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% endif %}
 <h5>Short description</h5>
 <button onclick="return showshortdiff('None')" class="button_as_link">None</button> |
@@ -233,15 +234,15 @@ actually returning UTF-8 as promised -->
                 {% if message.from_user %}
                 from {{message.from_user}}
                 {% endif %}
-                at {{message.datetime|date:"Y-m-d H:i:s"}} {% if message.message %}<a href="{% url "ddtss_delmessage" message.message_id %}">Delete</a>{% endif %}
-                <a class="messagelink" target="_blank" href="{% url "ddtss_message_descr" descr.description_id %}?in_reply_to={{message.message_id}}">Reply</a>
+                at {{message.datetime|date:"Y-m-d H:i:s"}} {% if message.message %}<a href="{% url 'ddtss_delmessage' message.message_id %}">Delete</a>{% endif %}
+                <a class="messagelink" target="_blank" href="{% url 'ddtss_message_descr' descr.description_id %}?in_reply_to={{message.message_id}}">Reply</a>
             </span>
         </li>
     {% if forloop.last %}
     </ul>
     {% endif %}
     {% endfor %}
-    <a class="messagelink" target="_blank" href="{% url "ddtss_message_descr" descr.description_id %}">New comment</a>
+    <a class="messagelink" target="_blank" href="{% url 'ddtss_message_descr' descr.description_id %}">New comment</a>
 </div>
 <!-- end new description comments per Messages -->
 

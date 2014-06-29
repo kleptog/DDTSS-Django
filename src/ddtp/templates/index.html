@@ -3,7 +3,7 @@
 {% block title %}Debian Description Tracking{% endblock %}
 
 {% block body %}
-<a href="{% url "ddtss_index" %}">to the ddtss (a web interface for the ddtp)<a/><br>
+<a href="{% url 'ddtss_index' %}">to the ddtss (a web interface for the ddtp)<a/><br>
 Daily description translation stats for
 <a href='stats/stats-etch.html'>Etch</a>,
 <a href='stats/stats-lenny.html'>Lenny</a> ,
@@ -12,9 +12,9 @@ Daily description translation stats for
 <a href='stats/stats-sid.html'>Sid</a>
 
 <hr>
-<a href="http://www.debian.org/international/l10n/ddtp">Documentation about DDTP and DDTSS<a/>
+<a href="//www.debian.org/international/l10n/ddtp">Documentation about DDTP and DDTSS<a/>
 <hr>
-<img src="http://ddtp.debian.net/gnuplot/ddts-stat.png">
+<img src="//ddtp.debian.net/gnuplot/ddts-stat.png">
 <hr>
 {{ description_count }} package descriptions;<br>
 <br>
@@ -27,6 +27,6 @@ Daily description translation stats for
 <hr>
 {% for lang, total, active in langinfo %}
 <h3>{{lang.language}} in sid</h3>
-<img src="http://ddtp.debian.net/gnuplot/stat-trans-sid-{{lang.language}}.png">
+<img src="//ddtp.debian.net/gnuplot/stat-trans-sid-{{lang.language}}.png">
 {% endfor %}
 {% endblock %}
