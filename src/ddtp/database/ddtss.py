@@ -559,26 +559,26 @@ class Messages(Base):
     def global_messages(cls, session):
         """ Returns a query for messages destined for everyone """
         return session.query(cls) \
-                          .filter(cls.to_user==None) \
-                          .filter(cls.language==None) \
-                          .filter(cls.for_description==None) \
-                          .filter(cls.from_user!=None)
+                          .filter(cls.to_user.is_(None)) \
+                          .filter(cls.language.is_(None)) \
+                          .filter(cls.for_description.is_(None)) \
+                          .filter(cls.from_user.isnot(None))
 
     @classmethod
     def team_messages(cls, session, language):
         """ Return a query for messages for a given language team """
         return session.query(cls) \
                           .filter(cls.language==language) \
-                          .filter(cls.for_description==None) \
-                          .filter(cls.from_user!=None)
+                          .filter(cls.for_description.is_(None)) \
+                          .filter(cls.from_user.isnot(None))
 
     @classmethod
     def description_messages(cls, session, description_id):
         """ Return a query for messages for the given description """
         return session.query(cls) \
-                          .filter(cls.language==None) \
+                          .filter(cls.language.is_(None)) \
                           .filter(cls.for_description==description_id) \
-                          .filter(cls.to_user==None)
+                          .filter(cls.to_user.is_(None))
 
     @classmethod
     def translation_messages(cls, session, language, description_id):
@@ -586,13 +586,13 @@ class Messages(Base):
         return session.query(cls) \
                           .filter(cls.language==language) \
                           .filter(cls.for_description==description_id) \
-                          .filter(cls.to_user==None)
+                          .filter(cls.to_user.is_(None))
     @classmethod
     def user_messages(cls, session, username):
         """ Return a query for messages for the given user """
         return session.query(cls) \
                           .filter(cls.to_user==username) \
-                          .filter(cls.from_user!=None)
+                          .filter(cls.from_user.isnot(None))
 
     @classmethod
     def involveddescriptions(cls, session, username):
@@ -600,7 +600,7 @@ class Messages(Base):
         detected by the descriptions they have sent a message for """
         return session.query(cls.for_description) \
                           .filter(cls.from_user==username) \
-                          .filter(cls.for_description!=None) \
+                          .filter(cls.for_description.isnot(None)) \
                           .distinct()
 
     @classmethod
@@ -608,7 +608,7 @@ class Messages(Base):
         """ Return a query for message relating to the acceptance of translations """
         return session.query(cls) \
                           .filter(cls.language==language) \
-                          .filter(cls.for_description!=None) \
+                          .filter(cls.for_description.isnot(None)) \
                           .filter(cls.actionstring=='translation accepted') \
                           .order_by(desc(cls.timestamp))
 

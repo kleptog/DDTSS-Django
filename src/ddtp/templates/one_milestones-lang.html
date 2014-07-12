@@ -15,10 +15,10 @@ $(document).ready(function($) {
 {% block content %}
 <h1>milestones '{{milestone}}' for {{lang.language}}
         <a href="{% url 'ddtss_addusermilestone' 'mile' milestone %}">
-            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
         <a href="{% url 'ddtss_addlangmilestone' 'mile' milestone %}">
-            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
 {% endif %}
 </h1>
 <div id="flot_chart" style="display:none;">
@@ -45,10 +45,10 @@ $(document).ready(function($) {
         {% endif %}
         {% endif %}
         <a href="{% url 'ddtss_addusermilestone' 'd_id' descr.description_id %}">
-            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add description to user milestone" height="15"></a>
 {% if user.is_coordinator %}
         <a href="{% url 'ddtss_addlangmilestone' 'd_id' descr.description_id %}">
-            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/lang_milestone-plus.png" alt="Hight" title="add description to lang milestone" height="15"></a>
 {% endif %}
     </td>
     <td> <a style="text-decoration:none;" href="{% url 'ddt_descr' descr.description_id %}">{{ descr.nice_package_versions }}</a></td> </tr>

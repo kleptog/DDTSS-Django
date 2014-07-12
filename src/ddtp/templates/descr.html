@@ -5,10 +5,10 @@
 {% block content %}
 <h3>Description: {{descr.description_id}}
         <a href="{% url 'ddtss_addusermilestone' 'd_id' descr.description_id %}">
-            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
 {% if user.is_coordinator %}
         <span name="onlycoordinator" style="display:inline"> <a href="{% url 'ddtss_addlangmilestone' 'd_id' descr.description_id %}">
-            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
+            <img src="{{ STATIC_URL }}ddtss/img/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
 {% endif %}
     </h3>
 </h3>
@@ -31,7 +31,7 @@ This Description is translated to <a href="{% url 'ddt_transdescr' descr.descrip
 {% else %}
 This Description is not yet translated to {{ lang }}
 {% endif %}
-<a href="{% url 'ddtss_translate' lang descr.description_id%}"><img src="{{ STATIC_URL }}quill.png" border=0 height=13></a> <br>
+<a href="{% url 'ddtss_translate' lang descr.description_id%}"><img src="{{ STATIC_URL }}ddtp/img/quill.png" border=0 height=13></a> <br>
 {% endfor %}
 <br>
 parts-md5sum: <br><pre>

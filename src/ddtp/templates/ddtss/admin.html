@@ -20,7 +20,7 @@ $(document).ready(function($) {
 {% for lang in languages %}
 <tr class="{% cycle 'odd' 'even' %}">
    <td><a href="{% url 'ddtss_admin_lang' lang.language %}">{{ lang.language }}</a></td>
-   <td align="left">{{lang.fullname}}</td>
+   <td align="left">{{ lang.fullname }}</td>
    <td align="center">{% if lang.enabled_ddtss %}Yes{%else%}No{%endif%}</td>
 </tr>
 {% endfor %}

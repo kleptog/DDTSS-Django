@@ -5,10 +5,10 @@
 {% block content %}
 <h3>{{source_name}}
         <a href="{% url 'ddtss_addusermilestone' 'source' source_name %}">
-            <img src="{{ STATIC_URL }}user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
+            <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add for user milestone" height="15"></a>
 {% if user.is_coordinator %}
         <span name="onlycoordinator" style="display:inline"> <a href="{% url 'ddtss_addlangmilestone' 'source' source_name %}">
-            <img src="{{ STATIC_URL }}lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
+            <img src="{{ STATIC_URL }}ddtss/img/lang_milestone-plus.png" alt="Hight" title="add for lang milestone" height="15"></a></span>
 {% endif %}
 </h3>
 {% for description in descriptions %}

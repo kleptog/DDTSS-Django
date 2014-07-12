@@ -808,8 +808,8 @@ def view_delmessage(session, request, message_id ):
 
     # lang admin can remove team message
     if auth.auth_level == auth.AUTH_LEVEL_COORDINATOR \
-            and message.to_user == None \
-            and message.description_id == None:
+            and message.to_user is None \
+            and message.description_id is None:
         session.delete(message)
         session.commit()
 
