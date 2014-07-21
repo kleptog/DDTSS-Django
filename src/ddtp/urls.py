@@ -7,7 +7,8 @@ admin.autodiscover()
 from ddtp.ddtp_web import views as ddt_views
 from ddtp.ddtss import urls as ddtss_urls
 
-handler500 # Pyflakes
+# Pyflakes
+handler500
 
 urlpatterns = patterns(
     '',

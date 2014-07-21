@@ -75,12 +75,16 @@ those yourself.
 Remove file used to import data:
 $ rm active_tb.txt description_tag_tb.txt description_tb.txt languages_tb.txt package_version_tb.txt part_description_tb.txt part_tb.txt pendingtranslations_tb.txt pendingtranslationreview_tb.txt translation_tb.txt 
 
-5. Start up the Django test server.
+5. Create log directory:
+$ su -
+$ mkdir /var/log/ddtss/
+$ chown [your_user]:[your_user] /var/log/ddtss/
+Close root session:
+$ exit
 
+6. Start up the Django test server.
 Setting up a full production Django server is outside the scope of this
 README. This runs the development server:
-$ echo foo > src/ddtp/secret.key
-$ bin/django generate_secret_key
 $ bin/django syncdb
 $ bin/django runserver
 
