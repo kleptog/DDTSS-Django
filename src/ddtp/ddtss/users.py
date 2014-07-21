@@ -191,8 +191,9 @@ def view_create_user_complete(session, request):
         request.session['username'] = user.username
 
         logging.info("User created correctly" \
-                     " - username[%(user.username)s]" \
-                     " openid[%(user.openid)s]" % locals())
+                     " - username[%s]" \
+                     " openid[%s]",
+                     user.username, user.openid)
         if request.session.test_cookie_worked():
             request.session.delete_test_cookie()
 
@@ -318,7 +319,7 @@ def view_login_complete(session, request):
             # If found, login user using that
             request.session['username'] = user.username
             logger.info("OpenID login successfully" \
-                        " - username[%(user.username)s]" % locals())
+                        " - username[%s]", user.username)
             messages.success(request, "OpenID login successfully")
         elif 'username' in request.session:
             # User logged in with password as well OpenID
@@ -326,8 +327,9 @@ def view_login_complete(session, request):
 
             user.openid = request.session['openids'][0].openid
             logger.info("OpenID successfully linked" \
-                        " - username[%(user.username)s]" \
-                        " openid[%(user.openid)s]" % locals())
+                        " - username[%s]" \
+                        " openid[%s]", user.username,
+                        user.openid)
             messages.success(request, "OpenID successfully linked with user")
         else:
             messages.error(request, "OpenID successfully linked," \
