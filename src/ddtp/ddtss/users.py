@@ -26,6 +26,11 @@ django.http.get_host = lambda req: req.get_host()
 
 import django_openid_consumer.views
 
+# Import the logging library.
+import logging
+# Get an instance of a logger.
+logger = logging.getLogger(__name__)
+
 class UserCreationForm(forms.Form):
     """
     A form that creates a user, with no privileges, from the given username and password.
@@ -185,6 +190,10 @@ def view_create_user_complete(session, request):
         # Login user in
         request.session['username'] = user.username
 
+        logging.info("User created correctly" \
+                     " - username[%s]" \
+                     " openid[%s]",
+                     user.username, user.openid)
         if request.session.test_cookie_worked():
             request.session.delete_test_cookie()
 
@@ -251,8 +260,9 @@ def view_login(session, request):
             elif user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
                 # Login user in
                 request.session['username'] = form.cleaned_data['username']
-
-                messages.success(request, "Login successful.")
+                logger.info("Login successfully" \
+                        " - username[%s]", request.session['username'])
+                messages.success(request, "Login successfully.")
                 success = True
             else:
                 success = False
@@ -308,15 +318,22 @@ def view_login_complete(session, request):
         if user:
             # If found, login user using that
             request.session['username'] = user.username
-            messages.success(request, "OpenID login successful")
+            logger.info("OpenID login successfully" \
+                        " - username[%s]", user.username)
+            messages.success(request, "OpenID login successfully")
         elif 'username' in request.session:
             # User logged in with password as well OpenID
             user = session.query(Users).get(request.session['username'])
 
             user.openid = request.session['openids'][0].openid
-            messages.success(request, "OpenID succesfully linked with user")
+            logger.info("OpenID successfully linked" \
+                        " - username[%s]" \
+                        " openid[%s]", user.username,
+                        user.openid)
+            messages.success(request, "OpenID successfully linked with user")
         else:
-            messages.error(request, "OpenID succesful, but no account")
+            messages.error(request, "OpenID successfully linked," \
+                           " but no account")
 
         session.commit()
 
@@ -327,16 +344,19 @@ def view_login_complete(session, request):
 
     return django_openid_consumer.views.complete(request, on_failure=on_failure, on_success=on_success)
 
-
-def view_logout(request):
+@with_db_session
+def view_logout(session, request):
     """ Handle user logout """
-    if 'username' in request.session:
-        # Login user in
-        messages.success(request, "Logout successful.")
+    user = get_user(request, session)
+    if user.logged_in:
+        # User logged successfully
+        logger.info("Logout successfully" \
+                    " - username[%s]", user.username)
+        messages.success(request, "Logout successfully.")
+        django_openid_consumer.views.signout(request)
         del request.session['username']
 
-    django_openid_consumer.views.signout(request)
-
+    # User not logged in or logged out successfully
     response = redirect('ddtss_index')
 
     response.delete_cookie('ddtssuser')

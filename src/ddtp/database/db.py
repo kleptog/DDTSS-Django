@@ -9,8 +9,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 from django.conf import settings
+# Import the logging library.
+import logging
+
 
 Base = declarative_base()
+
+# Set SQL-Alchemy logging.
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 Session = None
 
@@ -18,7 +25,7 @@ def get_db_session():
     # create a configured "Session" class
     global Session
     if not Session:
-        db_engine = sqlalchemy.create_engine(URL(**settings.DDTP_DATABASE), echo=settings.DEBUG)
+        db_engine = sqlalchemy.create_engine(URL(**settings.DDTP_DATABASE))
         Session = sessionmaker(bind=db_engine)
     # create a Session
     return Session()

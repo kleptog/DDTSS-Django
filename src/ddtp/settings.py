@@ -1,4 +1,3 @@
-
 import os
 
 ADMINS = (
@@ -27,11 +26,22 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/admin_media/'
 
-# Use the generate_secret_key command to make the key
+# Code snipped from https://gist.github.com/ndarville/3452907
+# Project secret-key-gen.py
 try:
-    SECRET_KEY = open(os.path.join(os.path.dirname(__file__), "secret.key")).read()
+    SECRET_FILE = os.path.join(os.path.dirname(__file__), "secret.key")
+    SECRET_KEY = open(SECRET_FILE).read().strip()
 except IOError:
-    pass
+    try:
+        import random
+        SECRET_KEY = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+        secret = file(SECRET_FILE, 'w')
+        secret.write(SECRET_KEY)
+        secret.close()
+    except IOError:
+        Exception("Please create a %(SECRET_FILE)s file with random characters" \
+                  " to generate your secret key!" % locals())
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -88,3 +98,45 @@ DDTP_DATABASE=dict(drivername='postgresql',
 DDTSS_LOCK_TIMEOUT=900
 # If true, disables various permission checks
 DEMO_MODE=False
+
+# File to save all logging messages.
+LOGFILE_NAME = '/var/log/ddtss/ddtss.log'
+# 20 MegaByte.
+LOGFILE_SIZE = 20 * 1024 * 1024
+# Max 20 files.
+LOGFILE_COUNT = 20
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s | %(levelname)s | Module[%(module)s] PID[%(process)d] Thread[%(thread)d] Message[%(message)s]'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': LOGFILE_NAME,
+            'formatter': 'verbose',
+            'maxBytes': LOGFILE_SIZE,
+            'backupCount': LOGFILE_COUNT,
+        }
+    },
+    'loggers': {
+        # '' - Stands for get them all
+        '': {
+            'handlers': ['null', 'file'],
+            'propagate': False,
+            'level': 'DEBUG'
+        }
+    }
+}
