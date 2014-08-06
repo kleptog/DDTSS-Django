@@ -1,6 +1,21 @@
-# DDTSS-Django - A Django implementation of the DDTP/DDTSS website
-# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
-# See LICENCE file for details.
+"""
+DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
+Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
 
 import hashlib
 import string
@@ -190,7 +205,7 @@ def view_create_user_complete(session, request):
         # Login user in
         request.session['username'] = user.username
 
-        logging.info("User created correctly" \
+        logging.info("Account successfully created" \
                      " - username[%s]" \
                      " openid[%s]",
                      user.username, user.openid)
@@ -260,9 +275,9 @@ def view_login(session, request):
             elif user and user.md5password == hashlib.md5(user.key + form.cleaned_data['password']).hexdigest():
                 # Login user in
                 request.session['username'] = form.cleaned_data['username']
-                logger.info("Login successfully" \
+                logger.info("Login successful" \
                         " - username[%s]", request.session['username'])
-                messages.success(request, "Login successfully.")
+                messages.success(request, "Login successful.")
                 success = True
             else:
                 success = False
@@ -318,9 +333,9 @@ def view_login_complete(session, request):
         if user:
             # If found, login user using that
             request.session['username'] = user.username
-            logger.info("OpenID login successfully" \
+            logger.info("OpenID login successful" \
                         " - username[%s]", user.username)
-            messages.success(request, "OpenID login successfully")
+            messages.success(request, "OpenID login successful")
         elif 'username' in request.session:
             # User logged in with password as well OpenID
             user = session.query(Users).get(request.session['username'])
@@ -349,14 +364,14 @@ def view_logout(session, request):
     """ Handle user logout """
     user = get_user(request, session)
     if user.logged_in:
-        # User logged successfully
-        logger.info("Logout successfully" \
+        # User logout successful
+        logger.info("Logout successful" \
                     " - username[%s]", user.username)
-        messages.success(request, "Logout successfully.")
+        messages.success(request, "Logout successful.")
         django_openid_consumer.views.signout(request)
         del request.session['username']
 
-    # User not logged in or logged out successfully
+    # User not logged in or logged out successful
     response = redirect('ddtss_index')
 
     response.delete_cookie('ddtssuser')

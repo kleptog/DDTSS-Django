@@ -76,11 +76,13 @@ Remove file used to import data:
 $ rm active_tb.txt description_tag_tb.txt description_tb.txt languages_tb.txt package_version_tb.txt part_description_tb.txt part_tb.txt pendingtranslations_tb.txt pendingtranslationreview_tb.txt translation_tb.txt 
 
 5. Create log directory:
+You can choose a different path/destination by changing /src/ddtp/settings.py file.
+We suggest to save in a directory in order to group all ddtss log files.
 $ su -
-$ mkdir /var/log/ddtss/
-$ chown [your_user]:[your_user] /var/log/ddtss/
+# mkdir /var/log/ddtss/
+# chown [your_user]:[your_user] /var/log/ddtss/
 Close root session:
-$ exit
+# exit
 
 6. Start up the Django test server.
 Setting up a full production Django server is outside the scope of this
@@ -129,7 +131,7 @@ src/ddtp/ddt       - DDTP website application
 src/ddtp/templates - Templates for DDTP website
     ddtss/         - Templates for DDTSS website
 
-src/ddtp/media     - Images used by templates
+src/ddtp/static    - Static content used by templates
 
 For development it is useful to know the command:
 

@@ -1,64 +1,31 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% extends "ddtss/base_ddtss.html" %}
 
 {% block title %}
-DDTSS ({{lang.language}}): Translating {{descr.package}}
+DDTSS ({{ lang.language }}): Translating {{ descr.package }}
 {% endblock %}
 
-{% block ddtss_head %}
-<script type="text/javascript">//<![CDATA[
-function showshortdiff (url) {
-    var boxes = document.getElementsByName('shortboxes');
-    for(i = boxes.length; i >= 0; i -= 1) {
-        boxes[i].style.display = 'none';
-    }
-    /* Coded like this to avoid errors on 'None' */
-    box = document.getElementById(url)
-    if(box) {
-        box.style.display='block';
-    }
-}
-
-function showlongdiff (url) {
-    var boxes = document.getElementsByName("longboxes");
-    for(i=0, l=boxes.length; i<l; i++) {
-        boxes[i].style.display = "none";
-    }
- box = document.getElementById(url)
- if(box) box.style.display='block'
- return false;
-}
-
-function toggle_ShowShortDescr() {
-    var ShowDescr_fields = document.getElementsByName("ShowShortDescr");
-    for(i=0, l=ShowDescr_fields.length; i<l; i++) {
-        if(ShowDescr_fields[i].style.display == "block") {
-            ShowDescr_fields[i].style.display = "none";
-        }
-        else {
-            ShowDescr_fields[i].style.display = "block";
-        }
-    }
-    return false;
-}
-
-function toggle_ShowLongDescr() {
-    var ShowDescr_fields = document.getElementsByName("ShowLongDescr");
-    for(i=0, l=ShowDescr_fields.length; i<l; i++) {
-        if(ShowDescr_fields[i].style.display == "block") {
-            ShowDescr_fields[i].style.display = "none";
-        }
-        else {
-            ShowDescr_fields[i].style.display = "block";
-        }
-    }
-    return false;
-}
-
-$(document).ready(function($) {
-    $("#submit").prop('disabled',true);
-    DDTSS.setupMessagelinks();
-})
-//]]></script>
+{% block head_specific_page %}
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/translate.js"></script>
+<script type="text/javascript">
+TRANSLATE.wordlistUrl = '{% url 'ddtss_wordlist' lang.language %}';
+</script>
 {% endblock %}
 
 {% block content %}
@@ -70,12 +37,12 @@ description, please hit &#39;Abandon&#39; below so others can have a
 go</font>
 </h1>
 {% endif %}
-<h1>Translating {{descr.package}}</h1>
+<h1>Translating {{ descr.package }}</h1>
 <ul>
-  <li><tt># Source: {{descr.source}}</tt></li>
-<!--  <li><tt># Package(s): fmit</tt></li> -->
-  <li><tt># Prioritize: {{descr.prioritize}}</tt></li>
-  <li><tt># Versions: {{descr.nice_package_versions}}</tt>
+  <li><pre># Source: {{ descr.source }}</pre></li>
+<!--  <li><pre># Package(s): fmit</pre></li> -->
+  <li><pre># Prioritize: {{ descr.prioritize }}</pre></li>
+  <li><pre># Versions: {{ descr.nice_package_versions }}</pre>
 </li>
 </ul>
 
@@ -88,19 +55,19 @@ go</font>
 <form method="post" action="{% url 'ddtss_translate' lang.language descr.description_id %}" enctype="multipart/form-data" accept-charset="utf-8">
 {% endif %}
 <h5>Short description</h5>
-<button onclick="return showshortdiff('None')" class="button_as_link">None</button> |
+<button onclick="TRANSLATE.showShortDiff('None'); return false;" class="button_as_link">None</button> |
 {% if diff_short %}
-<button onclick="return showshortdiff('show-short-change-diff')" class="button_as_link">Show Diff Changes</button> |
+<button onclick="TRANSLATE.showShortDiff('show-short-change-diff'); return false;" class="button_as_link">Show Diff Changes</button> |
 {% endif %}
 {% for olddiff in olddiffs %}
-<button onclick="return showshortdiff('show-short-diff-{{olddiff.oldid}}')" class="button_as_link">Show diff to {{olddiff.oldid}}</button> |
+<button onclick="TRANSLATE.showShortDiff('show-short-diff-{{ olddiff.oldid }}'); return false;" class="button_as_link">Show diff to {{olddiff.oldid}}</button> |
 {% if forloop.last %}
-<button onclick="return toggle_ShowShortDescr();" class="button_as_link">(toggle full show)</button>
+<button onclick="TRANSLATE.toggleShowShortDescr(); return false;" class="button_as_link">(toggle full show)</button>
 {% endif %}
 {% endfor %}
 <p>
 <ul>
-  <li>Untranslated:  <tt>{{descr.short}}</tt></li>
+  <li>Untranslated:  <span id="untranslated-short-description">{{ descr.short }}</span></li>
 {% if diff_short %}
 <span name="shortboxes" id="show-short-change-diff" style="display:none;border-style:solid;border-width:thin">
   <li><div class='diff'>Diff to previous revision <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
@@ -128,20 +95,20 @@ Translated:
   <li>Translated ({{lang.language}}):  <input type="text" name="short" value="{{trans.display_short}}" size="75" onchange="document.forms[0].submit.disabled=0" spellcheck="true" /></div></li>
 </ul>
 <h5>Long description</h5>
-<button onclick="return showlongdiff('None')" class="button_as_link">None</button> |
+<button onclick="TRANSLATE.showLongDiff('None'); return false;" class="button_as_link">None</button> |
 {% if diff_long %}
-<button onclick="return showlongdiff('show-long-change-diff')" class="button_as_link">Show Diff Changes</button> |
+<button onclick="TRANSLATE.showLongDiff('show-long-change-diff'); return false;" class="button_as_link">Show Diff Changes</button> |
 {% endif %}
 {% for olddiff in olddiffs %}
-<button onclick="return showlongdiff('show-long-diff-{{olddiff.oldid}}')" class="button_as_link">Show Diff to {{olddiff.oldid}}</button> |
+<button onclick="TRANSLATE.showLongDiff('show-long-diff-{{ olddiff.oldid }}'); return false;" class="button_as_link">Show Diff to {{olddiff.oldid}}</button> |
 {% if forloop.last %}
-<button onclick="return toggle_ShowLongDescr();" class="button_as_link">(toggle full show)</button>
+<button onclick="TRANSLATE.toggleShowLongDescr(); return false;" class="button_as_link">(toggle full show)</button>
 {% endif %}
 {% endfor %}
 <p>
 (Note: You must preserve the number of paragraphs)
 <ul>
-  <li>Untranslated:  <pre>{{descr.long}}</pre></li>
+  <li>Untranslated:  <pre id="untranslated-long-description">{{ descr.long }}</pre></li>
 {% if diff_long %}
 <span name="longboxes" id="show-long-change-diff" style="display:none;border-style:solid;border-width:thin">
     <li> <div class='diff'>Diff to previous revision <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
@@ -151,16 +118,16 @@ Translated:
 {% for olddiff in olddiffs %}
 <span name="longboxes" id="show-long-diff-{{olddiff.oldid}}" style="display:none;border-style:solid;border-width:thin">
     <li> <div class='diff'>Diff to description {{descr_id}} <span class='old'>(Old Version)</span><span class='new'>(New Version)</span><br>
-<pre>{% for type, text in olddiff.diff_long %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
+<pre>{% for type, text in olddiff.diff_long %}<span class='{{ type }}'>{{text}}</span>{% endfor %}</pre>
 ---
-<pre>{% for type, text in olddiff.diff_translong %}<span class='{{type}}'>{{text}}</span>{%endfor%}</pre>
+<pre>{% for type, text in olddiff.diff_translong %}<span class='{{ type }}'>{{ text }}</span>{% endfor %}</pre>
 <span name="ShowLongDescr" style="display:none;border-style:solid;border-width:thin;background-color:#CCCCCC;">
 English:
-<pre><span class='old' >{{olddiff.oldlong}}</span>
-<span class='new' >{{olddiff.long}}</span></pre>
+<pre><span class='old' >{{ olddiff.oldlong }}</span>
+<span class='new' >{{ olddiff.long }}</span></pre>
 Translated:
-<pre><span class='old' >{{olddiff.oldtranslong}}</span>
-<span class='new' >{{olddiff.translong}}</span></pre>
+<pre><span class='old' >{{ olddiff.oldtranslong }}</span>
+<span class='new' >{{ olddiff.translong }}</span></pre>
 </span></div>
     </li>
 </span>
@@ -182,10 +149,10 @@ Translated:
         <th>Message
     {% endif %}
       <tr>
-        <td><span style="font-size:80%">{{message.from_user}} at {{message.datetime|date:"Y-m-d H:i:s"}}</span>
-        <td><span style="font-size:80%">{{message.actionstring}}</span>
+        <td><span style="font-size:80%">{{ message.from_user }} at {{ message.datetime|date:"Y-m-d H:i:s" }}</span>
+        <td><span style="font-size:80%">{{ message.actionstring }}</span>
         <td>{% if message.message %}
-            <span title="{{message.parent.message}}">{{message.message|linebreaksbr}}</span><br>
+            <span title="{{message.parent.message}}">{{ message.message|linebreaksbr }}</span><br>
             {% endif %}
     {% if forloop.last %}
     </table>
@@ -221,26 +188,26 @@ actually returning UTF-8 as promised -->
     <h2>Comments for this description</h2>
     <small>Shared between languages, for talking <i>about</i> this description.</small><br>
     {% for message in descr_messages %}
-    {% if forloop.first %}
-    <ul>
-    {% endif %}
+        {% if forloop.first %}
+            <ul>
+        {% endif %}
         <li>
-            {% if message.message %}
+        {% if message.message %}
             <span
-            title="{{message.parent.message}}">{{message.message|linebreaksbr}}</span><br>
-            {% endif %}
-            <span style="font-size:80%">
-                {{message.actionstring}}
+                title="{{ message.parent.message }}">{{ message.message|linebreaksbr }}</span><br>
+        {% endif %}
+        <span style="font-size:80%">
+                {{ message.actionstring }}
                 {% if message.from_user %}
-                from {{message.from_user}}
+                    from {{ message.from_user }}
                 {% endif %}
-                at {{message.datetime|date:"Y-m-d H:i:s"}} {% if message.message %}<a href="{% url 'ddtss_delmessage' message.message_id %}">Delete</a>{% endif %}
+                at {{ message.datetime|date:"Y-m-d H:i:s" }} {% if message.message %}<a href="{% url 'ddtss_delmessage' message.message_id %}">Delete</a>{% endif %}
                 <a class="messagelink" target="_blank" href="{% url 'ddtss_message_descr' descr.description_id %}?in_reply_to={{message.message_id}}">Reply</a>
             </span>
         </li>
-    {% if forloop.last %}
-    </ul>
-    {% endif %}
+        {% if forloop.last %}
+            </ul>
+        {% endif %}
     {% endfor %}
     <a class="messagelink" target="_blank" href="{% url 'ddtss_message_descr' descr.description_id %}">New comment</a>
 </div>

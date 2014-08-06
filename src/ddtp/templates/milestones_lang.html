@@ -1,0 +1,56 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
+{% extends "base_ddtp.html" %}
+
+{% block title %}Debian Description Tracking  --- milestones for {{ lang.language }}{% endblock %}
+
+{% block head_specific_page %}
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/milestones_lang.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1>milestones for {{ lang.language }}</h1>
+<a href="{% url 'ddtss_index_lang' lang.language %}">back to team page {{ lang.language }}</a><br>
+<table id="milestonetable" cellspacing="1" class="tablesorter">
+<thead>
+<tr><th>milestone</th> <th>translated</th> <th>pending</th>  <th>total</th> <th>progress</th></tr>
+</thead>
+<tbody>
+{% for milestone, milestoneinfo in milestones %}
+<tr class="{% cycle 'odd' 'even' %}">
+    <td><a href="{% url 'ddt_stats_one_milestones_lang' lang.language milestone %}">{{ milestone }}</a>
+        <a href="{% url 'ddtss_addusermilestone' 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
+{% if user.is_coordinator %}
+        <a href="{% url 'ddtss_addlangmilestone' 'mile' milestone %}">
+            <img src="{{ STATIC_URL }}ddtss/img/lang_milestone-plus.png" alt="Hight" title="add whole milestone to lang milestone" height="15"></a>
+{% endif %}
+    </td>
+    <td align='right'>{{ milestoneinfo.translated }}</td>
+    <td align='right'>{{ milestoneinfo.pending }}</td>
+    <td align='right'> {{ milestoneinfo.total }}</td>
+    <td> <div class="progress_bar">
+            <strong>{{ milestoneinfo.percent }}%</strong>
+            <span style="width: {{ milestoneinfo.percent }}%;">&nbsp;</span>
+        </div>
+    </td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

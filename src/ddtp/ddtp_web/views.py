@@ -1,6 +1,21 @@
-# DDTSS-Django - A Django implementation of the DDTP/DDTSS website
-# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
-# See LICENCE file for details.
+"""
+DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
+Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
@@ -13,7 +28,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import subqueryload
 from ddtp.ddtss.views import get_user
 
-@cache_page(60*60)   # Cache for an hour
+# Cache for an hour
+@cache_page(60*60)
 @with_db_session
 def view_browse(session, request, prefix):
     """ Does overview pages (<foo>.html) """
@@ -42,7 +58,8 @@ def view_browse(session, request, prefix):
 
     return render_to_response("overview.html", {'packages': params, 'prefix': prefix, 'user': user}, context_instance=RequestContext(request))
 
-@cache_page(60*60)   # Cache for an hour
+# Cache for an hour
+@cache_page(60*60)
 @with_db_session
 def view_index(session, request):
     """ Main index.html, main page """
@@ -238,7 +255,7 @@ def stats_milestones_lang(session, request, language):
     params['user'] = user
     params['milestones'] = [(r[0], {'total': r[1], 'translated': resultdict.get(r[0],0), 'pending': resultdict1.get(r[0],0), 'percent': (resultdict.get(r[0],0)*100/r[1]) } ) for r in resultset2]
 
-    return render_to_response("milestones-lang.html", params, context_instance=RequestContext(request))
+    return render_to_response("milestones_lang.html", params, context_instance=RequestContext(request))
 
 @with_db_session
 def stats_one_milestones_lang(session, request, language, mile):
@@ -280,7 +297,7 @@ def stats_one_milestones_lang(session, request, language, mile):
     params['milestone'] = mile
     params['descriptions'] = [(r, {'translate': resultdict.get(r.description_id,0), 'pending': resultdict1.get(r.description_id,0)}) for r in resultset]
 
-    return render_to_response("one_milestones-lang.html", params, context_instance=RequestContext(request))
+    return render_to_response("one_milestones_lang.html", params, context_instance=RequestContext(request))
 
 def block_robots(request):
     """ A simple robots.txt for when this get made the top-level of a site. Stops a robot requesting every package. """
