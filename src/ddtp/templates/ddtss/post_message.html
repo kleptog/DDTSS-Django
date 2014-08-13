@@ -1,3 +1,20 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% extends "ddtss/base_ddtss.html" %}
 
 {% block title %}
@@ -10,20 +27,20 @@ Write a message {{title}}
 {% if type == "global" %}
     Send DDTSS global message
 {% elif type == "user" %}
-    Send message to {{to_user}}
+    Send message to {{ to_user }}
 {% elif type == "descr" %}
-    Send message about description {{description.description_id}} ({{description.package}})
+    Send message about description {{ description.description_id }} ({{ description.package }})
 {% elif type == "descrlang" %}
-    Send message about translation of description {{description.description_id}} ({{description.package}}) in {{language.language}}
+    Send message about translation of description {{ description.description_id }} ({{ description.package }}) in {{language.language}}
 {% elif type == "lang" %}
-    Send message to {{language.language}} translation team
+    Send message to {{ language.language }} translation team
 {% else %}
-    ??? type = {{type}} ???
+    ??? type = {{ type }} ???
 {% endif %}
 </h1>
     <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
         <textarea name="message" rows="4" cols="45"></textarea><br />
-        <input type="hidden" name="in_reply_to" value="{{in_reply_to}}"  />
+        <input type="hidden" name="in_reply_to" value="{{ in_reply_to }}"  />
         <input type="submit" name="submit" value="send message" />
         <input type="submit" name="cancel" value="Cancel" />
     </form>

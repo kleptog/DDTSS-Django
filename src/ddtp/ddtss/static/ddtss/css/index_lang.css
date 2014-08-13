@@ -1,0 +1,57 @@
+/*!
+ * DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
+ * Copyright (C) 2014 Fabio Pirola <fabio@pirola.org>
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+#div-pannels {
+  padding: 0px 0px 0px 0px;
+}
+
+#left-pannel {
+  width: 50%;
+  float: left;
+  padding: 0px 0px 0px 15px;
+}
+
+#right-pannel {
+  float: left;
+  width: 40%;
+}
+
+#right-pannel ul {
+  list-style: inside;
+}
+
+h2 {
+  margin-bottom: 10px!important;
+}
+
+.line-separator{
+  width: 100%;
+  border-bottom:1px dotted #313030;
+}
+
+label {
+  font-size: 90%;
+  top: 0px;
+}
+

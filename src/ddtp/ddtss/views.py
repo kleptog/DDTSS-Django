@@ -1,25 +1,49 @@
-# DDTSS-Django - A Django implementation of the DDTP/DDTSS website
-# Copyright (C) 2011 Martijn van Oosterhout <kleptog@svana.org>
-# See LICENCE file for details.
+"""
+DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
+Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>,
+                        Fabio Pirola <fabio@pirola.org>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
 
 import time
 import difflib
 import re
+import logging
+import json
 
 from django import forms
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
-from django.http import Http404, HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden, HttpResponse
 from django.template import RequestContext
+
 from ddtp.database.db import with_db_session
 from ddtp.database.ddtp import Description, ActiveDescription, Translation, PackageVersion, DescriptionMilestone
-from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages
+from ddtp.database.ddtss import Languages, PendingTranslation, PendingTranslationReview, Users, Messages, \
+    Wordlist
 from urlparse import urlsplit
 from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
 
 from ddtp.ddtss.translationmodel import DefaultTranslationModel
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 @with_db_session
 def view_index(session, request, lang=None):
@@ -33,14 +57,14 @@ def view_index(session, request, lang=None):
         return redirect('ddtss_index_lang', lang)
 
     pending_translations = session.query(Languages, \
-                                         func.sum(expression.case([(PendingTranslation.state==PendingTranslation.STATE_PENDING_TRANSLATION, 1)], else_=0)), \
-                                         func.sum(expression.case([(PendingTranslation.state==PendingTranslation.STATE_PENDING_REVIEW, 1)], else_=0))) \
+                                         func.sum(expression.case([(PendingTranslation.state == PendingTranslation.STATE_PENDING_TRANSLATION, 1)], else_=0)), \
+                                         func.sum(expression.case([(PendingTranslation.state == PendingTranslation.STATE_PENDING_REVIEW, 1)], else_=0))) \
                                   .outerjoin(PendingTranslation) \
                                   .group_by(Languages) \
                                   .all()
 
     translated = session.query(Languages.language, func.count(Translation.description_id)) \
-                        .join(Translation, Translation.language==Languages.language) \
+                        .join(Translation, Translation.language == Languages.language) \
                         .group_by(Languages.language) \
                         .all()
 
@@ -48,32 +72,44 @@ def view_index(session, request, lang=None):
     translated = dict(translated)
 
     # Combine into one resultset
-    params = []
+    languages = []
+    total_pending_translation = 0
+    total_pending_review = 0
+    total_translated = 0
     for row in pending_translations:
-        params.append( dict(language=row[0].language,
+        languages.append(dict(language=row[0].language,
                             fullname=row[0].fullname,
                             enabled=row[0].enabled_ddtss,
                             pending_translation=row[1],
                             pending_review=row[2],
-                            translated=translated.get(row[0].language,0)) )
+                            translated=translated.get(row[0].language, 0)))
+        total_pending_translation += row[1]
+        total_pending_review += row[2]
+        total_translated += translated.get(row[0].language, 0)
 
     # Sort by translated descending
-    params.sort(key=lambda x:x['translated'], reverse=True)
+    #languages.sort(key=lambda x:x['translated'], reverse=True)
 
-    return render_to_response("ddtss/index.html", {'languages': params, 'user': user}, context_instance=RequestContext(request))
+    return render_to_response("ddtss/index.html",
+                              {'languages': languages,
+                               'user': user,
+                               'total_pending_translation': total_pending_translation,
+                               'total_pending_review': total_pending_review,
+                               'total_translated': total_translated},
+                              context_instance=RequestContext(request))
 
 def get_user(request, session):
     user = None
 
     if 'username' in request.session:
         # If logged in, use that user
-        user = session.query(Users).filter_by(username = request.session['username']).one()
+        user = session.query(Users).filter_by(username=request.session['username']).one()
     elif 'ddtssuser' in request.COOKIES:
         # If persistant cookie is present, get the username from there
         cookie_user = Users.from_cookie(request.COOKIES['ddtssuser'])
         if cookie_user:
             # If we found a persistant cookie, check if it's a real user from the database
-            user = session.query(Users).filter_by(username = cookie_user.username).first()
+            user = session.query(Users).filter_by(username=cookie_user.username).first()
         if user:
             # If found, store in session
             request.session['username'] = cookie_user.username
@@ -93,7 +129,7 @@ def save_user(response, user):
     """ Wrapper which save user to response and returns the response """
     cookie = user.to_cookie()
 
-    response.set_cookie('ddtssuser', cookie, max_age=6*30*86400)
+    response.set_cookie('ddtssuser', cookie, max_age=6 * 30 * 86400)
     return response
 
 class FetchForm(forms.Form):
@@ -133,15 +169,15 @@ def view_index_lang(session, request, language):
         elif re.match('^\d+$', pack):
             description_id = int(pack)
         else:
-            packageversion = session.query(PackageVersion).filter(PackageVersion.package==pack). \
+            packageversion = session.query(PackageVersion).filter(PackageVersion.package == pack). \
                                      join(ActiveDescription, ActiveDescription.description_id == PackageVersion.description_id).first()
 
             if not packageversion:
                 return show_message_screen(request, 'No Package %s found' % pack, 'ddtss_index_lang', language)
 
-            description_id=packageversion.description_id
+            description_id = packageversion.description_id
 
-        description = session.query(Description).filter(Description.description_id==description_id).first()
+        description = session.query(Description).filter(Description.description_id == description_id).first()
 
         if not description:
             return show_message_screen(request, 'No description-id %s found' % str(description_id), 'ddtss_index_lang', language)
@@ -172,7 +208,7 @@ def view_index_lang(session, request, language):
                 trans.short, trans.long = PendingTranslation.make_suggestion(description, language)
                 session.add(trans)
                 session.commit()
-                return show_message_screen(request, 'Fetched package %s (%s)' % (description.package,str(description_id)), 'ddtss_translate', language, str(description_id))
+                return show_message_screen(request, 'Fetched package %s (%s)' % (description.package, str(description_id)), 'ddtss_translate', language, str(description_id))
 
         return show_message_screen(request, 'Package %s already translated (and not forced)' % (pack), 'ddtss_index_lang', language)
 
@@ -180,10 +216,10 @@ def view_index_lang(session, request, language):
 
     # TODO: Don't load actual descriptions
     translations = session.query(PendingTranslation,
-                                 func.sum(expression.case([(PendingTranslationReview.username==user.username, 1)], else_=0)).label('reviewed'),
+                                 func.sum(expression.case([(PendingTranslationReview.username == user.username, 1)], else_=0)).label('reviewed'),
                                  func.count().label('reviews')) \
                           .outerjoin(PendingTranslationReview) \
-                          .filter(PendingTranslation.language_ref==language) \
+                          .filter(PendingTranslation.language_ref == language) \
                           .group_by(PendingTranslation) \
                           .options(subqueryload(PendingTranslation.reviews)) \
                           .options(subqueryload(PendingTranslation.description)) \
@@ -229,7 +265,7 @@ def view_index_lang(session, request, language):
                                   ('lang_milestone_low', 'Team low', lang.milestone_low)):
         if not milestone:
             continue
-        m = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone==milestone).first()
+        m = session.query(DescriptionMilestone).filter(DescriptionMilestone.milestone == milestone).first()
         if not m:
             continue
 
@@ -354,7 +390,7 @@ def view_translate(session, request, language, description_id):
 
         if form.cleaned_data['submit']:
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
-            trans.lastupdate=int(time.time())
+            trans.lastupdate = int(time.time())
             trans.comment = form.cleaned_data['comment']
             trans.unlock()
 
@@ -407,10 +443,10 @@ def view_translate(session, request, language, description_id):
         oneolddiff['oldshort'] = olddescr.short()
         oneolddiff['oldlong'] = olddescr.long()
         oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_quick_suggestion(olddescr, language)
-        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
-        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
-        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
-        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'], oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'], oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'], oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'], oneolddiff['translong'])
         olddiffs.append(oneolddiff)
 
     session.commit()
@@ -439,11 +475,11 @@ def generate_line_diff(old, new):
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         print tag, i1, i2, j1, j2
         if tag in ('delete', 'replace'):
-            res.append( ('old', old[i1:i2]) )
+            res.append(('old', old[i1:i2]))
         if tag in ('insert', 'replace'):
-            res.append( ('new', new[j1:j2]) )
+            res.append(('new', new[j1:j2]))
         if tag == 'equal':
-            res.append( ('', old[i1:i2]) )
+            res.append(('', old[i1:i2]))
 
     return res
 
@@ -487,12 +523,12 @@ def generate_long_description_diff(old, new):
 
         for j in range(len(old_lines)):
             # Put the newline back on the end
-            res.extend( generate_line_diff(old_lines[j], new_lines[j]) )
-            res.append( ('', '\n') )
+            res.extend(generate_line_diff(old_lines[j], new_lines[j]))
+            res.append(('', '\n'))
 
         # Except for the last paragraph, add seperater
-        if i != len(old_parts)-1:
-            res.append( ('', ' .\n') )
+        if i != len(old_parts) - 1:
+            res.append(('', ' .\n'))
 
     return res
 
@@ -563,7 +599,7 @@ def view_review(session, request, language, description_id):
 
                 trans.comment = None
 
-            trans.lastupdate=int(time.time())
+            trans.lastupdate = int(time.time())
             session.commit()
             return show_message_screen(request, 'Changed comment only', 'ddtss_index_lang', language)
 
@@ -580,10 +616,10 @@ def view_review(session, request, language, description_id):
                     session.commit()
                     return show_message_screen(request, 'Translation was already reviewed', 'ddtss_index_lang', language)
             # Add to reviewers
-            trans.reviews.append( PendingTranslationReview(username=user.username) )
+            trans.reviews.append(PendingTranslationReview(username=user.username))
             # count review
             user.countreviews += 1
-            trans.lastupdate=int(time.time())
+            trans.lastupdate = int(time.time())
 
             message = ""
             if trans.comment:
@@ -614,7 +650,7 @@ def view_review(session, request, language, description_id):
             trans.update_translation(form.cleaned_data['short'], form.cleaned_data['long'])
             trans.comment = form.cleaned_data['comment']
             trans.owner_username = user.username
-            trans.lastupdate=int(time.time())
+            trans.lastupdate = int(time.time())
             # Clear reviews
             for review in trans.reviews:
                 session.delete(review)
@@ -669,10 +705,10 @@ def view_review(session, request, language, description_id):
         oneolddiff['oldshort'] = olddescr.short()
         oneolddiff['oldlong'] = olddescr.long()
         oneolddiff['oldtransshort'], oneolddiff['oldtranslong'] = PendingTranslation.make_quick_suggestion(olddescr, language)
-        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'],oneolddiff['short'])
-        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'],oneolddiff['transshort'])
-        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'],oneolddiff['long'])
-        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'],oneolddiff['translong'])
+        oneolddiff['diff_short'] = generate_line_diff(oneolddiff['oldshort'], oneolddiff['short'])
+        oneolddiff['diff_transshort'] = generate_line_diff(oneolddiff['oldtransshort'], oneolddiff['transshort'])
+        oneolddiff['diff_long'] = generate_line_diff(oneolddiff['oldlong'], oneolddiff['long'])
+        oneolddiff['diff_translong'] = generate_line_diff(oneolddiff['oldtranslong'], oneolddiff['translong'])
         olddiffs.append(oneolddiff)
 
     return render_to_response("ddtss/translate.html", dict(
@@ -751,7 +787,23 @@ def view_write_message(session, request, type, language=None, description=None, 
             session.add(message)
 
             session.commit()
-            return show_message_screen(request, 'message sent: %s %s %s %s ' % ( to_user, str(description), language, form.cleaned_data['in_reply_to']) , 'close')
+            message_suffix = None
+            if type == "global":
+                message_suffix = "to all users"
+            elif type == "user":
+                message_suffix = "to %s" % (to_user)
+            elif type == "descr":
+                message_suffix = "about description %s (%s)" % (descr.description_id, descr.package)
+            elif type == "descrlang":
+                message_suffix = "about translation of description %s (%s) in %s" % (
+                                     descr.description_id,descr.package, lang.language)
+            elif type == "lang":
+                message_suffix = "to %s translation team" % (lang.language)
+            else:
+                message_suffix = "... ??? ..."
+
+            return show_message_screen(request, 'Message sent correctly %s' % (message_suffix)
+                                       , 'close')
 
     return render_to_response("ddtss/post_message.html", dict(
         action=request.get_full_path(),
@@ -764,21 +816,21 @@ def view_write_message(session, request, type, language=None, description=None, 
         ), context_instance=RequestContext(request))
 
 @with_db_session
-def view_delmessage(session, request, message_id ):
+def view_delmessage(session, request, message_id):
     """ del a message """
 
     referer = request.META.get('HTTP_REFERER', None)
     if referer is None:
-        redirect_to='ddtss_index'
+        redirect_to = 'ddtss_index'
     try:
         redirect_to = urlsplit(referer, 'http', False)[2]
     except IndexError:
-        redirect_to='ddtss_index'
+        redirect_to = 'ddtss_index'
 
     user = get_user(request, session)
 
     message = session.query(Messages) \
-            .filter(Messages.message_id==message_id) \
+            .filter(Messages.message_id == message_id) \
             .one()
 
     auth = user.get_authority(message.language)
@@ -787,7 +839,7 @@ def view_delmessage(session, request, message_id ):
     # remove only the to_user
     if (message.to_user and message.for_description) \
             and (user.is_superuser or auth.auth_level == auth.AUTH_LEVEL_COORDINATOR or user.username == message.to_user or user.username == message.from_user):
-        message.to_user=None;
+        message.to_user = None;
         session.commit()
 
         return redirect(redirect_to)
@@ -799,7 +851,7 @@ def view_delmessage(session, request, message_id ):
             or user.username == message.to_user \
             or user.username == message.from_user:
         if message.actionstring:
-            message.message=""
+            message.message = ""
         else:
             session.delete(message)
         session.commit()
@@ -819,3 +871,45 @@ def view_delmessage(session, request, message_id ):
 
     return HttpResponseForbidden('<h1>Forbidden</h1>')
 
+# Refresh cached page every 1 Hour
+# or forced refresh by setting timeout.
+@with_db_session
+def view_get_wordlist(session, request, language):
+    """ Retrieve worlist for a specific language and
+        cache json data. """
+    lang = session.query(Languages).get(language)
+
+    # Unknown language
+    if not lang or not lang.enabled_ddtss:
+        raise Http404()
+
+    logger.debug("Load wordlist" \
+                " - language[%s] lang[%s]", language, lang)
+    db_wordlist = session.query(Wordlist.word,
+                                 Wordlist.translation) \
+                       .filter(Wordlist.language == lang) \
+                       .with_lockmode('update').all()
+    session.commit()
+    # special, if to_user and for_description set...
+    # remove only the to_user
+    all_wordlist = {}
+    if db_wordlist:
+        for word, translation in db_wordlist:
+            logger.debug("word[%(word)s] translation[%(translation)s]" % locals())
+            all_wordlist[word] = translation
+
+    return HttpResponse(json.dumps(all_wordlist), content_type="application/json")
+
+
+@with_db_session
+def view_wordlist_page(session, request, language):
+    """ Show the wordlist page for a language """
+    lang = session.query(Languages).get(language)
+
+    # Unknown language
+    if not lang or not lang.enabled_ddtss:
+        raise Http404()
+
+    return render_to_response("ddtss/wordlist_page.html", dict(
+        forreview=False,
+        lang=lang), context_instance=RequestContext(request))

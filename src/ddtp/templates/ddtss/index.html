@@ -1,7 +1,32 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% extends "ddtss/base_ddtss.html" %}
 
 {% block title %}
 DDTSS
+{% endblock %}
+
+{% block head_specific_page %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/dataTables.fixedHeader.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.dataTables.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/dataTables.fixedHeader.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/index.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +38,7 @@ Afterwards the updated translation is submitted to the DDTS server.
 <p>
 This is the experimental DDTSS-Django version. It is currently under developement.
 <p>
-More information about the DDTP and the DDTSS can be found  <a href="//www.debian.org/international/l10n/ddtp">here</a>.
+More information about the DDTP and the DDTSS can be found  <a href="//www.debian.org/international/l10n/ddtp" target="_blank">here</a>.
 {# These message are the Django messages #}
 {% if messages %}
 <ul class="messages">
@@ -23,29 +48,52 @@ More information about the DDTP and the DDTSS can be found  <a href="//www.debia
 </ul>
 {% endif %}
 <h1>Select a language:</h1>
-<table class="langlist"><col width="150px" /><col width="150px" /><col width="150px" /><col width="150px"/>
-<tr><th>Language</th> <th>Pending translation</th> <th>Pending review</th> <th>Translated</th></tr>
-{% for lang in languages %}{% if lang.enabled %}
-<tr class="{% cycle 'odd' 'even' %}">
-   <td><a href="{% url 'ddtss_index_lang' lang.language %}">{{ lang.language }}</a>
-   {% if lang.fullname %}({{lang.fullname}}){% endif %}</td>
-   <td align="right">{{lang.pending_translation}}</td>
-   <td align="right">{{lang.pending_review}}</td>
-   <td align="right">{{lang.translated}}</td>
-</tr>
-{% endif %}{% endfor %}
-<tr>
-    <th colspan="3">Total</th> <th align="right">76882</th>
-</tr>
-</table>
+
+<div id="div-table-languages">
+    <table id="table-languages" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Language</th>
+                <th>Pending translation</th>
+                <th>Pending review</th>
+                <th>Translated</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th>{{ total_pending_translation }}</th>
+                <th>{{ total_pending_review }}</th>
+                <th>{{ total_translated }}</th>
+            </tr>
+        </tfoot>
+         <tbody>
+             {% for lang in languages %}
+                 {% if lang.enabled %}
+                     <tr>
+                         <td><a href="{% url 'ddtss_index_lang' lang.language %}">{{ lang.language }}</a>
+                         {% if lang.fullname %}
+                             ({{lang.fullname}})
+                         {% endif %}
+                         </td>
+                         <td>{{ lang.pending_translation }}</td>
+                         <td>{{ lang.pending_review }}</td>
+                         <td>{{ lang.translated }}</td>
+                     </tr>
+                 {% endif %}
+             {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <p>
 The following languages are accepted by the DDTS but are disabled here
-because they have not requested it be actived.  They are ofcourse still
+because they have not requested it be actived.  They are of course still
 available via the email system (the DDTS).
 <ul>
 {% for lang in languages %}
 {% if not lang.enabled %}
-<li>{{lang.language}}</li>
+<li>{{ lang.language }}</li>
 {% endif %}
 {% endfor %}
 </ul>

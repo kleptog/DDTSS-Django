@@ -1,0 +1,68 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2014 Fabio Pirola <fabio@pirola.org>                              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
+{% extends "ddtss/base_ddtss.html" %}
+
+{% block title %}
+WORDLIST
+{% endblock %}
+
+{% block head_specific_page %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/dataTables.fixedHeader.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/dataTables.tableTools.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/wordlist_page.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.dataTables.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/dataTables.fixedHeader.js"></script>
+<script asynch type="text/javascript" src="{{ STATIC_URL }}ddtss/js/FileSaver/FileSaver.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/wordlist_page.js"></script>
+<script type="text/javascript">
+WORDLIST_PAGE.language = '{{ lang.language }}';
+WORDLIST_PAGE.wordlistUrl = '{% url 'ddtss_wordlist' lang.language %}';
+</script>
+{% endblock %}
+
+
+{% block content %}
+<br>
+
+<button onclick="WORDLIST_PAGE.saveAsCsv('None'); return false;" class="DTTT_button DTTT_button_print top-left save-csv">Save as CSV</button> 
+<div id="div-table-wordlist">
+    <table id="table-wordlist" class="display" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Word</th>
+                <th>Translation</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Word</th>
+                <th>Translation</th>
+            </tr>
+        </tfoot>
+         <tbody>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+{% endblock %}

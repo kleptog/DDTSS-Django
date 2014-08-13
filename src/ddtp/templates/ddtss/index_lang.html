@@ -1,52 +1,49 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% extends "ddtss/base_ddtss.html" %}
 
 {% block title %}
-DDTSS ({{lang.language}})
+DDTSS ({{ lang.language }})
 {% endblock %}
 
-{% block ddtss_head %}
-<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.flot.js"></script>
-<script type="text/javascript">//<![CDATA[
-function toggleAge() {
-    toggleFields(document.getElementsByName('showage'));
-}
-
-function toggleSize() {
-    toggleFields(document.getElementsByName('showsize'));
-}
-
-function toggleFields(fields) {
-    var i;
-    for(i = fields.length - 1; i >= 0; i -= 1) {
-        if(fields[i].style.display === 'inline') {
-            fields[i].style.display = 'none';
-        } else {
-            fields[i].style.display = 'inline';
-        }
-    }
-}
-
-$(document).ready(function($) {
-    DDTSS.setupMessagelinks();
-})
-//]]></script>
+{% block head_specific_page %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/index_lang.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.flot.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/index_lang.js"></script>
 {% endblock %}
 
 {% block content %}
-<h1>DDTSS for {{lang.language}} {% if lang.fullname %}({{lang.fullname}}){% endif %}</h1>
+<h1>DDTSS for {{ lang.language }} {% if lang.fullname %}({{ lang.fullname }}){% endif %}</h1>
 
 <!-- Project Messages -->
 {% for message in global_messages %}
 {% if forloop.first %}
 <div class=messages>
-    <h2>Project-Messages<div class="help" title="Project Messages for the DDTP">?</div>  </h2>
+    <h2>Project-Messages
+      <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="Project Messages for the DDTP"></span></span>
+    </h2>
 {% if user.is_superuser %}
     <a class="messagelink" target="_blank" href="{% url 'ddtss_message' %}">New global message</a>
 {% endif %}
     <ul>
 {% endif %}
         <li>
-            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <b title="{{message.parent.message}}">{{ message.message }}</b><br>
             <span style="font-size:80%">
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
@@ -67,11 +64,11 @@ $(document).ready(function($) {
 <span style="font-size:120%">
     <b>You can use all the features only when logged in! Please <a href="login">Login</a></b>
 </span>
-<p><a href="//www.debian.org/international/l10n/ddtp#rules">Common translation rules</a></p>
+<p><a href="//www.debian.org/international/l10n/ddtp#rules" target="_blank">Common translation rules</a></p>
 {% endif %}
 
 
-Coordinators for {{lang.language}}:
+Coordinators for {{ lang.language }}:
 {% for user in lang.coordinators %} <a class="messagelink" target="_blank" href="{% url 'ddtss_message_user' user.username %}">{{user.username}}</a>
 {%if not forloop.last%}, {% endif %}
 {% empty %}(None){% endfor %}
@@ -90,14 +87,16 @@ Coordinators for {{lang.language}}:
 {% for message in team_messages %}
 {% if forloop.first %}
 <div class=messages>
-    <h2>Team Messages<div class="help" title="Team Messages">?</div>  </h2>
+    <h2>Team Messages
+        <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="Team Messages"></span></span>
+    </h2>
     {% if user.is_coordinator %}
     <a class="messagelink" target="_blank" href="{% url 'ddtss_message_lang' lang.language %}">New team message</a>
     {% endif %}
     <ul>
 {% endif %}
         <li>
-            <b title="{{message.parent.message}}">{{message.message}}</b><br>
+            <b title="{{ message.parent.message }}">{{ message.message }}</b><br>
             <span style="font-size:80%">
                 from {{message.from_user}}
                 at {{message.datetime|date:"Y-m-d H:i:s"}}
@@ -122,22 +121,21 @@ Coordinators for {{lang.language}}:
 <tbody>
 {% for milestoneinfo in milestones %}
 <tr class="{% cycle 'odd' 'even' %}">
-    <td><img src="{{ STATIC_URL }}ddtss/img/{{milestoneinfo.type}}.png" height="15">{{milestoneinfo.typename}}</td>
-    <td><a href="{% url 'ddt_stats_one_milestones_lang' lang.language milestoneinfo.name %}">{{milestoneinfo.name}}</a></td>
-    <td align='right'>{{milestoneinfo.translated}}</td>
-<!--    <td align='right'>{{milestoneinfo.pending}}</td> -->
-    <td align='right'> {{milestoneinfo.total}}</td>
+    <td><img src="{{ STATIC_URL }}ddtss/img/{{ milestoneinfo.type }}.png" height="15">{{ milestoneinfo.typename }}</td>
+    <td><a href="{% url 'ddt_stats_one_milestones_lang' lang.language milestoneinfo.name %}">{{ milestoneinfo.name }}</a></td>
+    <td align='right'>{{ milestoneinfo.translated }}</td>
+<!--    <td align='right'>{{ milestoneinfo.pending }}</td> -->
+    <td align='right'> {{ milestoneinfo.total }}</td>
     <td> <div class="progress_bar">
-            <strong>{{milestoneinfo.percent|floatformat}}%</strong>
-            <span style="width: {{milestoneinfo.percent}}%;">&nbsp;</span>
+            <strong>{{ milestoneinfo.percent|floatformat }}%</strong>
+            <span style="width: {{ milestoneinfo.percent }}%;">&nbsp;</span>
         </div>
     </td>
-    <td><div onclick="DDTSS.setMilestoneChart('{{milestoneinfo.typename}} milestone', '{% url 'ddtss_flot_milestone_data' lang.language milestoneinfo.name %}')">Chart</div></td>
+    <td><div onclick="DDTSS.setMilestoneChart('{{ milestoneinfo.typename }} milestone', '{% url 'ddtss_flot_milestone_data' lang.language milestoneinfo.name %}')"; return false;>Chart</div></td>
     </tr>
 {% endfor %}
 </tbody>
 </table>
-
 <div id="flot_chart" style="display:none">
    <h3 id="flot_title" style="width:100%; text-align:center"></h3>
    <div id="flot_graph" style="width:100%;height:150px"></div>
@@ -145,15 +143,13 @@ Coordinators for {{lang.language}}:
 <!-- End Milestones -->
 {% endif %}
 
-
-<table>
-    <col width="60%" /><col width="40%" />
-<tr>
-  <td valign='top' >
-  <div class=untranslated>
-  <h2>Pending translation ({{ pending_translations|length }})
-    <div class="help" title="List of descriptions needing translation. When you select a description, it will be locked for you for 15 minutes.">?</div>
-  </h2>
+<div class="line-separator"></div>
+<div id="div-pannels">
+  <div id="left-pannel">
+    <div class=untranslated>
+      <h2>Pending translation ({{ pending_translations|length }})
+        <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="List of descriptions needing translation. When you select a description, it will be locked for you for 15 minutes."></span></span>
+     </h2>
   <ol>
 {% for trans in pending_translations %}
 {% if forloop.first %}<ol>{% endif %}
@@ -178,13 +174,13 @@ Coordinators for {{lang.language}}:
   </ol>
   </div>
 
-  <h4>Fetch specific description
-    <div class="help" title="Get a specific description to translate. Normally it won't fetch descriptions already translated, use force to override.">?</div>
-  </h4>
+  <h2>Fetch specific description
+    <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="Get a specific description to translate. Normally it won't fetch descriptions already translated, use force to override."></span></span>
+  </h2>
   <form method="post" action="{% url 'ddtss_index_lang' lang.language %}" enctype="multipart/form-data" accept-charset="utf-8">
+    <label><input type="checkbox" name="force" value="yes" id="force" />&nbsp;Force fetching even if not untranslated</label>
+    <br>
     <input name="package" type="text" />
-    <label><input type="checkbox" name="force" value="yes" id="force" /></label>
-    <label for="force">Force fetching even if not untranslated</label>
     <div>
       <input type="hidden" name=".cgifields" value="force"  />
     </div>
@@ -193,7 +189,7 @@ Coordinators for {{lang.language}}:
 
   <div class=forreview>
   <h2>Pending review ({{ pending_review|length }})
-    <div class="help" title="List of translations that need review. Note: it may ask you review something you already reviewed. This is because someone has changed it.">?</div>
+    <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="List of translations that need review. Note: it may ask you review something you already reviewed. This is because someone has changed it."></span></span>
   </h2>
   <ol>
 {% for trans in pending_review %}
@@ -222,27 +218,33 @@ Coordinators for {{lang.language}}:
   </div>
 <!-- Suggestions not yet done
 <div class=suggestion>
-<h2>Suggestions (2)  <div class="help" title="List of suggestions that need review.">?</div>
+<h2>Suggestions (2)
+    <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="List of suggestions that need review."></span></span>
 
 </h2><ol><li><a href="/ddtss/index.cgi/suggestion/11273">junior-games-gl</a> externalreview 2010-08-18</li> </ol></div>
 -->
-</td>
-<td valign='top' >
+{# End left pannel. #}
+</div>
+<div id="right-pannel">
+{# Begin right pannel. #}
 <div class=infobox>
-<h2>Infos about : <div class="help" title="About your account, some stats,....">?</div>
+<h2>Infos about
+      <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="About your account, some stats, ..."></span></span>
 </h2><ul>
-<li><button onclick="toggleSize(); return false;" class="button_as_link">Toggle display size</button></li>
-<li><button onclick="toggleAge(); return false;" class="button_as_link">Toggle display ages</button></li>
+<li><button onclick="INDEX_LANG.toggleSize(); return false;" class="button_as_link">Toggle display size</button></li>
+<li><button onclick="INDEX_LANG.toggleAge(); return false;" class="button_as_link">Toggle display ages</button></li>
 {% if user.logged_in %}
 <li>Translations: {{user.counttranslations}}</li>
 <li>Reviews: {{user.countreviews}}</li>
 
-<li><div onclick="DDTSS.setUserChart('{% url 'ddtss_flot_thisuser_data' %}')">Chart</div></li>
+<li><div onclick="DDTSS.setUserChart('{% url 'ddtss_flot_thisuser_data' %}')"; return false;>Chart</div></li>
 {% endif %}
 </ul>
 </div>
 <div class=messages>
-    <h2>Messages for you<div class="help" title="Messages from other users for you">?</div>  </h2>
+    <h2>Messages for you
+      <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="Messages from other users for you"></span></span>
+    </h2>
 {% for message in user_messages %}
 {% if forloop.first %}<ul>{% endif %}
     <li>
@@ -263,7 +265,7 @@ Coordinators for {{lang.language}}:
 </div>
   <div class=reviewed>
   <h2>Reviewed by you ({{ reviewed|length }})
-    <div class="help" title="List of translations you have already reviewed. You can still make changes though.">?</div>
+      <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="List of translations you have already reviewed. You can still make changes though."></span></span>
   </h2>
 {% for trans in reviewed %}
 {% if forloop.first %}<ol>{% endif %}
@@ -288,7 +290,7 @@ Coordinators for {{lang.language}}:
   </div>
   <div class=translated>
   <h2>Recently translated
-    <div class="help" title="Recently translated descriptions">?</div>
+     <span class="box-help"><span class="help-icon"></span><span class="tooltip-help" tooltip-text="Recently translated descriptions"></span></span>
   </h2>
 {% if recently_translated %}
 <ol>
@@ -300,13 +302,15 @@ Coordinators for {{lang.language}}:
     None
 {% endif %}
 </div>
-</td></tr>
-</table>
+{# End right pannel. #}
+</div>
+<div class="clear"></div>
+</div>
 <a href="{% url 'ddtss_index_lang' lang.language %}">Refresh</a> |
 <a href="{% url 'ddtss_index_lang' 'xx' %}">Another language</a> |
-<a href="/ddtss/index.cgi/nl/wordlist">Wordlist</a> |
-<a href="//www.debian.org/international/l10n/ddtp">DDTP documentation</a> |
-<a href="//www.debian.org/international/l10n/ddtp#rules">Common translation rules</a> |
+<a href="{% url 'ddtss_wordlist_page' lang.language %}">Wordlist</a> |
+<a href="//www.debian.org/international/l10n/ddtp" target="_blank">DDTP documentation</a> |
+<a href="//www.debian.org/international/l10n/ddtp#rules" target="_blank">Common translation rules</a> |
 {% if user.logged_in %}
 <a href="{% url 'ddtss_logout' %}">Logout</a>
 {% else %}

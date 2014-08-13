@@ -1,3 +1,20 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% load settings %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -6,8 +23,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>{% block title %}ddtp.debian.org{% endblock %}</title>
 	<link rel="stylesheet" href="{{ STATIC_URL }}ddtp/css/debian/debian.css" type="text/css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}ddtp/css/ddtp.css" type="text/css" />
-{% block head %}
+	<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery-2.1.1.js"></script>
+{% block head_application %}
+{% endblock %}
+{% block head_specific_page %}
 {% endblock %}
 </head>
 <body>
@@ -25,7 +44,7 @@ Please send any feedback to the debian-i18n@l.d.o mailing list.
 <div id="header">
         <div id="upperheader">
                 <div id="logo">
-                        <a href="//www.debian.org/" title="Debian Home"><img src="{{ STATIC_URL }}ddtp/img/debian/openlogo-50.png" alt="Debian" width="50" height="61" /></a>
+                        <a href="//www.debian.org/" title="Debian Home" target="_blank"><img src="{{ STATIC_URL }}ddtp/img/debian/openlogo-50.png" alt="Debian" width="50" height="61" /></a>
                 </div>
                 <p class="section"><a href="/">ddtp</a></p>
 		
@@ -34,10 +53,10 @@ Please send any feedback to the debian-i18n@l.d.o mailing list.
         <div id="navbar">
                 <p class="hidecss"><a href="#inner">Skip Quicknav</a></p>
                 <ul>
-                   <li><a href="//www.debian.org/intro/about">About Debian</a></li>
-                   <li><a href="//www.debian.org/international/l10n/ddtp">About DDTP</a></li>
+                   <li><a href="//www.debian.org/intro/about" target="_blank">About Debian</a></li>
+                   <li><a href="//www.debian.org/international/l10n/ddtp" target="_blank">About DDTP</a></li>
                    <li><a href="{% url 'ddtss_index' %}">Contribute</a></li>
-                   <li><a href="//wiki.debian.org/I18n/DDTP2">For Developers</a></li>
+                   <li><a href="//wiki.debian.org/I18n/DDTP2" target="_blank">For Developers</a></li>
                 </ul>
         </div>
 	<p id="breadcrumbs">{% block breadcrumbs %}ddtp.debian.org{% endblock %}</p>

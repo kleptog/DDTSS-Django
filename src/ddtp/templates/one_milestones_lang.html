@@ -1,19 +1,34 @@
+{# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
+{# Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>              #}
+{#                                                                                 #}
+{# This program is free software; you can redistribute it and/or                   #}
+{# modify it under the terms of the GNU General Public License                     #}
+{# as published by the Free Software Foundation; either version 2                  #}
+{# of the License, or (at your option) any later version.                          #}
+{#                                                                                 #}
+{# This program is distributed in the hope that it will be useful,                 #}
+{# but WITHOUT ANY WARRANTY; without even the implied warranty of                  #}
+{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                   #}
+{# GNU General Public License for more details.                                    #}
+{#                                                                                 #}
+{# You should have received a copy of the GNU General Public License               #}
+{# along with this program; if not, write to the Free Software                     #}
+{# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. #}
+
 {% extends "ddtss/base_ddtss.html" %}
 
-{% block title %}Debian Description Tracking  --- milestones '{{milestone}}' for {{lang.language}}{% endblock %}
+{% block title %}Debian Description Tracking  --- milestones '{{ milestone }}' for {{ lang.language }}{% endblock %}
 
-{% block ddtss_head %}
-<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.flot.js"></script>
-
+{% block head_specific_page %}
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.flot.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/one_milestones_lang.js"></script>
 <script type="text/javascript">
-$(document).ready(function($) {
-    DDTSS.setMilestoneChart('Milestone progress', '{% url \'ddtss_flot_milestone_data\' lang.language milestone %}');
-})
+var flotMilestoneUrl = '{% url 'ddtss_flot_milestone_data' lang.language milestone %}';
 </script>
 {% endblock %}
 
 {% block content %}
-<h1>milestones '{{milestone}}' for {{lang.language}}
+<h1>milestones '{{ milestone }}' for {{ lang.language }}
         <a href="{% url 'ddtss_addusermilestone' 'mile' milestone %}">
             <img src="{{ STATIC_URL }}ddtss/img/user_milestone-plus.png" alt="Hight" title="add whole milestone to user milestone" height="15"></a>
 {% if user.is_coordinator %}
