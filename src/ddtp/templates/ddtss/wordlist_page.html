@@ -1,5 +1,5 @@
 {# DDTSS-Django - A Django implementation of the DDTP/DDTSS website.               #}
-{# Copyright (C) 2014 Fabio Pirola <fabio@pirola.org>                              #}
+{# Copyright (C) 2014-2015 Fabio Pirola <fabio@pirola.org>                         #}
 {#                                                                                 #}
 {# This program is free software; you can redistribute it and/or                   #}
 {# modify it under the terms of the GNU General Public License                     #}
@@ -18,21 +18,25 @@
 {% extends "ddtss/base_ddtss.html" %}
 
 {% block title %}
-WORDLIST
+WORDLIST ({{ lang.language }})
 {% endblock %}
 
 {% block head_specific_page %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/jquery.dataTables.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/dataTables.fixedHeader.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/datatables/dataTables.tableTools.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/jquery/colorbox/colorbox.css" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}ddtss/css/wordlist_page.css" />
 <script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.dataTables.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/dataTables.fixedHeader.js"></script>
 <script asynch type="text/javascript" src="{{ STATIC_URL }}ddtss/js/FileSaver/FileSaver.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/jquery/jquery.colorbox.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ddtss/js/wordlist_page.js"></script>
 <script type="text/javascript">
 WORDLIST_PAGE.language = '{{ lang.language }}';
+WORDLIST_PAGE.flagCoordinator = '{{ user.is_coordinator }}';
 WORDLIST_PAGE.wordlistUrl = '{% url 'ddtss_wordlist' lang.language %}';
+WORDLIST_PAGE.wordlistPageAddEditDeleteUrl = '{% url 'ddtss_wordlist_page_add_edit_delete' lang.language %}';
 </script>
 {% endblock %}
 
@@ -40,17 +44,56 @@ WORDLIST_PAGE.wordlistUrl = '{% url 'ddtss_wordlist' lang.language %}';
 {% block content %}
 <br>
 
-<button onclick="WORDLIST_PAGE.saveAsCsv('None'); return false;" class="DTTT_button DTTT_button_print top-left save-csv">Save as CSV</button> 
+<button id="button-add-word" onclick="WORDLIST_PAGE.openPopUp('add', undefined); return false;" class="DTTT_button DTTT_button_print top-left">Add word</button>
+<button onclick="WORDLIST_PAGE.saveAsCsv(); return false;" class="DTTT_button DTTT_button_print top-left save-csv">Save as CSV</button>
+
+<p><a id="open-pop-up" class="inline" style="display:none;" href="#insert-or-update-record">Insert or Update record</a></p>
+		<!-- This contains the hidden content for inline calls -->
+		<div style="display:none;">
+			<div id="insert-or-update-record">
+			<div id="head-content">...</div>
+			<br/>
+			<div id="data-content">
+			<strong>Word:</strong>
+			<br/>
+			<input type=text id="input-pop-up-word" name="input-pop-up-word" size=34 maxlength=250 placeholder="Here insert the new word" required = "required">
+			<span id="check-input-value-word" class="check-input-value">...</span>
+			<br/>
+			<strong>Translation:</strong>
+			<br/>
+			<textarea id="textarea-pop-up-translation" name="textarea-pop-up-translation" rows="5" cols="50" maxlength=512 placeholder="Here insert the translation of new word" required = "required"></textarea>
+			<span id="check-input-value-translation" class="check-input-value"><br/></span>
+			<br/>
+			<br/>
+			<button id="button-pop-up-save" onclick="WORDLIST_PAGE.saveWordlist(); return false;" class="DTTT_button DTTT_button_print top-left">Save</button>
+			<button id="button-pop-up-delete" onclick="WORDLIST_PAGE.saveWordlist(); return false;" class="DTTT_button DTTT_button_print top-left">Delete</button>
+			</div>
+			</div>
+		</div>
+<p><a id="open-pop-up-ok-status" class="inline" style="display:none;" href="#pop-up-ok-status">Return status</a></p>
+		<!-- This contains the hidden content for inline calls -->
+		<div style="display:none;">
+			<div id="pop-up-ok-status">
+			<div id="head-content"></div>
+			<br/>
+			<div id="data-content">
+			<strong>Wordlist updated correctly</strong>
+			</div>
+			</div>
+		</div>
+
 <div id="div-table-wordlist">
     <table id="table-wordlist" class="display" cellspacing="0">
         <thead>
             <tr>
+                <th>Edit / Delete</th>
                 <th>Word</th>
                 <th>Translation</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
+                <th>Edit / Delete</th>
                 <th>Word</th>
                 <th>Translation</th>
             </tr>

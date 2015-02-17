@@ -1,6 +1,6 @@
 /*!
  * DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
- * Copyright (C) 2014 Fabio Pirola <fabio@pirola.org>
+ * Copyright (C) 2014-2015 Fabio Pirola <fabio@pirola.org>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,3 +24,39 @@
 .save-csv {
   margin-bottom: 15px;
 }
+
+#cboxWrapper {
+  position:fixed;
+  margin-left: 300px;
+  top: 50px;
+}
+
+#head-content {
+  background-color: #DDD;
+  font-weight: bold;
+}
+
+#data-content {
+margin-left: 30px;
+}
+
+#data-content input[type="text"], #data-content textarea {
+margin-left: 15px;
+}
+
+.check-input-value {
+  color: red;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+button:disabled, input[type="text"]:read-only, textarea:read-only {
+  background: -webkit-linear-gradient(top, #ffffff 0%,#f3f3f3 89%,#f9f9f9 100%)!important;
+  opacity: 0.5;
+}
+
+button:disabled {
+  border-color: #999!important;
+  box-shadow: 0px 0px 0px!important;
+}
+
