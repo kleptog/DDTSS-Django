@@ -1,7 +1,7 @@
 """
 DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
-Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>,
-                        Fabio Pirola <fabio@pirola.org>
+Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>
+Copyright (C) 2014-2015 Fabio Pirola <fabio@pirola.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -38,7 +38,6 @@ from urlparse import urlsplit
 from sqlalchemy import func
 from sqlalchemy.sql import expression
 from sqlalchemy.orm import subqueryload
-
 from ddtp.ddtss.translationmodel import DefaultTranslationModel
 
 
@@ -871,12 +870,9 @@ def view_delmessage(session, request, message_id):
 
     return HttpResponseForbidden('<h1>Forbidden</h1>')
 
-# Refresh cached page every 1 Hour
-# or forced refresh by setting timeout.
 @with_db_session
 def view_get_wordlist(session, request, language):
-    """ Retrieve worlist for a specific language and
-        cache json data. """
+    """ Retrieve worlist for a specific language. """
     lang = session.query(Languages).get(language)
 
     # Unknown language
@@ -888,7 +884,7 @@ def view_get_wordlist(session, request, language):
     db_wordlist = session.query(Wordlist.word,
                                  Wordlist.translation) \
                        .filter(Wordlist.language == lang) \
-                       .with_lockmode('update').all()
+                       .all()
     session.commit()
     # special, if to_user and for_description set...
     # remove only the to_user
@@ -909,7 +905,90 @@ def view_wordlist_page(session, request, language):
     # Unknown language
     if not lang or not lang.enabled_ddtss:
         raise Http404()
+    
+    """ Retrieve and save coordinator flag """
+    user = get_user(request, session)
 
     return render_to_response("ddtss/wordlist_page.html", dict(
         forreview=False,
-        lang=lang), context_instance=RequestContext(request))
+        lang=lang,
+        user=user), context_instance=RequestContext(request))
+
+
+@with_db_session
+def view_wordlist_add_edit_delete(session, request, language):
+    user = get_user(request, session)
+    if not user.is_coordinator:
+        return HttpResponseForbidden()
+    
+    """ Retrieve worlist for a specific language. """
+    lang = session.query(Languages).get(language)
+
+    # Unknown language
+    if not lang or not lang.enabled_ddtss:
+        raise Http404()
+    
+    
+    """ Check request & input data """
+    if not request.is_ajax() \
+        or request.method != 'POST' \
+        or not request:
+        return HttpResponse(status=405)
+    
+    try:
+        data=json.loads(request.body)
+    except:
+        return HttpResponse(status=412)
+    
+    if not data \
+        or not data['action'] \
+        or data['action'] not in ['add', 'edit', 'delete'] \
+        or not data['word'] \
+        or len(data['word']) < 1 \
+        or not data['translation'] \
+        or len(data['translation'])<3:
+        return HttpResponse(status=422)
+    logger.debug("Check if already exists wordlist" \
+                " - language[%s] lang[%s] word[%s]", \
+                language, lang, data['word'])
+    
+    current_wordlist = session.query(Wordlist) \
+                            .filter(Wordlist.language == lang) \
+                            .filter(Wordlist.word == data['word']) \
+                            .with_lockmode('update') \
+                            .all()
+    if data['action'] == 'add':
+        if current_wordlist:
+            session.commit()
+            return HttpResponse(status=409)
+
+        logger.info("Add new word to wordlist" \
+                " - username[%s] language[%s] lang[%s] word[%s] translation[%s]", \
+                user.username, language, lang, data['word'], data['translation'])
+        newWord = Wordlist(language=lang, word=data['word'], translation=data['translation'])
+        session.add(newWord)
+        session.commit()
+        return HttpResponse(status=201)
+    if data['action'] == 'edit':
+        if not current_wordlist:
+            session.commit()
+            return HttpResponse(status=409)
+        logger.info("Update word to wordlist" \
+                " - username[%s] language[%s] lang[%s] word[%s] translation[%s]", \
+                user.username, language, lang, data['word'], data['translation'])
+        for wordlist_cycle in current_wordlist:
+            wordlist_cycle.translation=data['translation']
+        session.commit()
+        return HttpResponse(status=200)
+    
+    # Otherwise delete
+    if not current_wordlist:
+        session.commit()
+        return HttpResponse(status=410)
+    logger.info("Delete word from wordlist" \
+            " - username[%s] language[%s] lang[%s] word[%s] translation[%s]", \
+            user.username, language, lang, data['word'], data['translation'])
+    for wordlist_cycle in current_wordlist:
+        session.delete(wordlist_cycle)
+    session.commit()
+    return HttpResponse(status=204)

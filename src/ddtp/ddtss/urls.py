@@ -1,6 +1,7 @@
 """
 DDTSS-Django - A Django implementation of the DDTP/DDTSS website.
-Copyright (C) 2011-2014 Martijn van Oosterhout <kleptog@svana.org>
+Copyright (C) 2011-2015 Martijn van Oosterhout <kleptog@svana.org>
+Copyright (C) 2014-2015 Fabio Pirola <fabio@pirola.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -56,6 +57,7 @@ urlpatterns = patterns(
     url(r'^flot/milestone/(?P<language>\w\w(?:_\w\w)?)/(?P<milestone>.+)$',ddtss_flot.milestone_data, name='ddtss_flot_milestone_data'),
     url(r'^flot/thisuser$',ddtss_flot.thisuser_data, name='ddtss_flot_thisuser_data'),
     url(r'^wordlist/(?P<language>\w\w(?:_\w\w)?)$', (ddtss_views.view_get_wordlist), name='ddtss_wordlist'),
-    url(r'^wordlist_page/(?P<language>\w\w(?:_\w\w)?)$', (ddtss_views.view_wordlist_page), name='ddtss_wordlist_page')
+    url(r'^wordlist_page/(?P<language>\w\w(?:_\w\w)?)$', (ddtss_views.view_wordlist_page), name='ddtss_wordlist_page'),
+    url(r'^wordlist_page/(?P<language>\w\w(?:_\w\w)?)/add_edit_delete$', (ddtss_views.view_wordlist_add_edit_delete), name='ddtss_wordlist_page_add_edit_delete')
 )
 
